@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-string[] origins = { "http://localhost:5173" };
+string[] origins = { "http://localhost:5173", "https://chat-friend-three.vercel.app" };
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
