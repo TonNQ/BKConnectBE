@@ -1,4 +1,4 @@
-﻿namespace ChatFriend;
+﻿namespace BKConnectBE;
 
 public class Settings
 {

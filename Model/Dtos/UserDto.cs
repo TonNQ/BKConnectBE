@@ -1,21 +1,21 @@
-﻿using ChatFriend.Model.Entities;
+﻿// using BKConnectBE.Model.Entities;
 
-namespace ChatFriend.Model.Dtos;
+// namespace BKConnectBE.Model.Dtos;
 
-public class UserDto
-{
-    public UserDto() { }
+// public class UserDto
+// {
+//     public UserDto() { }
 
-    public UserDto(User user)
-    {
-        Name= user.Name;
-        Id = user.Id;
-        BirthDay = user.BirthDay;
-    }
+//     public UserDto(User user)
+//     {
+//         Name= user.Name;
+//         Id = user.Id;
+//         BirthDay = user.BirthDay;
+//     }
 
-    public int Id { get; set; }
+//     public int Id { get; set; }
 
-    public string Name { get; set; }
+//     public string Name { get; set; }
 
-    public DateTime BirthDay { get; set; }
-}
+//     public DateTime BirthDay { get; set; }
+// }

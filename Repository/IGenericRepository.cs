@@ -1,12 +1,14 @@
-﻿using ChatFriend.Model.Entities;
+﻿using BKConnectBE.Model.Entities;
 
-namespace ChatFriend.Repository;
+namespace BKConnectBE.Repository;
 
-public interface IGenericRepository <T> where T : BaseEntity
+public interface IGenericRepository <T> where T : class
 {
     void Add(T entity);
 
     T GetById(int id);
+
+    T GetById(string id);
 
     void Save();
 }
