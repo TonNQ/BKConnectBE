@@ -1,7 +1,12 @@
+using ChatFriend;
+using ChatFriend.Model;
+using ChatFriend.Repository;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.ChatHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -19,6 +24,19 @@ builder.Services.AddCors(options =>
                     .AllowCredentials()
         ) ;
 });
+
+var connectionString = settings.sqlServer.ConnectionString;
+connectionString = connectionString.Replace("{Host}", settings.sqlServer.Host);
+connectionString = connectionString.Replace("{DbName}", settings.sqlServer.DbName);
+connectionString = connectionString.Replace("{User}", settings.sqlServer.User);
+connectionString = connectionString.Replace("{Password}", settings.sqlServer.Password);
+
+builder.Services.AddDbContext<BKConnectContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddSignalR();
 
