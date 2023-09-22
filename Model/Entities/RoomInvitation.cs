@@ -3,18 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BKConnectBE.Model.Entities
 {
-    [Table("Messages")]
-    public class Message
+    [Table("RoomInvitations")]
+    public class RoomInvitation
     {
         [Key]
         public long Id { get; set; }
-
-        [Required]
-        [StringLength(512)]
-        public string Content { get; set; }
-
-        [Required]
-        public string TypeOfMessag { get; set; }
 
         [Required]
         public DateTime SendTime { get; set; }
@@ -22,12 +15,10 @@ namespace BKConnectBE.Model.Entities
         public string SenderId { get; set; }
         public virtual User Sender { get; set; }
 
+        public string ReceiverId { get; set; }
+        public virtual User Receiver { get; set; }
+
         public long RoomId { get; set; }
         public virtual Room Room { get; set; }
-
-        public long RootMessageId { get; set; }
-        public virtual Message RootMessage { get; set; }
-
-        public virtual ICollection<Message> ReplyMessage { set; get; }
     }
 }

@@ -1,14 +1,14 @@
-﻿using ChatFriend.Model;
-using ChatFriend.Model.Entities;
+﻿using BKConnectBE.Model;
+using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ChatFriend.Repository;
+namespace BKConnectBE.Repository;
 
-public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    private BKConnectContext _context;
+    private readonly BKConnectContext _context;
 
-    private DbSet<T> _db;
+    private readonly DbSet<T> _db;
 
     public GenericRepository(BKConnectContext context)
     {
@@ -18,12 +18,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public void Add(T entity)
     {
-        entity.UpdatedDate = DateTime.Now;
-        entity.CreatedDate = DateTime.Now;
         _db.Add(entity);
     }
 
     public T GetById(int id)
+    {
+        return _db.Find(id);
+    }
+
+    public T GetById (string id)
     {
         return _db.Find(id);
     }
