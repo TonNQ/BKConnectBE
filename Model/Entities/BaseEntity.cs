@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChatFriend.Model.Entities;
-
-public class BaseEntity
+namespace BKConnectBE.Model.Entities
 {
-    [Key]
-    public int Id { get; set; }
+    public class BaseEntity
+    {
+        [Key]
+        public long Id { get; set; }
 
-    [Required]
-    public DateTime UpdatedDate { get; set; }
+        [Required]
+        public DateTime UpdatedDate { get; set; }
 
-    [Required]
-    public DateTime CreatedDate { get; set; }
+        [Required]
+        public DateTime CreatedDate { get; set; }
+    }
 }

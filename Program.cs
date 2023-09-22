@@ -1,6 +1,6 @@
-using ChatFriend;
-using ChatFriend.Model;
-using ChatFriend.Repository;
+using BKConnectBE;
+using BKConnectBE.Model;
+using BKConnectBE.Repository;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.ChatHub;
 
@@ -36,7 +36,7 @@ builder.Services.AddDbContext<BKConnectContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddSignalR();
 

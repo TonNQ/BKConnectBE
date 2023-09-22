@@ -1,6 +1,6 @@
-﻿using ChatFriend.Model.Entities;
+﻿using BKConnectBE.Model.Entities;
 
-namespace ChatFriend.Repository;
+namespace BKConnectBE.Repository;
 
 public interface IGenericRepository <T> where T : BaseEntity
 {
