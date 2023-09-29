@@ -1,5 +1,4 @@
 ﻿using BKConnectBE.Model;
-using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BKConnectBE.Repository;
@@ -16,23 +15,23 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _db = context.Set<T>();
     }
 
-    public void Add(T entity)
+    public async Task AddAsync(T entity)
     {
-        _db.Add(entity);
+        await _db.AddAsync(entity);
     }
 
-    public T GetById(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
-        return _db.Find(id);
+        return await _db.FindAsync(id);
     }
 
-    public T GetById (string id)
+    public async Task<T> GetByIdAsync(string id)
     {
-        return _db.Find(id);
+        return await _db.FindAsync(id);
     }
 
-    public void Save()
+    public async Task SaveAsync()
     {
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }

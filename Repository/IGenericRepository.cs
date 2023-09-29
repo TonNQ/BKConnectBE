@@ -1,14 +1,12 @@
-﻿using BKConnectBE.Model.Entities;
+﻿namespace BKConnectBE.Repository;
 
-namespace BKConnectBE.Repository;
-
-public interface IGenericRepository <T> where T : class
+public interface IGenericRepository<T> where T : class
 {
-    void Add(T entity);
+    Task AddAsync(T entity);
 
-    T GetById(int id);
+    Task<T> GetByIdAsync(int id);
 
-    T GetById(string id);
+    Task<T> GetByIdAsync(string id);
 
-    void Save();
+    Task SaveAsync();
 }
