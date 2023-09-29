@@ -1,3 +1,4 @@
+using BKConnect.Common.Profiles;
 using BKConnectBE;
 using BKConnectBE.Model;
 using BKConnectBE.Repository;
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 string[] origins = { "http://localhost:5173", "https://chat-friend-three.vercel.app" };
 builder.Services.AddCors(options =>
 {
@@ -22,7 +24,7 @@ builder.Services.AddCors(options =>
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
-        ) ;
+        );
 });
 
 var connectionString = settings.sqlServer.ConnectionString;
@@ -36,7 +38,9 @@ builder.Services.AddDbContext<BKConnectContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
- builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 
 builder.Services.AddSignalR();
 
