@@ -1,4 +1,6 @@
 using BKConnect.Common.Profiles;
+using BKConnect.Middleware;
+using BKConnect.Service;
 using BKConnectBE;
 using BKConnectBE.Model;
 using BKConnectBE.Repository;
@@ -39,6 +41,7 @@ builder.Services.AddDbContext<BKConnectContext>(options =>
 });
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 
@@ -58,6 +61,8 @@ app.UseRouting();
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+app.UseMiddleware<ResultMiddleware>();
 
 app.UseEndpoints(endpoints =>
 {

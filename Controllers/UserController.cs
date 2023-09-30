@@ -1,41 +1,39 @@
-//using Model.Entities;
-//using Microsoft.AspNetCore.Mvc;
-//using BKConnectBE.Repository;
+using Microsoft.AspNetCore.Mvc;
+using BKConnectBE.Repository;
+using Microsoft.AspNetCore.Authorization;
+using BKConnectBE.Model.Entities;
+using BKConnectBE.Model.Dtos;
+using BKConnect.Service;
 
-//namespace WebApplication1.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class UserController : ControllerBase
-//    {
-//        private IGenericRepository<User> _userRepository;
+namespace WebApplication1.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class UserController : ControllerBase
+    {
+        private IGenericRepository<User> _userRepository;
 
-//        private readonly ILogger<UserController> _logger;
+        private IJwtService _jwtService;
 
-//        public UserController(ILogger<UserController> logger, IGenericRepository<User> userREpository)
-//        {
-//            _userRepository = userREpository;
-//            _logger = logger;
-//        }
+        public UserController(IGenericRepository<User> userREpository, IJwtService jwtService)
+        {
+            _userRepository = userREpository;
+            _jwtService = jwtService;
+        }
 
-//        [HttpGet("{id}")]
-//        public IActionResult GetUserById(int id)
-//        {
-//            var u = _userRepository.GetById(id);
-//            if (u == null) return BadRequest("id not found");
-//            return Ok(new UserDto(u));
-//        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var accesstoken = _jwtService.GenerateAccessToken();
+            var u = await _userRepository.GetByIdAsync(id);
+            if (u == null) return BadRequest("id not found");
+            return Ok(new UserDto(u));
+        }
 
-//        [HttpPost]
-//        public IActionResult CreateUser(Account a)
-//        {
-//            _userRepository.Add(new User()
-//            {
-//                Name = "user",
-//                BirthDay = DateTime.Now.AddYears(-18),
-//            });
-//            _userRepository.Save();
-//            return Ok();
-//        }
-//    }
-//}
+        [HttpPost]
+        public Task<IActionResult> UpdateUser()
+        {
+            throw new Exception("Loi update");
+        }
+    }
+}

@@ -2,7 +2,9 @@
 
 public class Settings
 {
-    public SqlServer sqlServer { get; set; }   
+    public SqlServer sqlServer { get; set; }
+
+    public JwtConfig jwtConfig { get; set; }
 }
 
 public class SqlServer

@@ -1,21 +1,29 @@
-﻿// using BKConnectBE.Model.Entities;
+﻿using BKConnectBE.Model.Entities;
+using System.Text.Json.Serialization;
 
-// namespace BKConnectBE.Model.Dtos;
+namespace BKConnectBE.Model.Dtos;
 
-// public class UserDto
-// {
-//     public UserDto() { }
+public class UserDto
+{
+    public UserDto() { }
 
-//     public UserDto(User user)
-//     {
-//         Name= user.Name;
-//         Id = user.Id;
-//         BirthDay = user.BirthDay;
-//     }
+    public UserDto(User user)
+    {
+        Name = user.Name;
+        Id = user.Id;
+        BirthDay = user.DateOfBirth;
+        Gender= user.Gender;
+    }
 
-//     public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
 
-//     public string Name { get; set; }
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
 
-//     public DateTime BirthDay { get; set; }
-// }
+    [JsonPropertyName("gender")]
+    public bool Gender { get; set; }
+
+    [JsonPropertyName("birthday")]
+    public DateTime BirthDay { get; set; }
+}
