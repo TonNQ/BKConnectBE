@@ -24,26 +24,13 @@ namespace BKConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Roles",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SchoolYears",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    YearStart = table.Column<long>(type: "bigint", nullable: false),
-                    YearEnd = table.Column<long>(type: "bigint", nullable: false)
+                    Year = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Schemes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,21 +58,45 @@ namespace BKConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Rooms",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    RoomType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SchoolYearId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rooms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rooms_SchoolYears_SchoolYearId",
+                        column: x => x.SchoolYearId,
+                        principalTable: "SchoolYears",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     LastOnline = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoleId = table.Column<long>(type: "bigint", nullable: false),
-                    ClassId = table.Column<long>(type: "bigint", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClassId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -96,10 +107,25 @@ namespace BKConnect.Migrations
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UploadTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoomId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
+                        name: "FK_Files_Rooms_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -132,13 +158,49 @@ namespace BKConnect.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
+                    TypeOfMessag = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SendTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RoomId = table.Column<long>(type: "bigint", nullable: false),
+                    RootMessageId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Messages_RootMessageId",
+                        column: x => x.RootMessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Rooms_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Rooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messages_Users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Token = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false)
+                    Token = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -157,7 +219,8 @@ namespace BKConnect.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BlockBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BlockBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     User1Id = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     User2Id = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
@@ -176,81 +239,6 @@ namespace BKConnect.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Files",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UploadTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoomId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Files", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
-                    TypeOfMessag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SendTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    RoomId = table.Column<long>(type: "bigint", nullable: false),
-                    RootMessageId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_Messages_RootMessageId",
-                        column: x => x.RootMessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Messages_Users_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Rooms",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    RoomType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastMessageId = table.Column<long>(type: "bigint", nullable: false),
-                    LastMessageId1 = table.Column<long>(type: "bigint", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SchoolYearId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Rooms_Messages_LastMessageId1",
-                        column: x => x.LastMessageId1,
-                        principalTable: "Messages",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Rooms_SchoolYears_SchoolYearId",
-                        column: x => x.SchoolYearId,
-                        principalTable: "SchoolYears",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -387,11 +375,6 @@ namespace BKConnect.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_LastMessageId1",
-                table: "Rooms",
-                column: "LastMessageId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Rooms_SchoolYearId",
                 table: "Rooms",
                 column: "SchoolYearId");
@@ -400,11 +383,6 @@ namespace BKConnect.Migrations
                 name: "IX_Users_ClassId",
                 table: "Users",
                 column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_RoleId",
-                table: "Users",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersOfRoom_ReadMessageId",
@@ -420,35 +398,11 @@ namespace BKConnect.Migrations
                 name: "IX_UsersOfRoom_UserId",
                 table: "UsersOfRoom",
                 column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Files_Rooms_RoomId",
-                table: "Files",
-                column: "RoomId",
-                principalTable: "Rooms",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Messages_Rooms_RoomId",
-                table: "Messages",
-                column: "RoomId",
-                principalTable: "Rooms",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Classes_Faculties_FacultyId",
-                table: "Classes");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Messages_Rooms_RoomId",
-                table: "Messages");
-
             migrationBuilder.DropTable(
                 name: "Files");
 
@@ -468,25 +422,22 @@ namespace BKConnect.Migrations
                 name: "UsersOfRoom");
 
             migrationBuilder.DropTable(
-                name: "Faculties");
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Rooms");
 
             migrationBuilder.DropTable(
-                name: "Messages");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "SchoolYears");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Faculties");
         }
     }
 }

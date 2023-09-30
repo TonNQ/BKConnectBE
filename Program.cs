@@ -1,4 +1,3 @@
-using BKConnect.Common.Profiles;
 using BKConnectBE;
 using BKConnectBE.Model;
 using BKConnectBE.Repository;
@@ -39,8 +38,6 @@ builder.Services.AddDbContext<BKConnectContext>(options =>
 });
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 
 builder.Services.AddSignalR();
 

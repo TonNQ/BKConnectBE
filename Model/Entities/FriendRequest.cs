@@ -9,7 +9,6 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public long Id { get; set; }
 
-        [Required]
         public DateTime SendTime { get; set; }
 
         public string SenderId { get; set; }

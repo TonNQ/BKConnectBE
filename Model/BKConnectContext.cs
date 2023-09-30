@@ -12,7 +12,6 @@ namespace BKConnectBE.Model
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
-        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
         public virtual DbSet<RoomInvitation> RoomInvitations { get; set; }
         public virtual DbSet<SchoolYear> SchoolYears { get; set; }
@@ -87,14 +86,6 @@ namespace BKConnectBE.Model
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.HasMany(r => r.Users)
-                    .WithOne(r => r.Role)
-                    .HasForeignKey(r => r.RoleId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-            
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.HasMany(r => r.UsersOfRoom)
