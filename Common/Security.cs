@@ -1,6 +1,6 @@
-namespace BKConnectBE.Commons
+namespace BKConnectBE.Common
 {
-    public static class Sercurity
+    public static class Security
     {
         public static string CreateMD5(string input)
         {

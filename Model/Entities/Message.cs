@@ -9,14 +9,11 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public long Id { get; set; }
 
-        [Required]
         [StringLength(512)]
         public string Content { get; set; }
 
-        [Required]
         public string TypeOfMessag { get; set; }
 
-        [Required]
         public DateTime SendTime { get; set; }
 
         public string SenderId { get; set; }
@@ -25,8 +22,8 @@ namespace BKConnectBE.Model.Entities
         public long RoomId { get; set; }
         public virtual Room Room { get; set; }
 
-        public long RootMessageId { get; set; }
-        public virtual Message RootMessage { get; set; }
+        public long? RootMessageId { get; set; }
+        public virtual Message? RootMessage { get; set; }
 
         public virtual ICollection<Message> ReplyMessage { set; get; }
     }

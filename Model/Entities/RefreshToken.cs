@@ -13,7 +13,6 @@ namespace BKConnectBE.Model.Entities
         public string UserId { get; set; }
         public User User { get; set; }
 
-        [Required]
         [StringLength(512)]
         public string Token { get; set; }
     }
