@@ -4,6 +4,8 @@ public interface IGenericRepository<T> where T : class
 {
     Task AddAsync(T entity);
 
+    void Update(T entity);
+
     Task<T> GetByIdAsync(int id);
 
     Task<T> GetByIdAsync(string id);

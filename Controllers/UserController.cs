@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Model.Dtos;
 using BKConnect.Service;
+using BKConnect.Controllers;
+using BKConnect.BKConnectBE.Common;
+using BKConnect.Model.Dtos.User;
 
 namespace WebApplication1.Controllers
 {
@@ -11,29 +14,34 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private IGenericRepository<User> _userRepository;
+        private IUserService userService;
 
-        private IJwtService _jwtService;
-
-        public UserController(IGenericRepository<User> userREpository, IJwtService jwtService)
+        public UserController(IUserService userService)
         {
-            _userRepository = userREpository;
-            _jwtService = jwtService;
+            this.userService = userService;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<ActionResult<Responses>> GetUserById(string id)
         {
-            var accesstoken = _jwtService.GenerateAccessToken();
-            var u = await _userRepository.GetByIdAsync(id);
-            if (u == null) return BadRequest("id not found");
-            return Ok(new UserDto(u));
+            var u = await userService.GetUserByIdAsync(id);
+            if (u == null) return BadRequest(this.Error("UserNotfound"));
+            Response.Cookies.Append("refresh_token", "abc", new CookieOptions
+            {
+                HttpOnly = true, // ??t cookie là HTTP-only
+                Secure = true, // ??m b?o cookie ch? ???c g?i qua HTTPS
+                SameSite = SameSiteMode.Strict, // Thi?t l?p SameSite
+                MaxAge = TimeSpan.FromDays(30) // Th?i gian s?ng c?a cookie (ví d?: 30 ngày)
+            });
+            return this.Success(u, MsgNo.SUCCESS);
         }
 
         [HttpPost]
-        public Task<IActionResult> UpdateUser()
+        public async Task<ActionResult<Responses>> UpdateUser(UpdateUserDto userDto)
         {
-            throw new Exception("Loi update");
+            await userService.UpdateUserAsync(userDto);
+            var refresh = Request.Cookies["refresh_token"];
+            return this.Success("Oke", MsgNo.SUCCESS);
         }
     }
 }

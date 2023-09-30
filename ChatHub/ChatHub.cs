@@ -44,7 +44,7 @@ public class ChatHub : Hub
         await Clients.All.SendAsync("OnDungGo", user);
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override Task OnDisconnectedAsync(Exception exception)
     {
         var u = users.FirstOrDefault(u => u.Value == Context.ConnectionId);
         if (u.Key != null){

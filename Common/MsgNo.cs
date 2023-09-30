@@ -3,6 +3,7 @@ namespace BKConnect.BKConnectBE.Common
     public static class MsgNo
     {
         //Success
+        public static readonly string SUCCESS = "Thành công";
         public static readonly string SUCCESS_REGISTER = "Đăng ký tài khoản thành công";
 
         //Error
