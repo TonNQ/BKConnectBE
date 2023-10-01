@@ -8,7 +8,7 @@ public class JwtService : IJwtService
 
     public JwtService(IConfiguration configuration) 
     {
-        config = configuration.GetSection("Settings").Get<Settings>().jwtConfig;
+        config = configuration.GetSection("Settings").Get<Settings>().JwtConfig;
     }
 
     public string GenerateAccessToken()

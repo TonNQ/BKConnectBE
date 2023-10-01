@@ -14,7 +14,6 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public long Id { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string Name { get; set; }
 

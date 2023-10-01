@@ -24,16 +24,23 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Responses>> GetUserById(string id)
         {
-            var u = await userService.GetUserByIdAsync(id);
-            if (u == null) return BadRequest(this.Error("UserNotfound"));
-            Response.Cookies.Append("refresh_token", "abc", new CookieOptions
+            try
             {
-                HttpOnly = true, // ??t cookie là HTTP-only
-                Secure = true, // ??m b?o cookie ch? ???c g?i qua HTTPS
-                SameSite = SameSiteMode.Strict, // Thi?t l?p SameSite
-                MaxAge = TimeSpan.FromDays(30) // Th?i gian s?ng c?a cookie (ví d?: 30 ngày)
-            });
-            return this.Success(u, MsgNo.SUCCESS);
+                var u = await userService.GetUserByIdAsync(id);
+                if (u == null) return BadRequest(this.Error("UserNotfound"));
+                Response.Cookies.Append("refresh_token", "abc", new CookieOptions
+                {
+                    HttpOnly = true, // ??t cookie là HTTP-only
+                    Secure = true, // ??m b?o cookie ch? ???c g?i qua HTTPS
+                    SameSite = SameSiteMode.Strict, // Thi?t l?p SameSite
+                    MaxAge = TimeSpan.FromDays(30) // Th?i gian s?ng c?a cookie (ví d?: 30 ngày)
+                });
+                return this.Success(u, MsgNo.SUCCESS);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this.Error(ex.Message));
+            }
         }
 
         [HttpPost]

@@ -2,9 +2,10 @@
 
 public class Settings
 {
-    public SqlServer sqlServer { get; set; }
+    public SqlServer SqlServer { get; set; }
+    public JwtConfig JwtConfig { get; set; }
 
-    public JwtConfig jwtConfig { get; set; }
+    public Emailing Emailing { get; set; }
 }
 
 public class SqlServer
@@ -29,4 +30,15 @@ public class JwtConfig
     public int AccessTokenExpireDays { get; set; }
 
     public int RefreshTokenExpireMonths { get; set; }
+}
+
+public class Emailing
+{
+    public string UserName { get; set; }
+
+    public string Password { get; set; }
+
+    public string Host { get; set; }
+
+    public int Port { get; set; }
 }

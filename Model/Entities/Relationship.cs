@@ -9,7 +9,6 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public long Id { get; set; }
 
-        [Required]
         public string BlockBy { get; set; }
 
         public string User1Id { get; set; }

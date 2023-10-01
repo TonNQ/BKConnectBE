@@ -14,10 +14,8 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public long Id { get; set; }
 
-        [Required]
         public long YearStart { get; set; }
 
-        [Required]
         public long YearEnd { get; set; }
 
         public virtual ICollection<Room> Rooms { set; get; }
