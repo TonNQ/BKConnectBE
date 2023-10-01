@@ -95,14 +95,13 @@ namespace BKConnect.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
                     b.Property<long>("RoomId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("RootMessageId")
+                    b.Property<long?>("RootMessageId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("SendTime")
@@ -112,7 +111,6 @@ namespace BKConnect.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TypeOfMessag")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -135,7 +133,6 @@ namespace BKConnect.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Token")
-                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
@@ -158,8 +155,10 @@ namespace BKConnect.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("BlockBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("User1Id")
                         .HasColumnType("nvarchar(450)");
@@ -176,24 +175,6 @@ namespace BKConnect.Migrations
                     b.ToTable("Relationships");
                 });
 
-            modelBuilder.Entity("BKConnectBE.Model.Entities.Role", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-                });
-
             modelBuilder.Entity("BKConnectBE.Model.Entities.Room", b =>
                 {
                     b.Property<long>("Id")
@@ -205,19 +186,11 @@ namespace BKConnect.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("LastMessageId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("LastMessageId1")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("RoomType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("SchoolYearId")
@@ -227,8 +200,6 @@ namespace BKConnect.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LastMessageId1");
 
                     b.HasIndex("SchoolYearId");
 
@@ -274,11 +245,11 @@ namespace BKConnect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("YearEnd")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Schemes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("YearStart")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Year")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -294,7 +265,6 @@ namespace BKConnect.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -317,11 +287,10 @@ namespace BKConnect.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Avatar")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<long>("ClassId")
+                    b.Property<long?>("ClassId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedDate")
@@ -338,11 +307,13 @@ namespace BKConnect.Migrations
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastOnline")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -351,8 +322,8 @@ namespace BKConnect.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -360,8 +331,6 @@ namespace BKConnect.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
-
-                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -435,8 +404,7 @@ namespace BKConnect.Migrations
                     b.HasOne("BKConnectBE.Model.Entities.Message", "RootMessage")
                         .WithMany("ReplyMessage")
                         .HasForeignKey("RootMessageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("BKConnectBE.Model.Entities.User", "Sender")
                         .WithMany("SentMessages")
@@ -479,17 +447,11 @@ namespace BKConnect.Migrations
 
             modelBuilder.Entity("BKConnectBE.Model.Entities.Room", b =>
                 {
-                    b.HasOne("BKConnectBE.Model.Entities.Message", "LastMessage")
-                        .WithMany()
-                        .HasForeignKey("LastMessageId1");
-
                     b.HasOne("BKConnectBE.Model.Entities.SchoolYear", "SchoolYear")
                         .WithMany("Rooms")
                         .HasForeignKey("SchoolYearId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("LastMessage");
 
                     b.Navigation("SchoolYear");
                 });
@@ -535,18 +497,9 @@ namespace BKConnect.Migrations
                     b.HasOne("BKConnectBE.Model.Entities.Class", "Class")
                         .WithMany("Users")
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BKConnectBE.Model.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Class");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("BKConnectBE.Model.Entities.UserOfRoom", b =>
@@ -588,11 +541,6 @@ namespace BKConnect.Migrations
             modelBuilder.Entity("BKConnectBE.Model.Entities.Message", b =>
                 {
                     b.Navigation("ReplyMessage");
-                });
-
-            modelBuilder.Entity("BKConnectBE.Model.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("BKConnectBE.Model.Entities.Room", b =>

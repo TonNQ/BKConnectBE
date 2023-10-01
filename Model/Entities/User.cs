@@ -16,14 +16,11 @@ namespace BKConnectBE.Model.Entities
         [Key]
         public string Id { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = "sv";
 
-        [Required]
         public DateTime DateOfBirth { get; set; }
 
-        [Required]
         public bool Gender { get; set; }
 
         [Required]
@@ -34,25 +31,21 @@ namespace BKConnectBE.Model.Entities
         [StringLength(100)]
         public string Password { get; set; }
 
-        [Required]
         [StringLength(256)]
         public string Avatar { get; set; }
 
-        [Required]
         public DateTime LastOnline { get; set; }
-
         
-        [Required]
         public DateTime UpdatedDate { get; set; }
 
-        [Required]
         public DateTime CreatedDate { get; set; }
 
-        public long RoleId { get; set; }
-        public virtual Role Role { get; set; }
+        public bool IsActive { get; set; }
 
-        public long ClassId { get; set; }
-        public virtual Class Class { get; set; }
+        public string Role { get; set; }
+
+        public long? ClassId { get; set; }
+        public virtual Class? Class { get; set; }
 
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<Message> SentMessages { set; get; }
