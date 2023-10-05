@@ -1,37 +1,40 @@
 ﻿using BKConnectBE.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace BKConnectBE.Repository;
-
-public class GenericRepository<T> : IGenericRepository<T> where T : class
+namespace BKConnectBE.Repository
 {
-    private readonly BKConnectContext _context;
-
-    private readonly DbSet<T> _db;
-
-    public GenericRepository(BKConnectContext context)
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        this._context = context;
-        _db = context.Set<T>();
-    }
+        private readonly BKConnectContext _context;
 
-    public async Task AddAsync(T entity)
-    {
-        await _db.AddAsync(entity);
-    }
+        private readonly DbSet<T> _db;
 
-    public async Task<T> GetByIdAsync(int id)
-    {
-        return await _db.FindAsync(id);
-    }
+        public GenericRepository(BKConnectContext context)
+        {
+            _context = context;
+            _db = context.Set<T>();
+        }
 
-    public async Task<T> GetByIdAsync(string id)
-    {
-        return await _db.FindAsync(id);
-    }
+        public async Task AddAsync(T entity)
+        {
+            await _db.AddAsync(entity);
+        }
 
-    public async Task SaveAsync()
-    {
-        await _context.SaveChangesAsync();
+        public async Task<T> GetByIdAsync(int id)
+        {
+            return await _db.FindAsync(id);
+        }
+
+        public async Task<T> GetByIdAsync(string id)
+        {
+            return await _db.FindAsync(id);
+        }
+        
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
+
+
