@@ -1,4 +1,4 @@
-namespace BKConnectBE.Commons
+namespace BKConnectBE.Common
 {
     public static class Security
     {

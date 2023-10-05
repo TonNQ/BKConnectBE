@@ -1,25 +1,26 @@
 ﻿using BKConnect.BKConnectBE.Common;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BKConnect.Controllers;
-
-public static class ControllerExtension
+namespace BKConnect.Controllers
 {
-    public static Responses Success(this ControllerBase controller, object data, string message) 
+    public static class ControllerExtension
     {
-        return new Responses
+        public static Responses Success(this ControllerBase controller, object data, string message)
         {
-            Message = message,
-            Data = data
-        };
-    }
+            return new Responses
+            {
+                Message = message,
+                Data = data
+            };
+        }
 
-    public static Responses Error(this ControllerBase controller, string messageError)
-    {
-        return new Responses
+        public static Responses Error(this ControllerBase controller, string messageError)
         {
-            Message = messageError,
-            Data = null
-        };
+            return new Responses
+            {
+                Message = messageError,
+                Data = null
+            };
+        }
     }
 }

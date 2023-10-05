@@ -11,7 +11,7 @@ namespace BKConnectBE.Repository
 
         public GenericRepository(BKConnectContext context)
         {
-            _context = context;
+            this._context = context;
             _db = context.Set<T>();
         }
 
@@ -29,12 +29,10 @@ namespace BKConnectBE.Repository
         {
             return await _db.FindAsync(id);
         }
-        
-        public async Task SaveAsync()
+
+        public async Task SaveChangeAsync()
         {
             await _context.SaveChangesAsync();
         }
     }
 }
-
-

@@ -1,51 +1,67 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using AutoMapper;
 using BKConnect.BKConnectBE.Common;
 using BKConnectBE;
+using BKConnectBE.Common;
+using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BKConnect.Service
+namespace BKConnect.Service.Jwt
 {
     public class JwtService : IJwtService
     {
         private readonly JwtConfig _config;
         private readonly IGenericRepository<RefreshToken> _genericRepositoryForRefreshToken;
+        private readonly IMapper _mapper;
+        private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
-        public JwtService(IConfiguration configuration, IGenericRepository<RefreshToken> genericRepositoryForRefreshToken)
+        public JwtService(IConfiguration configuration,
+            IGenericRepository<RefreshToken> genericRepositoryForRefreshToken)
         {
-            _config = configuration.GetSection("Settings").Get<Settings>().jwtConfig;
+            _config = configuration.GetSection("Settings").Get<Settings>().JwtConfig;
             _genericRepositoryForRefreshToken = genericRepositoryForRefreshToken;
+            _configurationProvider = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+            _mapper = new Mapper(_configurationProvider);
         }
 
         public string GenerateAccessToken(string userId, string userName, string role)
         {
-            List<Claim> claims = new List<Claim>
+            var claims = new List<Claim>()
             {
-                new Claim("Username", userName),
-                new Claim("UserId", userId),
-                new Claim("Role", role)
+                new ("Username", userName),
+                new ("UserId", userId),
+                new ("Role", role),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.AccessTokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(_config.AccessTokenExpireDays),
+                expires: DateTime.UtcNow.AddDays(_config.AccessTokenExpireDays),
                 signingCredentials: credentials
             );
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<RefreshToken> GenerateRefreshTokenAsync(string userId, string username, string role)
+        public Dictionary<string, string> DecodeToken(string token)
         {
-            List<Claim> claims = new List<Claim>
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwt = tokenHandler.ReadJwtToken(token);
+            return jwt.Claims.ToDictionary(x => x.Type, x => x.Value);
+        }
+
+        public async Task<RefreshTokenDto> GenerateRefreshTokenAsync(string userId, string username, string role)
         {
-            new Claim("Username", username),
-            new Claim("UserId", userId),
-            new Claim("Role", role)
-        };
+            var claims = new List<Claim>
+            {
+                new("Username", username),
+                new ("UserId", userId),
+                new ("Role", role)
+            };
+
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.RefreshTokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
@@ -61,26 +77,14 @@ namespace BKConnect.Service
                 Token = tokenHandler.WriteToken(token),
             };
             await _genericRepositoryForRefreshToken.AddAsync(refreshToken);
-            await _genericRepositoryForRefreshToken.SaveAsync();
-            return refreshToken;
+            await _genericRepositoryForRefreshToken.SaveChangeAsync();
+            return _mapper.Map<RefreshTokenDto>(refreshToken); ;
         }
 
         public string GetNewAccessToken(string refreshToken)
         {
-            IEnumerable<Claim> claims = GetTokenClaims(refreshToken);
-
-            Claim userId = claims.FirstOrDefault(c => c.Type == "UserId");
-            Claim username = claims.FirstOrDefault(c => c.Type == "Username");
-            Claim role = claims.FirstOrDefault(c => c.Type == "Role");
-
-            return GenerateAccessToken(userId.Value, username.Value, role.Value);
-        }
-
-        public IEnumerable<Claim> GetTokenClaims(string tokenString)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(tokenString);
-            return token.Claims;
+            Dictionary<string, string> tokenInfo = DecodeToken(refreshToken);
+            return GenerateAccessToken(tokenInfo["UserId"], tokenInfo["Username"], tokenInfo["Role"]);
         }
 
         public string ValidateToken(bool isAccessToken, string token)
@@ -115,5 +119,3 @@ namespace BKConnect.Service
         }
     }
 }
-
-
