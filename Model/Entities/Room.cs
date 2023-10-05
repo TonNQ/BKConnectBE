@@ -21,6 +21,7 @@ namespace BKConnectBE.Model.Entities
 
         public string RoomType { get; set; }
 
+        [Required]
         public DateTime UpdatedDate { get; set; }
 
         public DateTime CreatedDate { get; set; }
