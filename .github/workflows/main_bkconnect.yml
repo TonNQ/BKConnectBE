@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'bkconnect'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EC4CB2BEDAFA4DDF8409DFB85DC40FA4 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E4BE1BBC7CC348708B4333BC87064B1B }}
           package: .
