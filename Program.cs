@@ -1,16 +1,18 @@
+using BKConnect.Middleware;
+using BKConnect.Service.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BKConnectBE;
 using BKConnectBE.Model;
 using BKConnectBE.Repository;
+using BKConnectBE.Repository.Users;
+using BKConnectBE.Service.Authentication;
+using BKConnectBE.Service.Email;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.ChatHub;
 using Microsoft.IdentityModel.Tokens;
-using BKConnectBE.Service;
-using BKConnectBE.Repository.Users;
-using BKConnect.Service;
-using BKConnect.Middleware;
 using BKConnectBE.Common;
-using Microsoft.AspNetCore.Mvc;
+using BKConnectBE.Service.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -34,11 +36,11 @@ builder.Services.AddCors(options =>
         );
 });
 
-var connectionString = settings.sqlServer.ConnectionString;
-connectionString = connectionString.Replace("{Host}", settings.sqlServer.Host);
-connectionString = connectionString.Replace("{DbName}", settings.sqlServer.DbName);
-connectionString = connectionString.Replace("{User}", settings.sqlServer.User);
-connectionString = connectionString.Replace("{Password}", settings.sqlServer.Password);
+var connectionString = settings.SqlServer.ConnectionString;
+connectionString = connectionString.Replace("{Host}", settings.SqlServer.Host);
+connectionString = connectionString.Replace("{DbName}", settings.SqlServer.DbName);
+connectionString = connectionString.Replace("{User}", settings.SqlServer.User);
+connectionString = connectionString.Replace("{Password}", settings.SqlServer.Password);
 
 builder.Services.AddDbContext<BKConnectContext>(options =>
 {
@@ -53,19 +55,24 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 builder.Services.AddSignalR();
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
         opt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(settings.jwtConfig.AccessTokenKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(settings.JwtConfig.AccessTokenKey)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero

@@ -1,27 +1,67 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using BKConnectBE.Model.Entities;
-using BKConnectBE.Model.Dtos;
-using BKConnect.Service;
-using BKConnectBE.Service;
 using BKConnect.BKConnectBE.Common;
-using System.Security.Claims;
 using BKConnect.Controllers;
-using BKConnectBE.Model.Dtos.Authentications;
+using BKConnect.Service.Jwt;
+using BKConnectBE.Model.Dtos.UserManagement;
+using BKConnectBE.Model.Dtos.Authentication;
+using BKConnectBE.Service.Authentication;
+using BKConnectBE.Service.Users;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 
-namespace WebApplication1.Controllers
+namespace BKConnectBE.Controllers.Authentication
 {
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IAuthenticationService _AuthenticationService;
         private readonly IJwtService _jwtService;
-        
-        public AuthenticationController(IUserService userService, IJwtService jwtService)
+        private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public AuthenticationController(IAuthenticationService AuthenticationService,
+            IJwtService jwtService,
+            IUserService userService,
+            IHttpContextAccessor httpContextAccessor)
         {
-            _userService = userService;
+            _AuthenticationService = AuthenticationService;
             _jwtService = jwtService;
+            _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<Responses>> Register(AccountDto AccountDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(MsgNo.ERROR_INPUT_INVALID);
+                }
+                var responseInfo = await _AuthenticationService.Register(AccountDto);
+                return this.Success(responseInfo.Data, responseInfo.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpGet("activeAccount")]
+        public async Task<IActionResult> ActiveAccount(string secretHash)
+        {
+            try
+            {
+                await _AuthenticationService.ActiveAccount(secretHash);
+                return Redirect("localhost:5173/active_account");
+            }
+            catch (Exception)
+            {
+                return Redirect("https://fb.com");
+            }
+        }
+    
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -37,7 +77,7 @@ namespace WebApplication1.Controllers
                 UserDto userInfo = await _userService.GetUserAsync(request);
 
                 string token = _jwtService.GenerateAccessToken(userInfo.Id, userInfo.Name, userInfo.Role);
-                RefreshToken refreshToken = await _jwtService.GenerateRefreshTokenAsync(userInfo.Id, userInfo.Name, userInfo.Role);
+                RefreshTokenDto refreshToken = await _jwtService.GenerateRefreshTokenAsync(userInfo.Id, userInfo.Name, userInfo.Role);
                 StoreToken(refreshToken.Token);
 
                 var data = new

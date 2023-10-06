@@ -1,13 +1,13 @@
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
-using BKConnectBE.Commons;
-using BKConnectBE.Model.Dtos;
-using BKConnectBE.Model.Dtos.Authentications;
+using BKConnectBE.Common;
+using BKConnectBE.Model.Dtos.UserManagement;
+using BKConnectBE.Model.Dtos.Authentication;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
 using BKConnectBE.Repository.Users;
 
-namespace BKConnectBE.Service
+namespace BKConnectBE.Service.Users
 {
     public class UserService : IUserService
     {

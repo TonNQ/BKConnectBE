@@ -1,7 +1,7 @@
-using BKConnectBE.Model.Dtos;
-using BKConnectBE.Model.Dtos.Authentications;
+using BKConnectBE.Model.Dtos.UserManagement;
+using BKConnectBE.Model.Dtos.Authentication;
 
-namespace BKConnectBE.Service
+namespace BKConnectBE.Service.Users
 {
     public interface IUserService
     {

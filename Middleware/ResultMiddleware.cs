@@ -1,32 +1,33 @@
-﻿using BKConnect.BKConnectBE.Common;
+using BKConnect.BKConnectBE.Common;
 
-namespace BKConnect.Middleware;
-
-public class ResultMiddleware
+namespace BKConnect.Middleware
 {
-    private readonly RequestDelegate _next;
-
-    public ResultMiddleware(RequestDelegate next)
+    public class ResultMiddleware
     {
-        _next = next;
-    }
+        private readonly RequestDelegate _next;
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-        try
+        public ResultMiddleware(RequestDelegate next)
         {
-            await _next(context);
+            _next = next;
         }
-        catch(Exception exception)
-        {
-            var response = new Responses()
-            {
-                Data = exception.Message,
-                Message = MsgNo.ERROR_INTERNAL_SERVICE
-            };
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync<Responses>(response);
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception exception)
+            {
+                var response = new Responses()
+                {
+                    Data = exception.Message,
+                    Message = MsgNo.ERROR_INTERNAL_SERVICE
+                };
+
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync<Responses>(response);
+            }
         }
     }
 }
