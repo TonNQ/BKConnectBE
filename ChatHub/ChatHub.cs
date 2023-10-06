@@ -1,12 +1,11 @@
-﻿
-
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using System.Xml.Linq;
 
 namespace WebApplication1.ChatHub;
 
 public class ChatHub : Hub
 {
+    // Luu user ket noi
     private static Dictionary<string, string> users = new Dictionary<string, string>();
 
     public override Task OnConnectedAsync()
