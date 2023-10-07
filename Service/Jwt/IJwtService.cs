@@ -6,12 +6,14 @@ namespace BKConnect.Service.Jwt
     {
         string GenerateAccessToken(string userId, string userName, string role);
 
+        string GenerateTemporaryCode(string userId);
+
         Dictionary<string, string> DecodeToken(string token);
 
-        public Task<RefreshTokenDto> GenerateRefreshTokenAsync(string userId, string username, string role);
+        Task<RefreshTokenDto> GenerateRefreshTokenAsync(string userId, string username, string role);
 
-        public string ValidateToken(bool isAccessToken, string token);
+        string ValidateToken(bool isAccessToken, string token);
 
-        public string GetNewAccessToken(string refreshToken);
+        string GetNewAccessToken(string refreshToken);
     }
 }

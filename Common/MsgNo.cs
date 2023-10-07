@@ -8,6 +8,9 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_LOGIN = "Đăng nhập thành công";
         public static readonly string SUCCESS_GET_PROFILE = "Lấy thông tin người dùng thành công";
         public static readonly string SUCCESS_GET_TOKEN = "Lấy access token thành công";
+        public static readonly string SUCCESS_EMAIL_FORGOT_PASSWORD = "Vui lòng kiểm tra email để đặt lại mật khẩu";
+        public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
+        public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -18,6 +21,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_INPUT_INVALID = "Dữ liệu nhập vào không hợp lệ";
         public static readonly string ERROR_EMAIL_NOT_REGISTERED = "Email này chưa được đăng ký";
         public static readonly string ERROR_PASSWORD_WRONG = "Mật khẩu chưa chính xác";
+        public static readonly string ERROR_PASSWORD_NOT_RESETED = "Mật khẩu chưa được đặt lại";
         public static readonly string ERROR_TOKEN_INVALID = "Vui lòng đăng nhập để tiếp tục";
         public static readonly string ERROR_ACCOUNT_NOT_ACTIVE = "Vui lòng kích hoạt tài khoản";
 

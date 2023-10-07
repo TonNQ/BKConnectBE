@@ -46,6 +46,24 @@ namespace BKConnect.Service.Jwt
             return tokenHandler.WriteToken(token);
         }
 
+        public string GenerateTemporaryCode(string userId)
+        {
+            var claims = new List<Claim>()
+            {
+                new ("UserId", userId),
+                new ("Date", DateTime.Now.ToString("dd-MM-yyyy")),
+            };
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.AccessTokenKey));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(_config.AccessTokenExpireDays),
+                signingCredentials: credentials
+            );
+            var tokenHandler = new JwtSecurityTokenHandler();
+            return tokenHandler.WriteToken(token);
+        }
+
         public Dictionary<string, string> DecodeToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

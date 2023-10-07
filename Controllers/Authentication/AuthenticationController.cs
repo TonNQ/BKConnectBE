@@ -8,6 +8,9 @@ using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
+using System.Text.RegularExpressions;
+using System.Reflection.Metadata;
+using BKConnectBE.Common;
 
 namespace BKConnectBE.Controllers.Authentication
 {
@@ -61,7 +64,7 @@ namespace BKConnectBE.Controllers.Authentication
                 return Redirect("https://fb.com");
             }
         }
-    
+
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -130,6 +133,57 @@ namespace BKConnectBE.Controllers.Authentication
             catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("forgotPassword")]
+        public async Task<ActionResult<Responses>> ForgotPassword(EmailDto input)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
+                }
+
+                var response = await _AuthenticationService.ForgotPassword(input.Email);
+                return this.Success(response.Data, response.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("resetPassword")]
+        public async Task<ActionResult<Responses>> ResetPassword(ResetPasswordDto resetPassword)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
+                }
+                var response = await _AuthenticationService.ResetPassword(resetPassword);
+                return this.Success(response.Data, response.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("checkToken")]
+        public async Task<ActionResult<Responses>> CheckToken(string secretHash)
+        {
+            try
+            {
+                var response = await _AuthenticationService.CheckToken(secretHash);
+                return this.Success(response.Data, response.Message);
+            }
+            catch (Exception)
+            {
+                return new UnprocessableEntityResult();
             }
         }
 
