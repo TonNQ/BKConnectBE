@@ -8,5 +8,11 @@ namespace BKConnectBE.Service.Authentication
         Task<Responses> Register(AccountDto AccountDto);
 
         Task ActiveAccount(string secretHash);
+
+        Task<Responses> ForgotPassword(string email);
+
+        Task<Responses> ResetPassword(ResetPasswordDto resetPasswordDto);
+
+        Task<Responses> CheckToken(string secretHash);
     }
 }

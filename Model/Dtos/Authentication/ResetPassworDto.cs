@@ -4,12 +4,10 @@ using BKConnectBE.Common;
 
 namespace BKConnectBE.Model.Dtos.Authentication
 {
-    public class AccountDto
+    public class ResetPasswordDto
     {
-        [Required(ErrorMessage = "Trường {0} không được trống!")]
-        [RegularExpression(Constants.REGEX_EMAIL, ErrorMessage = "{0} không hợp lệ!")]
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
+        [JsonPropertyName("temporaryCode")]
+        public string TemporaryCode { get; set; }
 
         [Display(Name = "Mật khẩu")]
         [Required(ErrorMessage = "Trường {0} không được trống!")]
