@@ -12,6 +12,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
         public static readonly string SUCCESS_UPDATE_PROFILE = "Cập nhật thành công";
+        public static readonly string SUCCESS_LOGOUT = "Đăng xuất thành công";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -27,6 +28,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_ACCOUNT_NOT_ACTIVE = "Vui lòng kích hoạt tài khoản";
         public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
         public static readonly string ERROR_CURRENT_PASSWORD_WRONG = "Mật khẩu hiện tại chưa chính xác";
+        public static readonly string ERROR_LOGOUT = "Đăng xuất thất bại";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";
