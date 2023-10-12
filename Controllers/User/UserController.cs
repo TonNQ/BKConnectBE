@@ -1,6 +1,5 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
-using BKConnect.Service.Jwt;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Users;
@@ -8,27 +7,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BKConnectBE.Controllers.User
 {
+    [CustomAuthorize]
+    [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IJwtService _jwtService;
         private readonly IUserService _userService;
-        public UserController(IJwtService jwtService, IUserService userService)
+        public UserController(IUserService userService)
         {
-            _jwtService = jwtService;
             _userService = userService;
         }
 
         [HttpGet("getProfile")]
-        public async Task<ActionResult<Responses>> GetUserProfile([FromHeader(Name = "Authorization")]string accessToken)
+        public async Task<ActionResult<Responses>> GetUserProfile()
         {
             try
             {
-                string id = _jwtService.ValidateToken(true, accessToken);
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    UserDto userInfo = await _userService.GetByIdAsync(userId);
+                    return this.Success(userInfo, MsgNo.SUCCESS_GET_PROFILE);
+                }
 
-                Dictionary<string, string> tokenInfo = _jwtService.DecodeToken(accessToken);
-                UserDto userInfo = await _userService.GetByIdAsync(tokenInfo["UserId"]);
-
-                return this.Success(userInfo, MsgNo.SUCCESS_GET_PROFILE);
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
             }
             catch (Exception e)
             {
@@ -37,20 +37,22 @@ namespace BKConnectBE.Controllers.User
         }
 
         [HttpPut("updateProfile")]
-        public async Task<ActionResult<Responses>> UpdateUserProfile([FromHeader(Name = "Authorization")]string accessToken, UserInputDto userDto)
+        public async Task<ActionResult<Responses>> UpdateUserProfile(UserInputDto userDto)
         {
             try
             {
-                string id = _jwtService.ValidateToken(true, accessToken);
-
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
                 }
 
-                UserDto userInfo = await _userService.UpdateUserAsync(id, userDto);
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    UserDto userInfo = await _userService.UpdateUserAsync(userId, userDto);
+                    return this.Success(userInfo, MsgNo.SUCCESS_UPDATE_PROFILE);
+                }
 
-                return this.Success(userInfo, MsgNo.SUCCESS_UPDATE_PROFILE);
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
             }
             catch (Exception e)
             {
@@ -59,22 +61,24 @@ namespace BKConnectBE.Controllers.User
         }
 
         [HttpPut("changePassword")]
-        public async Task<ActionResult<Responses>> ChangePassword([FromHeader(Name = "Authorization")]string accessToken, PasswordDto passwordDto)
+        public async Task<ActionResult<Responses>> ChangePassword(PasswordDto passwordDto)
         {
             try
             {
-                string id = _jwtService.ValidateToken(true, accessToken);
-
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
                 }
 
-                await _userService.ChangePasswordAsync(id, passwordDto);
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    await _userService.ChangePasswordAsync(userId, passwordDto);
+                    return this.Success(userId, MsgNo.SUCCESS_UPDATE_PROFILE);
+                }
 
-                return this.Success(id, MsgNo.SUCCESS_UPDATE_PROFILE);
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
             }
