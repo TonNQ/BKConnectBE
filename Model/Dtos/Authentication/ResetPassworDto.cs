@@ -6,7 +6,7 @@ namespace BKConnectBE.Model.Dtos.Authentication
 {
     public class ResetPasswordDto
     {
-        [JsonPropertyName("temporaryCode")]
+        [JsonPropertyName("temporary_code")]
         public string TemporaryCode { get; set; }
 
         [Display(Name = "Mật khẩu")]

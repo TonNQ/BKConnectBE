@@ -1,4 +1,5 @@
-﻿using BKConnectBE.Model;
+﻿using System.Linq.Expressions;
+using BKConnectBE.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace BKConnectBE.Repository

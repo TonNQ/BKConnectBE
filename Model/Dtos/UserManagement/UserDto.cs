@@ -17,7 +17,7 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         public bool Gender { get; set; }
 
         [JsonPropertyName("birthday")]
-        public DateTime BirthDay { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [JsonPropertyName("class")]
         public string Class { get; set; }
