@@ -11,6 +11,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_EMAIL_FORGOT_PASSWORD = "Vui lòng kiểm tra email để đặt lại mật khẩu";
         public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
+        public static readonly string SUCCESS_UPDATE_PROFILE = "Cập nhật thành công";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -24,6 +25,8 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_PASSWORD_NOT_RESETED = "Mật khẩu chưa được đặt lại";
         public static readonly string ERROR_TOKEN_INVALID = "Vui lòng đăng nhập để tiếp tục";
         public static readonly string ERROR_ACCOUNT_NOT_ACTIVE = "Vui lòng kích hoạt tài khoản";
+        public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
+        public static readonly string ERROR_CURRENT_PASSWORD_WRONG = "Mật khẩu hiện tại chưa chính xác";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

@@ -8,9 +8,6 @@ using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
-using System.Text.RegularExpressions;
-using System.Reflection.Metadata;
-using BKConnectBE.Common;
 
 namespace BKConnectBE.Controllers.Authentication
 {
@@ -65,7 +62,6 @@ namespace BKConnectBE.Controllers.Authentication
             }
         }
 
-
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<Responses>> Login(AccountDto request)
@@ -119,9 +115,9 @@ namespace BKConnectBE.Controllers.Authentication
                 return BadRequest(this.Error(e.Message));
             }
         }
-
-        [HttpPost("validate")]
-        public async Task<ActionResult<Responses>> ValidateAccessToken(string accessToken)
+        
+        [HttpGet("validate")]
+        public async Task<ActionResult<Responses>> ValidateAccessToken([FromHeader(Name = "Authorization")] string accessToken)
         {
             try
             {

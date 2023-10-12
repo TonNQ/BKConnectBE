@@ -28,6 +28,7 @@ namespace BKConnectBE.Common
                     opt => opt.MapFrom(src => src.Class.Name)
                 );
 
+            CreateMap<UserInputDto, User>();
             CreateMap<RefreshToken, RefreshTokenDto>();
         }
     }

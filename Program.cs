@@ -1,18 +1,18 @@
 using BKConnect.Middleware;
 using BKConnect.Service.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BKConnectBE;
+using BKConnectBE.Common;
 using BKConnectBE.Model;
 using BKConnectBE.Repository;
 using BKConnectBE.Repository.Users;
 using BKConnectBE.Service.Authentication;
 using BKConnectBE.Service.Email;
+using BKConnectBE.Service.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApplication1.ChatHub;
 using Microsoft.IdentityModel.Tokens;
-using BKConnectBE.Common;
-using BKConnectBE.Service.Users;
+using WebApplication1.ChatHub;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -63,9 +63,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 builder.Services.AddSignalR();
-
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
@@ -78,6 +75,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
