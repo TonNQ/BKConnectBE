@@ -8,6 +8,7 @@ using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
+using BKConnectBE.Common.Attributes;
 
 namespace BKConnectBE.Controllers.Authentication
 {
@@ -115,16 +116,19 @@ namespace BKConnectBE.Controllers.Authentication
                 return BadRequest(this.Error(e.Message));
             }
         }
-        
+
+        [CustomAuthorize]
         [HttpGet("validate")]
-        public async Task<ActionResult<Responses>> ValidateAccessToken([FromHeader(Name = "Authorization")] string accessToken)
+        public async Task<ActionResult<Responses>> ValidateAccessToken()
         {
             try
             {
-                string id = _jwtService.ValidateToken(true, accessToken);
-                UserDto userInfo = await _userService.GetByIdAsync(id);
-
-                return this.Success(userInfo, MsgNo.SUCCESS_LOGIN);
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    UserDto userInfo = await _userService.GetByIdAsync(userId);
+                    return this.Success(userInfo, MsgNo.SUCCESS_LOGIN);
+                }
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
             }
             catch (Exception e)
             {
