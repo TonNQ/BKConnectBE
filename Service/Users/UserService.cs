@@ -64,7 +64,7 @@ namespace BKConnectBE.Service.Users
             return _mapper.Map<UserDto>(updatedUser);
         }
 
-        public async Task ChangePasswordAsync(string userId, PasswordDto password)
+        public async Task ChangePasswordAsync(string userId, ChangePasswordDto password)
         {
             User user = await _genericRepositoryForUser.GetByIdAsync(userId);
 

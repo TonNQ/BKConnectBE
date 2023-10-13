@@ -21,17 +21,17 @@ namespace BKConnectBE.Repository.Users
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _context.Users.Include(u => u.Class).FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<User> GetByIdAsync(string id)
         {
-            return await _context.Users.Include(u => u.Class).FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User> UpdateUserAsync(User user)
         {
-            User updatedUser = await _context.Users.Include(u => u.Class).FirstOrDefaultAsync(u => u.Id == user.Id);
+            User updatedUser = await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Id == user.Id);
             updatedUser.Name = user.Name;
             updatedUser.DateOfBirth = user.DateOfBirth;
             updatedUser.Gender = user.Gender;

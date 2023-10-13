@@ -5,7 +5,7 @@ using BKConnectBE.Common.Attributes;
 
 namespace BKConnectBE.Model.Dtos.UserManagement
 {
-    public class PasswordDto
+    public class ChangePasswordDto
     {
         [Required(ErrorMessage = "Trường {0} không được trống!")]
         [RegularExpression(Constants.REGEX_PASSWORD, ErrorMessage = "{0} không hợp lệ!")]
@@ -17,11 +17,5 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         [NotEqualToPassword(nameof(CurrentPassword))]
         [JsonPropertyName("new_password")]
         public string NewPassword { get; set; }
-
-        [Required(ErrorMessage = "Trường {0} không được trống!")]
-        [RegularExpression(Constants.REGEX_PASSWORD, ErrorMessage = "{0} không hợp lệ!")]
-        [Compare("NewPassword", ErrorMessage = "Xác nhận mật khẩu không đúng!")]
-        [JsonPropertyName("confirm_password")]
-        public string ConfirmPassword { get; set; }
     }
 }

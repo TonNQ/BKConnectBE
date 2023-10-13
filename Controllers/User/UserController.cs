@@ -1,12 +1,16 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
+using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKConnectBE.Controllers.User
 {
-    public class UserController : GenericController
+    [CustomAuthorize]
+    [ApiController]
+    [Route("users")]
+    public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)
@@ -58,7 +62,7 @@ namespace BKConnectBE.Controllers.User
         }
 
         [HttpPut("changePassword")]
-        public async Task<ActionResult<Responses>> ChangePassword(PasswordDto passwordDto)
+        public async Task<ActionResult<Responses>> ChangePassword(ChangePasswordDto passwordDto)
         {
             try
             {

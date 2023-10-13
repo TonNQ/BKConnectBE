@@ -5,7 +5,6 @@ using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Dtos.Authentication;
 using BKConnectBE.Service.Authentication;
 using BKConnectBE.Service.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Common.Attributes;
@@ -63,7 +62,6 @@ namespace BKConnectBE.Controllers.Authentication
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<Responses>> Login(AccountDto request)
         {

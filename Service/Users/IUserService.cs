@@ -8,6 +8,6 @@ namespace BKConnectBE.Service.Users
         Task<UserDto> GetUserAsync(AccountDto account);
         Task<UserDto> GetByIdAsync(string userId);
         Task<UserDto> UpdateUserAsync(string userId, UserInputDto user);
-        Task ChangePasswordAsync(string userId, PasswordDto password);
+        Task ChangePasswordAsync(string userId, ChangePasswordDto password);
     }
 }
