@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BKConnectBE.Common.Enumeration;
 
 namespace BKConnectBE.Model.Entities
 {
@@ -19,15 +20,18 @@ namespace BKConnectBE.Model.Entities
         [StringLength(50)]
         public string Name { get; set; }
 
+        [EnumDataType(typeof(RoomType))]
         public string RoomType { get; set; }
+
+        public string Avatar { get; set; }
 
         [Required]
         public DateTime UpdatedDate { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
-        public long SchoolYearId { get; set; }
-        public virtual SchoolYear SchoolYear { get; set; }
+        public long? SchoolYearId { get; set; }
+        public virtual SchoolYear? SchoolYear { get; set; }
 
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<UploadedFile> UploadedFiles { set; get; }
