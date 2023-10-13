@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using BKConnectBE.Common.Attributes;
-using BKConnectBE.Model.Entities;
 
 namespace BKConnectBE.Model.Dtos.UserManagement
 {

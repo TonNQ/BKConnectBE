@@ -22,12 +22,14 @@ namespace BKConnectBE.Common
                 .ForMember(d => d.CreatedDate, opt => opt.MapFrom(x => DateTime.Now));
 
             CreateMap<User, UserDto>()
-                .ForMember(
-                    dest => dest.Class,
-                    opt => opt.MapFrom(src => src.Class.Name)
-                );
+                .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.Class.Id))
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                .ForMember(dest => dest.FacultyId, opt => opt.MapFrom(src => src.Class.FacultyId))
+                .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Class.Faculty.Name));
 
-            CreateMap<UserInputDto, User>();
+            CreateMap<UserInputDto, User>()
+                .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.ClassId));
+
             CreateMap<RefreshToken, RefreshTokenDto>();
         }
     }
