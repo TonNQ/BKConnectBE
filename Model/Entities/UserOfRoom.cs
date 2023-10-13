@@ -11,8 +11,8 @@ namespace BKConnectBE.Model.Entities
 
         public bool IsAdmin { get; set; }
 
-        public long ReadMessageId { get; set; }
-        public virtual Message ReadMessage { get; set; }
+        public long? ReadMessageId { get; set; }
+        public virtual Message? ReadMessage { get; set; }
 
         public string UserId { get; set; }
         public virtual User User { get; set; }
