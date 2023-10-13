@@ -19,8 +19,17 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         [JsonPropertyName("birthday")]
         public DateTime DateOfBirth { get; set; }
 
-        [JsonPropertyName("class")]
-        public string Class { get; set; }
+        [JsonPropertyName("class_id")]
+        public long ClassId { get; set; }
+
+        [JsonPropertyName("class_name")]
+        public string ClassName { get; set; }
+
+        [JsonPropertyName("faculty_id")]
+        public string FacultyId { get; set; }
+
+        [JsonPropertyName("faculty_name")]
+        public string FacultyName { get; set; }
 
         [JsonPropertyName("role")]
         public string Role { get; set; }

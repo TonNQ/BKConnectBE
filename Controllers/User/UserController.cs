@@ -1,12 +1,15 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
+using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKConnectBE.Controllers.User
 {
-    public class UserController : GenericController
+    [CustomAuthorize]
+    [ApiController]
+    public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)
@@ -46,7 +49,7 @@ namespace BKConnectBE.Controllers.User
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
                     UserDto userInfo = await _userService.UpdateUserAsync(userId, userDto);
-                    return this.Success(userInfo, MsgNo.SUCCESS_UPDATE_PROFILE);
+                    return this.Success(userDto, MsgNo.SUCCESS_UPDATE_PROFILE);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
@@ -58,7 +61,7 @@ namespace BKConnectBE.Controllers.User
         }
 
         [HttpPut("changePassword")]
-        public async Task<ActionResult<Responses>> ChangePassword(PasswordDto passwordDto)
+        public async Task<ActionResult<Responses>> ChangePassword(ChangePasswordDto passwordDto)
         {
             try
             {

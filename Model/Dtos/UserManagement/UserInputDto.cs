@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using BKConnectBE.Common.Attributes;
-using BKConnectBE.Model.Entities;
 
 namespace BKConnectBE.Model.Dtos.UserManagement
 {
@@ -26,6 +25,10 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         [Required(ErrorMessage = "Trường {0} không được trống!")]
         [JsonPropertyName("class_id")]
         public long ClassId { get; set; }
+
+        [Required(ErrorMessage = "Trường {0} không được trống!")]
+        [JsonPropertyName("faculty_id")]
+        public string FacultyId { get; set; }
 
         [Required(ErrorMessage = "Trường {0} không được trống!")]
         [JsonPropertyName("avatar")]
