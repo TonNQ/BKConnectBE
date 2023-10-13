@@ -1,3 +1,4 @@
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Dtos.RoomManagement;
@@ -29,8 +30,10 @@ namespace BKConnectBE.Repository.Rooms
                     RoomType = r.RoomType,
                     Name = r.RoomType == RoomType.PrivateRoom.ToString() ? r.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User.Name : r.Name,
                     Avatar = r.RoomType == RoomType.PrivateRoom.ToString() ? r.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User.Avatar : r.Avatar,
-                    LastMessage = r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault() == null
-                        ? "" : r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault().Content,
+                    LastMessage = r.Messages.Any()
+                        ? (r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessag == MessageType.Text.ToString()
+                        ? r.Messages.OrderBy(m => m.Id).LastOrDefault().Content
+                        : $"Đã gửi một {Helper.GetEnumDescription(r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessag.ToEnum<MessageType>())}") : "",
                     LastMessageTime = r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault() == null
                         ? DateTime.MinValue : r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault().SendTime,
                 })
@@ -39,4 +42,4 @@ namespace BKConnectBE.Repository.Rooms
                 .ToListAsync();
         }
     }
-}
+};

@@ -9,6 +9,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_GET_PROFILE = "Lấy thông tin người dùng thành công";
         public static readonly string SUCCESS_GET_TOKEN = "Lấy access token thành công";
         public static readonly string SUCCESS_GET_ROOMS_OF_USER = "Lấy danh sách phòng chat của người dùng thành công";
+        public static readonly string SUCCESS_GET_USERS = "Tìm kiếm danh sách người dùng thành công";
         public static readonly string SUCCESS_EMAIL_FORGOT_PASSWORD = "Vui lòng kiểm tra email để đặt lại mật khẩu";
         public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
