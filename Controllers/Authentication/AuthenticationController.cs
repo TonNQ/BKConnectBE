@@ -15,17 +15,17 @@ namespace BKConnectBE.Controllers.Authentication
     [ApiController]
     public class AuthenticationController : Controller
     {
-        private readonly IAuthenticationService _AuthenticationService;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IJwtService _jwtService;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticationController(IAuthenticationService AuthenticationService,
+        public AuthenticationController(IAuthenticationService authenticationService,
             IJwtService jwtService,
             IUserService userService,
             IHttpContextAccessor httpContextAccessor)
         {
-            _AuthenticationService = AuthenticationService;
+            _authenticationService = authenticationService;
             _jwtService = jwtService;
             _userService = userService;
             _httpContextAccessor = httpContextAccessor;
@@ -40,7 +40,7 @@ namespace BKConnectBE.Controllers.Authentication
                 {
                     return BadRequest(MsgNo.ERROR_INPUT_INVALID);
                 }
-                var responseInfo = await _AuthenticationService.Register(AccountDto);
+                var responseInfo = await _authenticationService.Register(AccountDto);
                 return this.Success(responseInfo.Data, responseInfo.Message);
             }
             catch (Exception e)
@@ -54,7 +54,7 @@ namespace BKConnectBE.Controllers.Authentication
         {
             try
             {
-                await _AuthenticationService.ActiveAccount(secretHash);
+                await _authenticationService.ActiveAccount(secretHash);
                 return Redirect("localhost:5173/active_account");
             }
             catch (Exception)
@@ -76,9 +76,9 @@ namespace BKConnectBE.Controllers.Authentication
 
                 UserDto userInfo = await _userService.GetUserAsync(request);
 
-                string token = _jwtService.GenerateAccessToken(userInfo.Id, userInfo.Name, userInfo.Role);
                 RefreshTokenDto refreshToken = await _jwtService.GenerateRefreshTokenAsync(userInfo.Id, userInfo.Name, userInfo.Role);
                 StoreToken(refreshToken.Token);
+                string token = _jwtService.GenerateAccessToken(userInfo.Id, userInfo.Name, userInfo.Role, refreshToken.Id);
 
                 var data = new
                 {
@@ -146,7 +146,7 @@ namespace BKConnectBE.Controllers.Authentication
                     return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
                 }
 
-                var response = await _AuthenticationService.ForgotPassword(input.Email);
+                var response = await _authenticationService.ForgotPassword(input.Email);
                 return this.Success(response.Data, response.Message);
             }
             catch (Exception e)
@@ -164,7 +164,7 @@ namespace BKConnectBE.Controllers.Authentication
                 {
                     return BadRequest(this.Error(MsgNo.ERROR_INPUT_INVALID));
                 }
-                var response = await _AuthenticationService.ResetPassword(resetPassword);
+                var response = await _authenticationService.ResetPassword(resetPassword);
                 return this.Success(response.Data, response.Message);
             }
             catch (Exception e)
@@ -178,12 +178,29 @@ namespace BKConnectBE.Controllers.Authentication
         {
             try
             {
-                var response = await _AuthenticationService.CheckToken(secretHash);
+                var response = await _authenticationService.CheckToken(secretHash);
                 return this.Success(response.Data, response.Message);
             }
             catch (Exception)
             {
                 return new UnprocessableEntityResult();
+            }
+        }
+
+        [CustomAuthorize]
+        [HttpPost("logout")]
+        public async Task<ActionResult<Responses>> Logout()
+        {
+            try
+            {
+                string token = _httpContextAccessor.HttpContext.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
+                var response = await _authenticationService.Logout(token);
+                _httpContextAccessor.HttpContext.Request.Headers.Authorization = "";
+                return this.Success(response.Data, response.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
             }
         }
 

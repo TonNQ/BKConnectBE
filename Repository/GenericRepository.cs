@@ -21,7 +21,7 @@ namespace BKConnectBE.Repository
             await _db.AddAsync(entity);
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(long id)
         {
             return await _db.FindAsync(id);
         }
@@ -29,6 +29,15 @@ namespace BKConnectBE.Repository
         public async Task<T> GetByIdAsync(string id)
         {
             return await _db.FindAsync(id);
+        }
+
+        public async Task RemoveByIdAsync(long id)
+        {
+            var entity = await _db.FindAsync(id);
+            if (entity is not null)
+            {
+                _db.Remove(entity);
+            }
         }
 
         public async Task SaveChangeAsync()

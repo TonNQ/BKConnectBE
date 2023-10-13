@@ -30,6 +30,8 @@
 
         public int AccessTokenExpireDays { get; set; }
 
+        public int TemporaryCodeExpireDays { get; set; }
+
         public int RefreshTokenExpireMonths { get; set; }
     }
 

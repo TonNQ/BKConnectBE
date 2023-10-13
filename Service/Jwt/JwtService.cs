@@ -7,6 +7,7 @@ using BKConnectBE.Common;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
+using BKConnectBE.Repository.RefreshTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BKConnect.Service.Jwt
@@ -15,25 +16,29 @@ namespace BKConnect.Service.Jwt
     {
         private readonly JwtConfig _config;
         private readonly IGenericRepository<RefreshToken> _genericRepositoryForRefreshToken;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IMapper _mapper;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
         public JwtService(IConfiguration configuration,
-            IGenericRepository<RefreshToken> genericRepositoryForRefreshToken)
+            IGenericRepository<RefreshToken> genericRepositoryForRefreshToken,
+            IRefreshTokenRepository refreshTokenRepository)
         {
             _config = configuration.GetSection("Settings").Get<Settings>().JwtConfig;
             _genericRepositoryForRefreshToken = genericRepositoryForRefreshToken;
+            _refreshTokenRepository = refreshTokenRepository;
             _configurationProvider = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
             _mapper = new Mapper(_configurationProvider);
         }
 
-        public string GenerateAccessToken(string userId, string userName, string role)
+        public string GenerateAccessToken(string userId, string userName, string role, long refreshTokenId)
         {
             var claims = new List<Claim>()
             {
                 new ("Username", userName),
                 new ("UserId", userId),
                 new ("Role", role),
+                new ("RefreshTokenId", refreshTokenId.ToString()),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.AccessTokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -51,13 +56,14 @@ namespace BKConnect.Service.Jwt
             var claims = new List<Claim>()
             {
                 new ("UserId", userId),
+                new ("RefreshTokenId", "0"),
                 new ("Date", DateTime.Now.ToString("dd-MM-yyyy")),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.AccessTokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(_config.AccessTokenExpireDays),
+                expires: DateTime.UtcNow.AddDays(_config.TemporaryCodeExpireDays),
                 signingCredentials: credentials
             );
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -96,13 +102,14 @@ namespace BKConnect.Service.Jwt
             };
             await _genericRepositoryForRefreshToken.AddAsync(refreshToken);
             await _genericRepositoryForRefreshToken.SaveChangeAsync();
-            return _mapper.Map<RefreshTokenDto>(refreshToken); ;
+            return _mapper.Map<RefreshTokenDto>(refreshToken);
         }
 
         public string GetNewAccessToken(string refreshToken)
         {
             Dictionary<string, string> tokenInfo = DecodeToken(refreshToken);
-            return GenerateAccessToken(tokenInfo["UserId"], tokenInfo["Username"], tokenInfo["Role"]);
+            long refreshTokenId = _refreshTokenRepository.GetRefreshTokenId(refreshToken).Result;
+            return GenerateAccessToken(tokenInfo["UserId"], tokenInfo["Username"], tokenInfo["Role"], refreshTokenId);
         }
 
         public string ValidateToken(bool isAccessToken, string token)
@@ -127,8 +134,14 @@ namespace BKConnect.Service.Jwt
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = jwtToken.Claims.First(x => x.Type == "UserId").Value.ToString();
+                var refreshTokenId = jwtToken.Claims.First(x => x.Type == "RefreshTokenId").Value.ToString();
 
-                return userId;
+                if (_refreshTokenRepository.IsValidToken(long.Parse(refreshTokenId), userId))
+                {
+                    return userId;
+                }
+
+                throw new Exception(MsgNo.ERROR_TOKEN_INVALID);
             }
             catch
             {

@@ -32,10 +32,7 @@ namespace HK1_2023_2024.PBL4.BKConnectBE.Filter
 
                 string userId = _jwtService.ValidateToken(true, token);
 
-                if (userId != null)
-                {
-                    context.HttpContext.Items["UserId"] = userId;
-                }
+                context.HttpContext.Items["UserId"] = userId;
             }
             catch (Exception e)
             {

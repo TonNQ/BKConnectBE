@@ -4,7 +4,7 @@ namespace BKConnect.Service.Jwt
 {
     public interface IJwtService
     {
-        string GenerateAccessToken(string userId, string userName, string role);
+        string GenerateAccessToken(string userId, string userName, string role, long refreshTokenId);
 
         string GenerateTemporaryCode(string userId);
 

@@ -4,9 +4,11 @@
     {
         Task AddAsync(T entity);
 
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(long id);
 
         Task<T> GetByIdAsync(string id);
+
+        Task RemoveByIdAsync(long id);
 
         Task SaveChangeAsync();
     }

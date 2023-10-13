@@ -1,15 +1,12 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
-using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKConnectBE.Controllers.User
 {
-    [CustomAuthorize]
-    [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : GenericController
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)

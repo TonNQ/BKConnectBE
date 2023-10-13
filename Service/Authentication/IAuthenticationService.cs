@@ -14,5 +14,7 @@ namespace BKConnectBE.Service.Authentication
         Task<Responses> ResetPassword(ResetPasswordDto resetPasswordDto);
 
         Task<Responses> CheckToken(string secretHash);
+
+        Task<Responses> Logout(string secretHash);
     }
 }
