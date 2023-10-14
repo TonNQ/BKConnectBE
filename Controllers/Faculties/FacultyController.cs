@@ -20,11 +20,11 @@ namespace BKConnectBE.Controllers.Faculties
         }
 
         [HttpGet("getFaculty")]
-        public async Task<ActionResult<Responses>> GetFacultyInformation(SearchKeyCondition facultyRequestDto)
+        public async Task<ActionResult<Responses>> GetFacultyInformation(string facultyId)
         {
             try
             {
-                FacultyDto facultyDto = await _facultyService.GetFacultyByIdAsync(facultyRequestDto.SearchKey);
+                FacultyDto facultyDto = await _facultyService.GetFacultyByIdAsync(facultyId);
 
                 return this.Success(facultyDto, MsgNo.SUCCESS_GET_FACULTY);
             }
