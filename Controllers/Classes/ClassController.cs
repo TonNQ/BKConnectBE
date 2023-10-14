@@ -2,6 +2,7 @@ using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.ClassManagement;
+using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Service.Classes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +20,11 @@ namespace BKConnectBE.Controllers.Classes
         }
 
         [HttpGet("getClass")]
-        public async Task<ActionResult<Responses>> GetClassInformation(long classId)
+        public async Task<ActionResult<Responses>> GetClassInformation(LongKeyCondition longKeyCondition)
         {
             try
             {
-                ClassDto studentClass = await _classSerive.GetClassByIdAsync(classId);
+                ClassDto studentClass = await _classSerive.GetClassByIdAsync(longKeyCondition.SearchKey);
 
                 return this.Success(studentClass, MsgNo.SUCCESS_GET_CLASS);
             }

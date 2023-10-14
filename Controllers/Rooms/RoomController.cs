@@ -39,13 +39,13 @@ namespace BKConnectBE.Controllers.Rooms
         }
 
         [HttpGet("searchRoomsOfUser")]
-        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId(string searchKey)
+        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId(SearchKeyCondition searchKeyCondition)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchKey);
+                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchKeyCondition.SearchKey);
                     return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
                 }
 
