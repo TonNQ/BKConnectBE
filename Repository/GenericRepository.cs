@@ -20,6 +20,10 @@ namespace BKConnectBE.Repository
         {
             await _db.AddAsync(entity);
         }
+        public async Task<List<T>> GetAllAsync()
+        {
+            return await _db.ToListAsync();
+        }
 
         public async Task<T> GetByIdAsync(long id)
         {

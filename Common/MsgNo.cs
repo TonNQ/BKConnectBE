@@ -7,6 +7,8 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_ACTIVE_ACCOUNT = "Kích hoạt tài khoản thành công";
         public static readonly string SUCCESS_LOGIN = "Đăng nhập thành công";
         public static readonly string SUCCESS_GET_PROFILE = "Lấy thông tin người dùng thành công";
+        public static readonly string SUCCESS_GET_CLASS = "Lấy thông tin lớp học thành công";
+        public static readonly string SUCCESS_GET_FACULTY = "Lấy thông tin khoa thành công";
         public static readonly string SUCCESS_GET_TOKEN = "Lấy access token thành công";
         public static readonly string SUCCESS_GET_ROOMS_OF_USER = "Lấy danh sách phòng chat của người dùng thành công";
         public static readonly string SUCCESS_GET_USERS = "Tìm kiếm danh sách người dùng thành công";
@@ -20,6 +22,8 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
         public static readonly string ERROR_EMAIL_HAS_USED = "Email này đã được sử dụng";
         public static readonly string ERROR_USER_NOT_FOUND = "Người dùng không tồn tại";
+        public static readonly string ERROR_CLASS_NOT_FOUND = "Lớp học không tồn tại";
+        public static readonly string ERROR_FACULTY_NOT_FOUND = "Khoa không tồn tại";
         public static readonly string ERROR_USER_HAD_ACTIVED = "Tài khoản này đã được kích hoạt rồi";
         public static readonly string ERROR_SEND_EMAIL = "Gửi email thất bại. Vui lòng thử lại sau";
         public static readonly string ERROR_INPUT_INVALID = "Dữ liệu nhập vào không hợp lệ";
