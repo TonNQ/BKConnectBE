@@ -21,5 +21,8 @@ namespace BKConnectBE.Model.Dtos.RoomManagement
         
         [JsonPropertyName("last_message_time")]
         public DateTime LastMessageTime { get; set; }
+
+        [JsonPropertyName("is_read")]
+        public bool IsRead { get; set; }
     }
 }
