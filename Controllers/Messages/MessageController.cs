@@ -19,7 +19,7 @@ namespace BKConnectBE.Controllers.Messages
         }
 
         [HttpGet("getAllMessages")]
-        public async Task<ActionResult<Responses>> GetAllMessagesInRoom(LongKeyCondition longKeyCondition)
+        public async Task<ActionResult<Responses>> GetAllMessagesInRoom([FromQuery] LongKeyCondition longKeyCondition)
         {
             try
             {
@@ -28,10 +28,10 @@ namespace BKConnectBE.Controllers.Messages
                     var listMessages = await _messageSerive.GetAllMessagesInRoomAsync(userId, longKeyCondition.SearchKey);
                     return this.Success(listMessages, MsgNo.SUCCESS_GET_LIST_MESSAGES);
                 }
-                
+
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
             }

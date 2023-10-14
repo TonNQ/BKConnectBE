@@ -28,18 +28,23 @@ namespace BKConnectBE.Repository.Users
             return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<List<UserSearchDto>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        public async Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition)
         {
             var searchKey = Helper.RemoveUnicodeSymbol(searchCondition.SearchKey);
-            var users = await _context.Users.ToListAsync();
-            return users.Where(u => u.Id.Contains(searchKey)
-                || Helper.RemoveUnicodeSymbol(u.Name).Contains(searchKey))
+            var users = await _context.Users.Include(u => u.Class).ToListAsync();
+            var relationships = await _context.Relationships.ToListAsync();
+            return users.Where(u => u.Id != userId && (u.Id.Contains(searchKey)
+                || Helper.RemoveUnicodeSymbol(u.Name).Contains(searchKey)))
                 .OrderBy(u => u.Id).Skip((searchCondition.PageIndex - 1) * Constants.DEFAULT_PAGE_SIZE)
                 .Take(Constants.DEFAULT_PAGE_SIZE).Select(u => new UserSearchDto()
                 {
                     Id = u.Id,
                     Name = u.Name,
-                    Email = u.Email
+                    Avatar = u.Avatar,
+                    ClassName = u.Class?.Name,
+                    IsFriend = relationships.Any(r => r.BlockBy == null
+                        && (r.User1Id == u.Id && r.User2Id == userId)
+                        || (r.User2Id == u.Id && r.User1Id == userId))
                 }).ToList();
         }
 
