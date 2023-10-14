@@ -14,7 +14,7 @@ namespace BKConnectBE.Model.Entities
         public string Content { get; set; }
 
         [EnumDataType(typeof(MessageType))]
-        public string TypeOfMessag { get; set; }
+        public string TypeOfMessage { get; set; }
 
         public DateTime SendTime { get; set; }
 

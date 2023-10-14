@@ -33,6 +33,9 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.ClassId))
                 .ForPath(dest => dest.Class.FacultyId, opt => opt.MapFrom(src => src.FacultyId));
 
+            CreateMap<User, FriendDto>()
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class != null ? src.Class.Name : null));
+
             CreateMap<RefreshToken, RefreshTokenDto>();
 
             CreateMap<Class, ClassDto>()

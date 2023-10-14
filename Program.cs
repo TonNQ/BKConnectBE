@@ -19,6 +19,8 @@ using BKConnectBE.Service.Rooms;
 using BKConnectBE.Repository.Classes;
 using BKConnectBE.Service.Classes;
 using BKConnectBE.Service.Faculites;
+using BKConnectBE.Service.Relationships;
+using BKConnectBE.Repository.Relationships;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -63,6 +65,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<IRelationshipRepository, RelationshipRepository>();
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -71,6 +74,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<IFacultyService, FacultyService>();
+builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
