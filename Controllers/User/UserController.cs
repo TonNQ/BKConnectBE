@@ -1,6 +1,7 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
+using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,25 @@ namespace BKConnectBE.Controllers.User
                 {
                     await _userService.ChangePasswordAsync(userId, passwordDto);
                     return this.Success(userId, MsgNo.SUCCESS_UPDATE_PROFILE);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpGet("searchUsers")]
+        public async Task<ActionResult<Responses>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var listOfUsers = await _userService.SearchListOfUsers(searchCondition);
+                    return this.Success(listOfUsers, MsgNo.SUCCESS_GET_USERS);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

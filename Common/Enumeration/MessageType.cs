@@ -4,16 +4,16 @@ namespace BKConnectBE.Common.Enumeration
 {
     public enum MessageType
     {
-        [Description("Văn bản")]
+        [Description("văn bản")]
         Text,
 
-        [Description("Hình ảnh")]
+        [Description("hình ảnh")]
         Image,
 
-        [Description("Âm thanh")]
+        [Description("tin nhắn thoại")]
         Audio,
 
-        [Description("Tệp")]
+        [Description("tệp đính kèm")]
         File
     }
 }

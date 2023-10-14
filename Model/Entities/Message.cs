@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BKConnectBE.Common.Enumeration;
 
 namespace BKConnectBE.Model.Entities
 {
@@ -12,6 +13,7 @@ namespace BKConnectBE.Model.Entities
         [StringLength(512)]
         public string Content { get; set; }
 
+        [EnumDataType(typeof(MessageType))]
         public string TypeOfMessag { get; set; }
 
         public DateTime SendTime { get; set; }

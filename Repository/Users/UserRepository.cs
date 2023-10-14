@@ -1,4 +1,8 @@
+using System.Reflection.Metadata;
+using BKConnectBE.Common;
 using BKConnectBE.Model;
+using BKConnectBE.Model.Dtos.Parameters;
+using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +26,21 @@ namespace BKConnectBE.Repository.Users
         public async Task<User> GetByEmailAsync(string email)
         {
             return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<List<UserSearchDto>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        {
+            var searchKey = Helper.RemoveUnicodeSymbol(searchCondition.SearchKey);
+            var users = await _context.Users.ToListAsync();
+            return users.Where(u => u.Id.Contains(searchKey)
+                || Helper.RemoveUnicodeSymbol(u.Name).Contains(searchKey))
+                .OrderBy(u => u.Id).Skip((searchCondition.PageIndex - 1) * Constants.DEFAULT_PAGE_SIZE)
+                .Take(Constants.DEFAULT_PAGE_SIZE).Select(u => new UserSearchDto()
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email
+                }).ToList();
         }
 
         public async Task<User> GetByIdAsync(string id)

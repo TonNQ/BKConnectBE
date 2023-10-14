@@ -1,5 +1,6 @@
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Dtos.Authentication;
+using BKConnectBE.Model.Dtos.Parameters;
 
 namespace BKConnectBE.Service.Users
 {
@@ -7,6 +8,7 @@ namespace BKConnectBE.Service.Users
     {
         Task<UserDto> GetUserAsync(AccountDto account);
         Task<UserDto> GetByIdAsync(string userId);
+        Task<List<UserSearchDto>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition);
         Task<UserDto> UpdateUserAsync(string userId, UserInputDto user);
         Task ChangePasswordAsync(string userId, ChangePasswordDto password);
     }

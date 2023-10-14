@@ -1,6 +1,7 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
+using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Service.Rooms;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,13 +39,13 @@ namespace BKConnectBE.Controllers.Rooms
         }
 
         [HttpGet("searchRoomsOfUser")]
-        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId(string searchKey)
+        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId(SearchKeyCondition searchCondition)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchKey);
+                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchCondition.SearchKey);
                     return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
                 }
 

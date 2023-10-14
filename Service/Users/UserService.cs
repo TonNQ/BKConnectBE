@@ -6,6 +6,7 @@ using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
 using BKConnectBE.Repository.Users;
 using BKConnectBE.Common;
+using BKConnectBE.Model.Dtos.Parameters;
 
 namespace BKConnectBE.Service.Users
 {
@@ -49,6 +50,11 @@ namespace BKConnectBE.Service.Users
             return _mapper.Map<UserDto>(user);
         }
 
+        public async Task<List<UserSearchDto>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        {
+            return await _userRepository.SearchListOfUsers(searchCondition);
+        }
+
         public async Task<UserDto> UpdateUserAsync(string userId, UserInputDto userDto)
         {
             User user = _mapper.Map<User>(userDto);
@@ -58,8 +64,8 @@ namespace BKConnectBE.Service.Users
             {
                 throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
             }
-            
-            User updatedUser =  await _userRepository.UpdateUserAsync(user);
+
+            User updatedUser = await _userRepository.UpdateUserAsync(user);
             await _genericRepositoryForUser.SaveChangeAsync();
             return _mapper.Map<UserDto>(updatedUser);
         }
