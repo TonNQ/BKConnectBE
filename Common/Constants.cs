@@ -7,6 +7,6 @@ namespace BKConnectBE.Common
         public const string REGEX_EMAIL = @"^.+@.*dut\.udn\.vn$";
         public const string REGEX_PASSWORD = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$";
 
-        public const int DEFAULT_PAGE_SIZE = 2;
+        public const int DEFAULT_PAGE_SIZE = 5;
     }
 }

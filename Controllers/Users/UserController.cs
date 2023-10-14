@@ -87,13 +87,13 @@ namespace BKConnectBE.Controllers.User
         }
 
         [HttpGet("searchUsers")]
-        public async Task<ActionResult<Responses>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        public async Task<ActionResult<Responses>> SearchListOfUsers([FromQuery] SearchKeyConditionWithPage searchCondition)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var listOfUsers = await _userService.SearchListOfUsers(searchCondition);
+                    var listOfUsers = await _userService.SearchListOfUsers(userId, searchCondition);
                     return this.Success(listOfUsers, MsgNo.SUCCESS_GET_USERS);
                 }
 

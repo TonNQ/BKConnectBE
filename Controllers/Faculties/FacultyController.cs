@@ -20,7 +20,7 @@ namespace BKConnectBE.Controllers.Faculties
         }
 
         [HttpGet("getFaculty")]
-        public async Task<ActionResult<Responses>> GetFacultyInformation(SearchKeyCondition searchKeyCondition)
+        public async Task<ActionResult<Responses>> GetFacultyInformation([FromQuery] SearchKeyCondition searchKeyCondition)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace BKConnectBE.Controllers.Faculties
                 var faculties = await _facultyService.GetAllFaculiesAsync();
                 return this.Success(faculties, MsgNo.SUCCESS_GET_FACULTY);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
             }

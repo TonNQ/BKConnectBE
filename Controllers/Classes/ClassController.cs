@@ -20,7 +20,7 @@ namespace BKConnectBE.Controllers.Classes
         }
 
         [HttpGet("getClass")]
-        public async Task<ActionResult<Responses>> GetClassInformation(LongKeyCondition longKeyCondition)
+        public async Task<ActionResult<Responses>> GetClassInformation([FromQuery] LongKeyCondition longKeyCondition)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace BKConnectBE.Controllers.Classes
 
                 return this.Success(studentClass, MsgNo.SUCCESS_GET_CLASS);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
             }
@@ -43,7 +43,7 @@ namespace BKConnectBE.Controllers.Classes
 
                 return this.Success(classes, MsgNo.SUCCESS_GET_CLASS);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(this.Error(e.Message));
             }

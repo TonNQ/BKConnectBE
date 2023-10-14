@@ -45,9 +45,9 @@ namespace BKConnectBE.Service.Users
             return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<List<UserSearchDto>> SearchListOfUsers(SearchKeyConditionWithPage searchCondition)
+        public async Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition)
         {
-            return await _userRepository.SearchListOfUsers(searchCondition);
+            return await _userRepository.SearchListOfUsers(userId, searchCondition);
         }
 
         public async Task<UserDto> UpdateUserAsync(string userId, UserInputDto userDto)

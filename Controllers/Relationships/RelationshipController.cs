@@ -39,7 +39,7 @@ namespace BKConnectBE.Controllers.Relationships
         }
 
         [HttpGet("searchFriends")]
-        public async Task<ActionResult<Responses>> SearchListOfFriendsOfUser(SearchKeyCondition searchKeyCondition)
+        public async Task<ActionResult<Responses>> SearchListOfFriendsOfUser([FromQuery] SearchKeyCondition searchKeyCondition)
         {
             try
             {

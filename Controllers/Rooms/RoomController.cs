@@ -39,7 +39,7 @@ namespace BKConnectBE.Controllers.Rooms
         }
 
         [HttpGet("searchRoomsOfUser")]
-        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId(SearchKeyCondition searchKeyCondition)
+        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId([FromQuery] SearchKeyCondition searchKeyCondition)
         {
             try
             {
