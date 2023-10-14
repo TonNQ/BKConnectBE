@@ -111,7 +111,15 @@ namespace BKConnectBE.Service.Authentication
 
         public async Task<Responses> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            _jwtService.ValidateToken(true, resetPasswordDto.TemporaryCode);
+            try
+            {
+                _jwtService.ValidateToken(true, resetPasswordDto.TemporaryCode);
+            }
+            catch (Exception)
+            {
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+            }
+
             var data = _jwtService.DecodeToken(resetPasswordDto.TemporaryCode);
 
             var user = await _genericRepositoryForUser.GetByIdAsync(data["UserId"])
@@ -137,7 +145,7 @@ namespace BKConnectBE.Service.Authentication
             {
                 _jwtService.ValidateToken(true, secretHash);
                 var data = _jwtService.DecodeToken(secretHash);
-                
+
                 var user = await _genericRepositoryForUser.GetByIdAsync(data["UserId"])
                     ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
 

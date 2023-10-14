@@ -12,6 +12,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_GET_TOKEN = "Lấy access token thành công";
         public static readonly string SUCCESS_GET_ROOMS_OF_USER = "Lấy danh sách phòng chat của người dùng thành công";
         public static readonly string SUCCESS_GET_USERS = "Tìm kiếm danh sách người dùng thành công";
+        public static readonly string SUCCESS_GET_FRIENDS_OF_USER = "Tìm kiếm danh sách bạn bè của người dùng thành công";
         public static readonly string SUCCESS_EMAIL_FORGOT_PASSWORD = "Vui lòng kiểm tra email để đặt lại mật khẩu";
         public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
@@ -32,9 +33,10 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_PASSWORD_NOT_RESETED = "Mật khẩu chưa được đặt lại";
         public static readonly string ERROR_TOKEN_INVALID = "Vui lòng đăng nhập để tiếp tục";
         public static readonly string ERROR_ACCOUNT_NOT_ACTIVE = "Vui lòng kích hoạt tài khoản";
-        public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
         public static readonly string ERROR_CURRENT_PASSWORD_WRONG = "Mật khẩu hiện tại chưa chính xác";
         public static readonly string ERROR_LOGOUT = "Đăng xuất thất bại";
+        public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
+        public static readonly string ERROR_UNHADLED_ACTION = "Bạn không thể thực hiện hành động này";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

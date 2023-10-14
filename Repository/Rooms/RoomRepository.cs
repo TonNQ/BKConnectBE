@@ -31,9 +31,9 @@ namespace BKConnectBE.Repository.Rooms
                     Name = r.RoomType == RoomType.PrivateRoom.ToString() ? r.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User.Name : r.Name,
                     Avatar = r.RoomType == RoomType.PrivateRoom.ToString() ? r.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User.Avatar : r.Avatar,
                     LastMessage = r.Messages.Any()
-                        ? (r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessag == MessageType.Text.ToString()
-                        ? r.Messages.OrderBy(m => m.Id).LastOrDefault().Content
-                        : $"Đã gửi một {Helper.GetEnumDescription(r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessag.ToEnum<MessageType>())}") : "",
+                        ? (r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessage == MessageType.Text.ToString()
+                            ? r.Messages.OrderBy(m => m.Id).LastOrDefault().Content
+                            : $"Đã gửi một {Helper.GetEnumDescription(r.Messages.OrderBy(m => m.Id).LastOrDefault().TypeOfMessage.ToEnum<MessageType>())}") : "",
                     LastMessageTime = r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault() == null
                         ? DateTime.MinValue : r.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault().SendTime,
                 })
