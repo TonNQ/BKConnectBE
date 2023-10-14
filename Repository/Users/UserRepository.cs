@@ -1,5 +1,5 @@
-using System.Reflection.Metadata;
 using BKConnectBE.Common;
+using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.UserManagement;
@@ -56,6 +56,10 @@ namespace BKConnectBE.Repository.Users
             updatedUser.Gender = user.Gender;
             updatedUser.Avatar = user.Avatar;
             updatedUser.ClassId = (long)user.ClassId;
+            if (updatedUser.Role == Role.Teacher.ToString())
+            {
+                updatedUser.FacultyId = user.FacultyId;
+            }
             return updatedUser;
         }
     }

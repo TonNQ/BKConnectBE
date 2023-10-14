@@ -27,6 +27,10 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         public long ClassId { get; set; }
 
         [Required(ErrorMessage = "Trường {0} không được trống!")]
+        [JsonPropertyName("faculty_id")]
+        public string FacultyId { get; set; }
+
+        [Required(ErrorMessage = "Trường {0} không được trống!")]
         [JsonPropertyName("avatar")]
         public string Avatar { get; set; }
     }

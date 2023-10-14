@@ -1,6 +1,8 @@
 using AutoMapper;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.Authentication;
+using BKConnectBE.Model.Dtos.ClassManagement;
+using BKConnectBE.Model.Dtos.FacultyManagement;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Entities;
@@ -28,9 +30,20 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Class.Faculty.Name));
 
             CreateMap<UserInputDto, User>()
-                .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.ClassId));
+                .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.ClassId))
+                .ForPath(dest => dest.Class.FacultyId, opt => opt.MapFrom(src => src.FacultyId));
 
             CreateMap<RefreshToken, RefreshTokenDto>();
+
+            CreateMap<Class, ClassDto>()
+                .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.FacultyId, opt => opt.MapFrom(src => src.FacultyId))
+                .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Faculty.Name));
+
+            CreateMap<Faculty, FacultyDto>()
+                .ForMember(dest => dest.FacultyId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

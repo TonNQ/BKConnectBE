@@ -47,6 +47,9 @@ namespace BKConnectBE.Model.Entities
         public long? ClassId { get; set; }
         public virtual Class? Class { get; set; }
 
+        public string FacultyId { get; set; }
+        public virtual Faculty? Faculty { get; set; }
+
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<Message> SentMessages { set; get; }
         public virtual ICollection<RefreshToken> RefreshTokens { set; get; }
