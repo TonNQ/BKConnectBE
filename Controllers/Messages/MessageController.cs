@@ -19,13 +19,13 @@ namespace BKConnectBE.Controllers.Messages
         }
 
         [HttpGet("getAllMessages")]
-        public async Task<ActionResult<Responses>> GetAllMessagesInRoom(long roomId)
+        public async Task<ActionResult<Responses>> GetAllMessagesInRoom(LongKeyCondition longKeyCondition)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var listMessages = await _messageSerive.GetAllMessagesInRoomAsync(userId, roomId);
+                    var listMessages = await _messageSerive.GetAllMessagesInRoomAsync(userId, longKeyCondition.SearchKey);
                     return this.Success(listMessages, MsgNo.SUCCESS_GET_LIST_MESSAGES);
                 }
                 
