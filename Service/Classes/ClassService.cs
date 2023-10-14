@@ -18,12 +18,7 @@ namespace BKConnectBE.Service.Classes
 
         public async Task<ClassDto> GetClassByIdAsync(long classId)
         {
-            Class studentClass = await _classRepository.GetClassByIdAsync(classId);
-
-            if (studentClass == null)
-            {
-                throw new Exception(MsgNo.ERROR_CLASS_NOT_FOUND);
-            }
+            Class studentClass = await _classRepository.GetClassByIdAsync(classId) ?? throw new Exception(MsgNo.ERROR_CLASS_NOT_FOUND);
 
             return _mapper.Map<ClassDto>(studentClass);
         }

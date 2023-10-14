@@ -19,18 +19,14 @@ namespace BKConnectBE.Service.Faculites
         public async Task<List<FacultyDto>> GetAllFaculiesAsync()
         {
             var faculties = await _genericRepositoryForFaculty.GetAllAsync();
+
             return _mapper.Map<List<FacultyDto>>(faculties);
         }
 
         public async Task<FacultyDto> GetFacultyByIdAsync(string facultyId)
         {
-            Faculty faculty = await _genericRepositoryForFaculty.GetByIdAsync(facultyId);
-
-            if (faculty == null)
-            {
-                throw new Exception(MsgNo.ERROR_FACULTY_NOT_FOUND);
-            }
-
+            Faculty faculty = await _genericRepositoryForFaculty.GetByIdAsync(facultyId) ?? throw new Exception(MsgNo.ERROR_FACULTY_NOT_FOUND);
+            
             return _mapper.Map<FacultyDto>(faculty);
         }
     }
