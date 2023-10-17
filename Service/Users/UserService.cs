@@ -60,8 +60,9 @@ namespace BKConnectBE.Service.Users
                 throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
             }
 
-            User updatedUser = await _userRepository.UpdateUserAsync(user);
+            await _userRepository.UpdateUserAsync(user);
             await _genericRepositoryForUser.SaveChangeAsync();
+            User updatedUser = await _userRepository.GetByIdAsync(userId);
             return _mapper.Map<UserDto>(updatedUser);
         }
 

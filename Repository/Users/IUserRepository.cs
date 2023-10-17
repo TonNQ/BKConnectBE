@@ -9,7 +9,7 @@ namespace BKConnectBE.Repository.Users
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByIdAsync(string id);
         Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition);
-        Task<User> UpdateUserAsync(User user);
+        Task UpdateUserAsync(User user);
         Task ChangePasswordAsync(string userId, string password);
     }
 }
