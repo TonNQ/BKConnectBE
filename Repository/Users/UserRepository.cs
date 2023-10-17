@@ -53,7 +53,7 @@ namespace BKConnectBE.Repository.Users
             return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<User> UpdateUserAsync(User user)
+        public async Task UpdateUserAsync(User user)
         {
             User updatedUser = await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).FirstOrDefaultAsync(u => u.Id == user.Id);
             updatedUser.Name = user.Name;
@@ -65,7 +65,6 @@ namespace BKConnectBE.Repository.Users
             {
                 updatedUser.FacultyId = user.FacultyId;
             }
-            return updatedUser;
         }
     }
 }
