@@ -134,14 +134,7 @@ namespace BKConnect.Service.Jwt
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = jwtToken.Claims.First(x => x.Type == "UserId").Value.ToString();
-                var refreshTokenId = jwtToken.Claims.First(x => x.Type == "RefreshTokenId").Value.ToString();
-
-                if (_refreshTokenRepository.IsValidToken(long.Parse(refreshTokenId), userId))
-                {
-                    return userId;
-                }
-
-                throw new Exception(MsgNo.ERROR_TOKEN_INVALID);
+                return userId;
             }
             catch
             {
