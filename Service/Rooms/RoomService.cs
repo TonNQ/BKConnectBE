@@ -18,5 +18,10 @@ namespace BKConnectBE.Service.Rooms
         {
             return await _roomRepository.GetListOfRoomsByUserId(userId, searchKey);
         }
+
+        public async Task<List<string>> GetListOfUserIdInRoomAsync(long roomId)
+        {
+            return await _roomRepository.GetListOfUserIdInRoomAsync(roomId);
+        }
     }
 }

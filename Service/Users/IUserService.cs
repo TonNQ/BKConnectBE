@@ -1,6 +1,7 @@
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Dtos.Authentication;
 using BKConnectBE.Model.Dtos.Parameters;
+using BKConnectBE.Model.Dtos.MessageManagement;
 
 namespace BKConnectBE.Service.Users
 {
