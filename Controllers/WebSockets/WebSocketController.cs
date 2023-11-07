@@ -1,13 +1,17 @@
 using BKConnect.Service.Jwt;
-using BKConnectBE.Common.Attributes;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
+using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
+using BKConnectBE.Service.Messages;
+using BKConnectBE.Service.Rooms;
 using BKConnectBE.Service.Users;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 
 namespace BKConnect.Controllers;
 
@@ -16,8 +20,9 @@ namespace BKConnect.Controllers;
 public class WebSocketController : ControllerBase
 {
     private static List<WebSocketConnection> _websocketList;
-
     private readonly IUserService _userService;
+    private readonly IMessageService _messageService;
+    private readonly IRoomService _roomService;
     private readonly IJwtService _jwtService;
 
     public static List<WebSocketConnection> websocketList
@@ -32,10 +37,12 @@ public class WebSocketController : ControllerBase
         }
     }
 
-    public WebSocketController(IUserService userService, IJwtService jwtService)
+    public WebSocketController(IUserService userService, IMessageService messageService, IRoomService roomService, IJwtService jwtService)
     {
         _websocketList = websocketList;
         _userService = userService;
+        _messageService = messageService;
+        _roomService = roomService;
         _jwtService = jwtService;
     }
 
@@ -55,13 +62,13 @@ public class WebSocketController : ControllerBase
                 };
                 _websocketList.Add(webSocketConnection);
 
-                var websocketData = new WebsocketData
+                var receiveWebSocketData = new ReceiveWebSocketData
                 {
                     UserId = tokenInfo["UserId"],
                     DataType = WebSocketDataType.IsOnline.ToString()
                 };
 
-                await SendStatusMessage(websocketData);
+                await SendStatusMessage(receiveWebSocketData);
 
                 await Echo(webSocketConnection);
             }
@@ -81,7 +88,12 @@ public class WebSocketController : ControllerBase
         while (!cnn.WebSocket.CloseStatus.HasValue)
         {
             var receivedData = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-            var receivedObject = JsonSerializer.Deserialize<WebsocketData>(receivedData);
+            var receivedObject = JsonSerializer.Deserialize<SendWebSocketData>(receivedData);
+
+            if (receivedObject.DataType == "IsMessage")
+            {
+                await SendTextMessage(receivedObject, cnn.UserId);
+            }
 
             buffer = new byte[1024 * 4];
             receiveResult = await cnn.WebSocket.ReceiveAsync(
@@ -93,7 +105,7 @@ public class WebSocketController : ControllerBase
 
     private async Task CloseConnection(WebSocketConnection cnn)
     {
-        var websocketData = new WebsocketData
+        var websocketData = new ReceiveWebSocketData
         {
             UserId = cnn.UserId,
             DataType = WebSocketDataType.IsOffline.ToString()
@@ -104,9 +116,10 @@ public class WebSocketController : ControllerBase
 
         await cnn.WebSocket.CloseAsync(
             WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
+        _websocketList.Remove(cnn);
     }
 
-    private async Task SendStatusMessage(WebsocketData websocketData)
+    private async Task SendStatusMessage(ReceiveWebSocketData websocketData)
     {
         var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(websocketData));
 
@@ -120,6 +133,39 @@ public class WebSocketController : ControllerBase
                 true,
                 CancellationToken.None));
         }
+
+        await Task.WhenAll(tasks);
+    }
+
+    private async Task SendTextMessage(SendWebSocketData websocketData, string userId)
+    {
+        ReceiveMessageDto newMsg = await _messageService.AddMessageAsync(websocketData.SendMessage);
+        List<string> listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.SendMessage.RoomId);
+        List<WebSocketConnection> listOfWebSocket = _websocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+
+        var receiveWebSocketData = new ReceiveWebSocketData {
+            UserId = userId,
+            DataType = websocketData.DataType,
+            ReceiveMessage = newMsg
+        };
+
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
+        var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+        var tasks = new List<Task>();
+
+        foreach (WebSocketConnection webSocket in listOfWebSocket)
+        {
+            tasks.Add(webSocket.WebSocket.SendAsync(
+                new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None));
+        }
+
         await Task.WhenAll(tasks);
     }
 }

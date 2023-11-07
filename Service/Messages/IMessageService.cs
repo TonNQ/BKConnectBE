@@ -4,6 +4,7 @@ namespace BKConnectBE.Service.Messages
 {
     public interface IMessageService
     {
-        Task<List<MessageDto>> GetAllMessagesInRoomAsync(string userId, long roomId);
+        Task<List<ReceiveMessageDto>> GetAllMessagesInRoomAsync(string userId, long roomId);
+        Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto);
     }
 }

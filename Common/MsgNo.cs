@@ -26,6 +26,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_USER_NOT_FOUND = "Người dùng không tồn tại";
         public static readonly string ERROR_CLASS_NOT_FOUND = "Lớp học không tồn tại";
         public static readonly string ERROR_FACULTY_NOT_FOUND = "Khoa không tồn tại";
+        public static readonly string ERROR_ROOM_NOT_FOUND = "Phòng không tồn tại";
         public static readonly string ERROR_USER_HAD_ACTIVED = "Tài khoản này đã được kích hoạt rồi";
         public static readonly string ERROR_SEND_EMAIL = "Gửi email thất bại. Vui lòng thử lại sau";
         public static readonly string ERROR_INPUT_INVALID = "Dữ liệu nhập vào không hợp lệ";
