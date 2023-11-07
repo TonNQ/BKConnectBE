@@ -12,10 +12,10 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
         [EnumDataType(typeof(WebSocketDataType))]
         public string DataType { get; set; }
 
-        [JsonPropertyName("send_message")]
-        public SendMessageDto SendMessage { get; set; } = null;
+        [JsonPropertyName("message")]
+        public SendMessageDto Message { get; set; } = null;
 
         [JsonPropertyName("friend_request")]
-        public FriendRequestDto FriendRequest { get; set; } = null;
+        public SendServerFriendRequestDto FriendRequest { get; set; } = null;
     }
 }

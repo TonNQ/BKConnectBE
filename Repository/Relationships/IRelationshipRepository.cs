@@ -6,5 +6,6 @@ namespace BKConnectBE.Repository.Relationships
     {
         Task<List<User>> GetListOfFriendsByUserId(string userId);
         Task<List<User>> SearchListOfFriendsByUserId(string userId, string searchKey);
+        Task CreateNewRelationship(string userId1, string userId2);
     }
 }
