@@ -113,6 +113,7 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseWebSockets();
 
 app.UseMiddleware<ResultMiddleware>();
 

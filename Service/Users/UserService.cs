@@ -78,5 +78,11 @@ namespace BKConnectBE.Service.Users
             await _userRepository.ChangePasswordAsync(userId, Security.CreateMD5(password.NewPassword));
             await _genericRepositoryForUser.SaveChangeAsync();
         }
+
+        public async Task UpdateLastOnlineAsync(string userId)
+        {
+            await _userRepository.UpdateLastOnlineAsync(userId);
+            await _genericRepositoryForUser.SaveChangeAsync();
+        }
     }
 }

@@ -11,5 +11,7 @@ namespace BKConnectBE.Repository.Users
         Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition);
         Task UpdateUserAsync(User user);
         Task ChangePasswordAsync(string userId, string password);
+        Task UpdateLastOnlineAsync(string userId);
+
     }
 }
