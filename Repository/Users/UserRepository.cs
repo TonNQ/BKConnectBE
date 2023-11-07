@@ -1,3 +1,4 @@
+using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
@@ -65,6 +66,18 @@ namespace BKConnectBE.Repository.Users
             {
                 updatedUser.FacultyId = user.FacultyId;
             }
+        }
+
+        public async Task UpdateLastOnlineAsync(string userId)
+        {
+            var updatedUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if(updatedUser == null)
+            {
+                throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+            }
+            
+            updatedUser.LastOnline = DateTime.Now;
         }
     }
 }
