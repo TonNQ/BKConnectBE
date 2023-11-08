@@ -1,4 +1,5 @@
 using BKConnectBE.Model.Dtos.RoomManagement;
+using BKConnectBE.Model.Entities;
 
 namespace BKConnectBE.Repository.Rooms
 {
@@ -6,6 +7,7 @@ namespace BKConnectBE.Repository.Rooms
     {
         Task<List<RoomSidebarDto>> GetListOfRoomsByUserId(string userId, string searchKey);
         Task<List<string>> GetListOfUserIdInRoomAsync(long roomId);
+        Task<Room> GetInformationOfRoom(long roomId);
         Task CreateNewPrivateRoom(string userId1, string userId2);
     }
 }

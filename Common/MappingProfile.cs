@@ -5,6 +5,7 @@ using BKConnectBE.Model.Dtos.ClassManagement;
 using BKConnectBE.Model.Dtos.FacultyManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
+using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Entities;
 
@@ -38,11 +39,11 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class != null ? src.Class.Name : null));
 
             CreateMap<RefreshToken, RefreshTokenDto>();
-            
+
             CreateMap<Message, ReceiveMessageDto>()
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.Name))
                 .ForMember(dest => dest.RootMessageContent, opt => opt.MapFrom(src => src.RootMessage.Content));
-            
+
             CreateMap<SendMessageDto, Message>();
 
             CreateMap<Class, ClassDto>()
@@ -54,6 +55,10 @@ namespace BKConnectBE.Common
             CreateMap<Faculty, FacultyDto>()
                 .ForMember(dest => dest.FacultyId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<Room, RoomDetailDto>()
+                .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count))
+                .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(x => false));
         }
     }
 }

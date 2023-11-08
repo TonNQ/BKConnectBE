@@ -49,6 +49,13 @@ namespace BKConnectBE.Repository.Rooms
             });
         }
 
+        public async Task<Room> GetInformationOfRoom(long roomId)
+        {
+            return await _context.Rooms
+                .Include(r => r.UsersOfRoom).ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+        }
+
         public async Task<List<RoomSidebarDto>> GetListOfRoomsByUserId(string userId, string searchKey)
         {
             return await _context.Rooms
