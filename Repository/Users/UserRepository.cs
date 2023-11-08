@@ -79,5 +79,17 @@ namespace BKConnectBE.Repository.Users
             
             updatedUser.LastOnline = DateTime.Now;
         }
+
+        public async Task<string> GetUsernameById(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return user.Name;
+        }
+
+        public async Task<bool> GetUserGenderById(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return user.Gender;
+        }
     }
 }

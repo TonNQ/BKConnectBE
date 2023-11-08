@@ -148,7 +148,7 @@ public class WebSocketController : ControllerBase
 
     private async Task SendTextMessage(SendWebSocketData websocketData, string userId)
     {
-        var newMsg = await _messageService.AddMessageAsync(websocketData.Message);
+        var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
         var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
         var listOfWebSocket = _websocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
@@ -158,17 +158,21 @@ public class WebSocketController : ControllerBase
             DataType = websocketData.DataType,
             Message = newMsg
         };
+        string rootMessageSenderId = await _messageService.GetRootMessageSenderId(websocketData.Message.RootMessageId);
 
         var options = new JsonSerializerOptions
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
             WriteIndented = true
         };
-        var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
         var tasks = new List<Task>();
 
         foreach (WebSocketConnection webSocket in listOfWebSocket)
         {
+            receiveWebSocketData.Message = await _messageService.RenameUser(receiveWebSocketData.Message, webSocket.UserId, rootMessageSenderId);
+            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
             tasks.Add(webSocket.WebSocket.SendAsync(
                 new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
                 WebSocketMessageType.Text,

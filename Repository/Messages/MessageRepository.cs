@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,12 @@ namespace BKConnectBE.Repository.Messages
         {
             return await _context.Messages.Include(m => m.Sender).Include(m => m.RootMessage)
                 .FirstOrDefaultAsync(m => m.Id == messageId);
+        }
+
+        public async Task<string> GetRootMessageSenderIdAsync(long? messageId)
+        {
+            Message message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == messageId);
+            return message.SenderId;
         }
     }
 }

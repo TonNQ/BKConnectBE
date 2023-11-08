@@ -6,9 +6,6 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
 {
     public class SendMessageDto
     {
-        [JsonPropertyName("sender_id")]
-        public string SenderId { get; set; }
-
         [JsonPropertyName("send_time")]
         public DateTime SendTime { get; set; }
 

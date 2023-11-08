@@ -15,11 +15,11 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
         [JsonPropertyName("sender_name")]
         public string SenderName { get; set; }
 
+        [JsonPropertyName("sender_avatar")]
+        public string SenderAvatar { get; set; }
+
         [JsonPropertyName("send_time")]
         public DateTime SendTime { get; set; }
-
-        [JsonPropertyName("room_id")]
-        public long RoomId { get; set; }
 
         [JsonPropertyName("type_message")]
         [EnumDataType(typeof(MessageType))]
@@ -28,8 +28,8 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
         [JsonPropertyName("content")]
         public string Content { get; set; }
 
-        [JsonPropertyName("root_message_id")]
-        public long? RootMessageId { get; set; }
+        [JsonPropertyName("root_sender")]
+        public string RootSender { get; set; }
 
         [JsonPropertyName("root_message_content")]
         public string RootMessageContent { get; set; }

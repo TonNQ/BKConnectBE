@@ -12,6 +12,7 @@ namespace BKConnectBE.Repository.Users
         Task UpdateUserAsync(User user);
         Task ChangePasswordAsync(string userId, string password);
         Task UpdateLastOnlineAsync(string userId);
-
+        Task<string> GetUsernameById(string userId);
+        Task<bool> GetUserGenderById(string userId);
     }
 }
