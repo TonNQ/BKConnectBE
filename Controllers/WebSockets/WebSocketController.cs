@@ -1,8 +1,10 @@
 using BKConnect.Service.Jwt;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
+using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
+using BKConnectBE.Service.FriendRequests;
 using BKConnectBE.Service.Messages;
 using BKConnectBE.Service.Rooms;
 using BKConnectBE.Service.Users;
@@ -23,26 +25,29 @@ public class WebSocketController : ControllerBase
     private readonly IUserService _userService;
     private readonly IMessageService _messageService;
     private readonly IRoomService _roomService;
+    private readonly IFriendRequestService _friendRequestService;
     private readonly IJwtService _jwtService;
 
-    public static List<WebSocketConnection> websocketList
+    public static List<WebSocketConnection> WebsocketList
     {
         get
         {
-            if (_websocketList == null)
-            {
-                _websocketList = new List<WebSocketConnection>();
-            }
+            _websocketList ??= new List<WebSocketConnection>();
             return _websocketList;
         }
     }
 
-    public WebSocketController(IUserService userService, IMessageService messageService, IRoomService roomService, IJwtService jwtService)
+    public WebSocketController(IUserService userService,
+        IMessageService messageService,
+        IRoomService roomService,
+        IFriendRequestService friendRequestService,
+        IJwtService jwtService)
     {
-        _websocketList = websocketList;
+        _websocketList = WebsocketList;
         _userService = userService;
         _messageService = messageService;
         _roomService = roomService;
+        _friendRequestService = friendRequestService;
         _jwtService = jwtService;
     }
 
@@ -94,6 +99,10 @@ public class WebSocketController : ControllerBase
             {
                 await SendTextMessage(receivedObject, cnn.UserId);
             }
+            else if (receivedObject.DataType == "IsFriendRequest")
+            {
+                await SendFriendRequest(receivedObject, cnn.UserId);
+            }
 
             buffer = new byte[1024 * 4];
             receiveResult = await cnn.WebSocket.ReceiveAsync(
@@ -119,7 +128,7 @@ public class WebSocketController : ControllerBase
         _websocketList.Remove(cnn);
     }
 
-    private async Task SendStatusMessage(ReceiveWebSocketData websocketData)
+    private static async Task SendStatusMessage(ReceiveWebSocketData websocketData)
     {
         var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(websocketData));
 
@@ -139,14 +148,15 @@ public class WebSocketController : ControllerBase
 
     private async Task SendTextMessage(SendWebSocketData websocketData, string userId)
     {
-        ReceiveMessageDto newMsg = await _messageService.AddMessageAsync(websocketData.SendMessage);
-        List<string> listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.SendMessage.RoomId);
-        List<WebSocketConnection> listOfWebSocket = _websocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+        var newMsg = await _messageService.AddMessageAsync(websocketData.Message);
+        var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
+        var listOfWebSocket = _websocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-        var receiveWebSocketData = new ReceiveWebSocketData {
+        var receiveWebSocketData = new ReceiveWebSocketData
+        {
             UserId = userId,
             DataType = websocketData.DataType,
-            ReceiveMessage = newMsg
+            Message = newMsg
         };
 
         var options = new JsonSerializerOptions
@@ -167,5 +177,35 @@ public class WebSocketController : ControllerBase
         }
 
         await Task.WhenAll(tasks);
+    }
+
+    private async Task SendFriendRequest(SendWebSocketData websocketData, string userId)
+    {
+        var friendRequest = await _friendRequestService.CreateFriendRequest(userId, websocketData.FriendRequest.ReceiverId);
+        var webSocket = _websocketList.FirstOrDefault(ws => ws.UserId == websocketData.FriendRequest.ReceiverId);
+
+        if (webSocket is not null)
+        {
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                FriendRequest = friendRequest
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+            var tasks = new List<Task>();
+
+            await webSocket.WebSocket.SendAsync(
+                new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
+        }
     }
 }

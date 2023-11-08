@@ -11,6 +11,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_GET_FACULTY = "Lấy thông tin khoa thành công";
         public static readonly string SUCCESS_GET_TOKEN = "Lấy access token thành công";
         public static readonly string SUCCESS_GET_ROOMS_OF_USER = "Lấy danh sách phòng chat của người dùng thành công";
+        public static readonly string SUCCESS_GET_FRIEND_REQUESTS = "Lấy danh sách lời mời kết bạn thành công";
         public static readonly string SUCCESS_GET_USERS = "Tìm kiếm danh sách người dùng thành công";
         public static readonly string SUCCESS_GET_FRIENDS_OF_USER = "Tìm kiếm danh sách bạn bè của người dùng thành công";
         public static readonly string SUCCESS_GET_LIST_MESSAGES = "Lấy danh sách tin nhắn thành công";
@@ -19,6 +20,10 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
         public static readonly string SUCCESS_UPDATE_PROFILE = "Cập nhật thành công";
         public static readonly string SUCCESS_LOGOUT = "Đăng xuất thành công";
+        public static readonly string SUCCESS_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thành công";
+        public static readonly string SUCCESS_CREATE_FRIEND_REQUEST = "Gửi lời mời kết bạn thành công";
+        public static readonly string SUCCESS_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thành công";
+        public static readonly string SUCCESS_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thành công";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -39,6 +44,10 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_LOGOUT = "Đăng xuất thất bại";
         public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
         public static readonly string ERROR_UNHADLED_ACTION = "Bạn không thể thực hiện hành động này";
+        public static readonly string ERROR_CREATE_FRIEND_REQUEST = "Gửi lời mời kết bạn thất bại";
+        public static readonly string ERROR_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thất bại";
+        public static readonly string ERROR_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thất bại";
+        public static readonly string ERROR_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thất bại";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

@@ -13,6 +13,15 @@ namespace BKConnectBE.Repository.Relationships
             _context = context;
         }
 
+        public async Task CreateNewRelationship(string userId1, string userId2)
+        {
+            await _context.Relationships.AddAsync(new Relationship()
+            {
+                User1Id = userId1,
+                User2Id = userId2
+            });
+        }
+
         public async Task<List<User>> GetListOfFriendsByUserId(string userId)
         {
             return await _context.Relationships.Include(f => f.User1).Include(f => f.User2).ThenInclude(u => u.Class)

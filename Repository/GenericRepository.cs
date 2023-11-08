@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
+using System.Transactions;
 using BKConnectBE.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BKConnectBE.Repository
 {
@@ -46,7 +48,18 @@ namespace BKConnectBE.Repository
 
         public async Task SaveChangeAsync()
         {
-            await _context.SaveChangesAsync();
+            IDbContextTransaction transaction = null;
+            try
+            {
+                transaction = await _context.Database.BeginTransactionAsync();
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                transaction?.RollbackAsync();
+                throw;
+            }
         }
     }
 }

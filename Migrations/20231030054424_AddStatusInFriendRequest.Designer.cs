@@ -4,6 +4,7 @@ using BKConnectBE.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BKConnect.Migrations
 {
     [DbContext(typeof(BKConnectContext))]
-    partial class BKConnectContextModelSnapshot : ModelSnapshot
+    [Migration("20231030054424_AddStatusInFriendRequest")]
+    partial class AddStatusInFriendRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,9 +70,6 @@ namespace BKConnect.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("AcceptedTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ReceiverId")
                         .HasColumnType("nvarchar(450)");
