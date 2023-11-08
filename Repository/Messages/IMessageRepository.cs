@@ -6,5 +6,6 @@ namespace BKConnectBE.Repository.Messages
     {
         Task<List<Message>> GetAllMessagesInRoomAsync(long roomId);
         Task<Message> GetMessageByIdAsync(long messageId);
+        Task<string> GetRootMessageSenderIdAsync(long? messageId);
     }
 }

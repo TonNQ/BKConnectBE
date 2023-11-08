@@ -41,7 +41,6 @@ namespace BKConnectBE.Common
             
             CreateMap<Message, ReceiveMessageDto>()
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.Name))
-                .ForMember(dest => dest.RootMessageId, opt => opt.MapFrom(src => src.RootMessageId))
                 .ForMember(dest => dest.RootMessageContent, opt => opt.MapFrom(src => src.RootMessage.Content));
             
             CreateMap<SendMessageDto, Message>();
