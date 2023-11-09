@@ -13,7 +13,11 @@ namespace BKConnectBE.Service.Messages
         private readonly IMessageRepository _messageRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public MessageService(IGenericRepository<Message> genericRepositoryForMessage, IMessageRepository messageRepository, IUserRepository userRepository, IMapper mapper)
+
+        public MessageService(IGenericRepository<Message> genericRepositoryForMessage,
+            IMessageRepository messageRepository,
+            IUserRepository userRepository,
+            IMapper mapper)
         {
             _genericRepositoryForMessage = genericRepositoryForMessage;
             _messageRepository = messageRepository;
@@ -44,6 +48,7 @@ namespace BKConnectBE.Service.Messages
 
             return listMessagesDto;
         }
+
         public async Task<ReceiveMessageDto> RenameUser(ReceiveMessageDto receiveMsg, string userId, string rootSenderId)
         {
             if (receiveMsg.SenderId == userId)
@@ -52,14 +57,14 @@ namespace BKConnectBE.Service.Messages
             }
             else
             {
-                receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId); ;
+                receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
 
             if (rootSenderId == userId && receiveMsg.SenderId == userId)
             {
                 receiveMsg.RootSender = "chính mình";
             }
-            else if (rootSenderId == userId && receiveMsg.SenderId != userId)
+            else if (rootSenderId == userId)
             {
                 receiveMsg.RootSender = "bạn";
             }
