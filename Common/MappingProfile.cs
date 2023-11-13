@@ -38,6 +38,12 @@ namespace BKConnectBE.Common
             CreateMap<User, FriendDto>()
                 .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class != null ? src.Class.Name : null));
 
+            CreateMap<UserOfRoom, MemberOfRoomDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.User.Avatar))
+                .ForMember(dest => dest.IsAdmin, opt => opt.MapFrom(src => src.IsAdmin));
+
             CreateMap<RefreshToken, RefreshTokenDto>();
 
             CreateMap<Message, ReceiveMessageDto>()

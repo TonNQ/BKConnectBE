@@ -7,5 +7,6 @@ namespace BKConnectBE.Service.Rooms
         Task<List<RoomSidebarDto>> GetListOfRoomsByUserId(string userId, string searchKey = "");
         Task<List<string>> GetListOfUserIdInRoomAsync(long roomId);
         Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId);
+        Task<List<MemberOfRoomDto>> GetListOfMembersInRoomAsync(long roomId, string userId);
     }
 }

@@ -75,5 +75,24 @@ namespace BKConnectBE.Controllers.Rooms
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpGet("getListOfMembersInRoom")]
+        public async Task<ActionResult<Responses>> GetListOfMembersInRoom([FromQuery] LongKeyCondition condition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var listOfMembers = await _roomService.GetListOfMembersInRoomAsync(condition.SearchKey, userId);
+                    return this.Success(listOfMembers, MsgNo.SUCCESS_GET_LIST_OF_MEMBERS_IN_ROOM);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }
