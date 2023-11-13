@@ -23,7 +23,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_UPDATE_PROFILE = "Cập nhật thành công";
         public static readonly string SUCCESS_LOGOUT = "Đăng xuất thành công";
         public static readonly string SUCCESS_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thành công";
-        public static readonly string SUCCESS_CREATE_FRIEND_REQUEST = "Gửi lời mời kết bạn thành công";
+        public static readonly string SUCCESS_CHECK_FRIEND_REQUEST = "Kiểm tra việc lời mời kết bạn thành công";
         public static readonly string SUCCESS_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thành công";
         public static readonly string SUCCESS_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thành công";
         public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
