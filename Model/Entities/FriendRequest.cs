@@ -11,8 +11,6 @@ namespace BKConnectBE.Model.Entities
 
         public DateTime SendTime { get; set; }
 
-        public DateTime AcceptedTime { get; set; }
-
         public string Status { get; set; }
 
         public string SenderId { get; set; }

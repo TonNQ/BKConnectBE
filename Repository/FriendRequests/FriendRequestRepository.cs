@@ -22,13 +22,11 @@ namespace BKConnectBE.Repository.FriendRequests
                 .Include(fr => fr.Receiver)
                 .ThenInclude(r => r.Class)
                 .Where(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Accepted.ToString())
-                .OrderByDescending(fr => fr.AcceptedTime)
                 .Select(fr => new SentFriendRequestDto()
                 {
                     Id = fr.Id,
                     SendTime = fr.SendTime,
                     Status = (int)fr.Status.ToEnum<FriendRequestStatus>(),
-                    AcceptedTime = fr.AcceptedTime,
                     ReceiverId = fr.ReceiverId,
                     ReceiverName = fr.Receiver.Name,
                     ReceiverAvatar = fr.Receiver.Avatar,
