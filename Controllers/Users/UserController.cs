@@ -104,5 +104,24 @@ namespace BKConnectBE.Controllers.User
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpGet("getUserInformation")]
+        public async Task<ActionResult<Responses>> GetUserInformation(SearchKeyCondition searchCondition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj))
+                {
+                    UserDto userInfo = await _userService.GetByIdAsync(searchCondition.SearchKey);
+                    return this.Success(userInfo, MsgNo.SUCCESS_GET_PROFILE);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }
