@@ -1,29 +1,21 @@
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
-using BKConnect.Controllers;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.RoomManagement;
-using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Repository.Rooms;
-using BKConnectBE.Repository.Users;
 
 namespace BKConnectBE.Service.Rooms
 {
     public class RoomService : IRoomService
     {
         private readonly IRoomRepository _roomRepository;
-        private static List<WebSocketConnection> _websocketList;
         private readonly IMapper _mapper;
 
-        public RoomService(
-            IRoomRepository roomRepository,
-            IUserRepository userRepository,
-            IMapper mapper
-        )
+        public RoomService(IRoomRepository roomRepository, IMapper mapper)
         {
             _roomRepository = roomRepository;
             _mapper = mapper;
-            _websocketList = WebSocketController.WebsocketList;
         }
 
         public async Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId)
@@ -42,7 +34,7 @@ namespace BKConnectBE.Service.Rooms
 
                 roomDto.Name = friend.Name;
                 roomDto.Avatar = friend.Avatar;
-                if (_websocketList.Any(w => w.UserId == friend.Id))
+                if (WebSockets.WebsocketList.Any(w => w.UserId == friend.Id))
                 {
                     roomDto.IsOnline = true;
                 }

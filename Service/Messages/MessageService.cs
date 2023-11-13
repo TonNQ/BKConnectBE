@@ -29,6 +29,7 @@ namespace BKConnectBE.Service.Messages
         {
             Message sendMsg = _mapper.Map<Message>(messageDto);
             sendMsg.SenderId = userId;
+            sendMsg.SendTime = DateTime.Now;
             await _genericRepositoryForMessage.AddAsync(sendMsg);
             await _genericRepositoryForMessage.SaveChangeAsync();
             Message newMsg = await _messageRepository.GetMessageByIdAsync(sendMsg.Id);
@@ -42,7 +43,7 @@ namespace BKConnectBE.Service.Messages
             foreach (var msg in listMessages)
             {
                 var msgDto = _mapper.Map<ReceiveMessageDto>(msg);
-                msgDto = await RenameUser(msgDto, userId, msg.RootMessage.SenderId);
+                msgDto = await RenameUser(msgDto, userId, msg.RootMessage?.SenderId);
                 listMessagesDto.Add(msgDto);
             }
 
@@ -53,29 +54,32 @@ namespace BKConnectBE.Service.Messages
         {
             if (receiveMsg.SenderId == userId)
             {
-                receiveMsg.SenderName = "bạn";
+                receiveMsg.SenderName = "Bạn";
             }
             else
             {
                 receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
+            if (rootSenderId != null)
+            {
+                if (rootSenderId == userId && receiveMsg.SenderId == userId)
+                {
+                    receiveMsg.RootSender = "chính mình";
+                }
+                else if (rootSenderId == userId)
+                {
+                    receiveMsg.RootSender = "bạn";
+                }
+                else if (receiveMsg.SenderId == rootSenderId)
+                {
+                    receiveMsg.RootSender = await _userRepository.GetUserGenderById(rootSenderId) ? "anh ấy" : "cô ấy";
+                }
+                else
+                {
+                    receiveMsg.RootSender = await _userRepository.GetUsernameById(rootSenderId);
+                }
+            }
 
-            if (rootSenderId == userId && receiveMsg.SenderId == userId)
-            {
-                receiveMsg.RootSender = "chính mình";
-            }
-            else if (rootSenderId == userId)
-            {
-                receiveMsg.RootSender = "bạn";
-            }
-            else if (receiveMsg.SenderId == rootSenderId)
-            {
-                receiveMsg.RootSender = await _userRepository.GetUserGenderById(rootSenderId) ? "anh ấy" : "cô ấy";
-            }
-            else
-            {
-                receiveMsg.RootSender = await _userRepository.GetUsernameById(rootSenderId);
-            }
             return receiveMsg;
         }
         public async Task<string> GetRootMessageSenderId(long? messageId)
