@@ -26,7 +26,7 @@ namespace BKConnectBE.Service.Users
 
         public async Task<UserDto> GetUserAsync(AccountDto account)
         {
-            User user = await _userRepository.GetByEmailAsync(account.Email)
+            var user = await _userRepository.GetByEmailAsync(account.Email)
                 ?? throw new Exception(MsgNo.ERROR_EMAIL_NOT_REGISTERED);
             if (!user.IsActive)
             {
@@ -41,7 +41,7 @@ namespace BKConnectBE.Service.Users
 
         public async Task<UserDto> GetByIdAsync(string userId)
         {
-            User user = await _userRepository.GetByIdAsync(userId)
+            var user = await _userRepository.GetByIdAsync(userId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
             return _mapper.Map<UserDto>(user);
         }
@@ -53,7 +53,7 @@ namespace BKConnectBE.Service.Users
 
         public async Task<UserDto> UpdateUserAsync(string userId, UserInputDto userDto)
         {
-            User user = _mapper.Map<User>(userDto);
+            var user = _mapper.Map<User>(userDto);
             user.Id = userId;
 
             if (user == null)
@@ -69,7 +69,7 @@ namespace BKConnectBE.Service.Users
 
         public async Task ChangePasswordAsync(string userId, ChangePasswordDto password)
         {
-            User user = await _genericRepositoryForUser.GetByIdAsync(userId)
+            var user = await _genericRepositoryForUser.GetByIdAsync(userId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
             if (user.Password != Security.CreateMD5(password.CurrentPassword))
             {

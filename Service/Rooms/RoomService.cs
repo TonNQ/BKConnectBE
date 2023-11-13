@@ -5,6 +5,7 @@ using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Repository.Rooms;
+using BKConnectBE.Repository.Users;
 
 namespace BKConnectBE.Service.Rooms
 {
@@ -16,6 +17,7 @@ namespace BKConnectBE.Service.Rooms
 
         public RoomService(
             IRoomRepository roomRepository,
+            IUserRepository userRepository,
             IMapper mapper
         )
         {
@@ -64,6 +66,12 @@ namespace BKConnectBE.Service.Rooms
         public async Task<List<string>> GetListOfUserIdInRoomAsync(long roomId)
         {
             return await _roomRepository.GetListOfUserIdInRoomAsync(roomId);
+        }
+
+        public async Task<List<MemberOfRoomDto>> GetListOfMembersInRoomAsync(long roomId, string userId)
+        {
+            var members = await _roomRepository.GetListOfMembersInRoomAsync(roomId, userId);
+            return _mapper.Map<List<MemberOfRoomDto>>(members);
         }
     }
 }

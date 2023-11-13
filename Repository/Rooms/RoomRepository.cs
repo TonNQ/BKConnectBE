@@ -91,5 +91,13 @@ namespace BKConnectBE.Repository.Rooms
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId) ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
             return room.UsersOfRoom.Select(u => u.UserId).ToList();
         }
+
+        public async Task<List<UserOfRoom>> GetListOfMembersInRoomAsync(long roomId, string userId)
+        {
+            var room = await _context.Rooms.Include(r => r.UsersOfRoom).ThenInclude(u => u.User)
+                .FirstOrDefaultAsync(r => r.Id == roomId && r.UsersOfRoom.Any(u => u.UserId == userId))
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+            return room.UsersOfRoom.ToList();
+        }
     }
 };
