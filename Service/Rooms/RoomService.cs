@@ -1,11 +1,10 @@
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
-using BKConnect.Controllers;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Repository.Rooms;
-using BKConnectBE.Repository.Users;
 
 namespace BKConnectBE.Service.Rooms
 {
@@ -17,13 +16,12 @@ namespace BKConnectBE.Service.Rooms
 
         public RoomService(
             IRoomRepository roomRepository,
-            IUserRepository userRepository,
             IMapper mapper
         )
         {
             _roomRepository = roomRepository;
             _mapper = mapper;
-            _websocketList = WebSocketController.WebsocketList;
+            _websocketList = WebSockets.WebsocketList;
         }
 
         public async Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId)

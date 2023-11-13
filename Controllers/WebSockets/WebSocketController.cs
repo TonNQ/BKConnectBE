@@ -1,8 +1,7 @@
 using BKConnect.Service.Jwt;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
-using BKConnectBE.Model.Dtos.FriendRequestManagement;
-using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Service.FriendRequests;
 using BKConnectBE.Service.Messages;
@@ -28,22 +27,13 @@ public class WebSocketController : ControllerBase
     private readonly IFriendRequestService _friendRequestService;
     private readonly IJwtService _jwtService;
 
-    public static List<WebSocketConnection> WebsocketList
-    {
-        get
-        {
-            _websocketList ??= new List<WebSocketConnection>();
-            return _websocketList;
-        }
-    }
-
     public WebSocketController(IUserService userService,
         IMessageService messageService,
         IRoomService roomService,
         IFriendRequestService friendRequestService,
         IJwtService jwtService)
     {
-        _websocketList = WebsocketList;
+        _websocketList = WebSockets.WebsocketList;
         _userService = userService;
         _messageService = messageService;
         _roomService = roomService;
