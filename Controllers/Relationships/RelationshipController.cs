@@ -56,5 +56,24 @@ namespace BKConnectBE.Controllers.Relationships
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpDelete("unfriend")]
+        public async Task<ActionResult<Responses>> Unfriend(SearchKeyCondition friend)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    await _relationshipService.UnfriendAsync(userId, friend.SearchKey);
+                    return this.Success(null, MsgNo.SUCCESS_UNFRIEND);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }

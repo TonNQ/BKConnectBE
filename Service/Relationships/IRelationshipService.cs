@@ -6,5 +6,6 @@ namespace BKConnectBE.Service.Relationships
     {
         Task<List<FriendDto>> GetListOfFriendsByUserId(string userId);
         Task<List<FriendDto>> SearchListOfFriendsByUserId(string userId, string searchKey);
+        Task UnfriendAsync(string userId1, string userId2);
     }
 }
