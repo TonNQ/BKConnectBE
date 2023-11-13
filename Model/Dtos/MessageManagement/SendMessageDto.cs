@@ -6,13 +6,10 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
 {
     public class SendMessageDto
     {
-        [JsonPropertyName("send_time")]
-        public DateTime SendTime { get; set; }
-
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }
 
-        [JsonPropertyName("type_message")]
+        [JsonPropertyName("message_type")]
         [EnumDataType(typeof(MessageType))]
         public string TypeOfMessage { get; set; }
 
