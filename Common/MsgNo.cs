@@ -26,6 +26,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_CREATE_FRIEND_REQUEST = "Gửi lời mời kết bạn thành công";
         public static readonly string SUCCESS_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thành công";
         public static readonly string SUCCESS_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thành công";
+        public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -50,6 +51,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thất bại";
         public static readonly string ERROR_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thất bại";
         public static readonly string ERROR_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thất bại";
+        public static readonly string ERROR_RELATIONSHIP_NOT_FOUND = "Các bạn hiện không phải là bạn bè";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";
