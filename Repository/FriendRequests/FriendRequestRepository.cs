@@ -62,13 +62,19 @@ namespace BKConnectBE.Repository.FriendRequests
 
         public async Task<bool> CheckCanSendFriendRequest(string senderId, string receiverId)
         {
-            if (!await _context.Users.AnyAsync(u => u.Id == receiverId)
-                || !await _context.Users.AnyAsync(u => u.Id == senderId) || senderId == receiverId)
+            var listId = new List<string>{
+                senderId,
+                receiverId
+            };
+
+            if (senderId == receiverId || !await _context.Users.AnyAsync(u => listId.Contains(u.Id)))
+            {
                 return false;
-            return !await _context.FriendRequests.AnyAsync(fr => (fr.SenderId == senderId && fr.ReceiverId == receiverId)
-                || (fr.SenderId == receiverId && fr.ReceiverId == senderId))
-                && !await _context.Relationships.AnyAsync(r => (r.User1Id == senderId && r.User2Id == receiverId)
-                    || (r.User1Id == receiverId && r.User2Id == senderId));
+            }
+
+            return !await _context.FriendRequests.AnyAsync(fr => fr.Status != FriendRequestStatus.Accepted.ToString()
+                && listId.Contains(fr.ReceiverId) && listId.Contains(fr.SenderId))
+                && !await _context.Relationships.AnyAsync(r => listId.Contains(r.User1Id) && listId.Contains(r.User2Id));
         }
 
         public async Task UpdateStatusOfListFriendRequests(string userId)
@@ -103,7 +109,7 @@ namespace BKConnectBE.Repository.FriendRequests
             });
         }
 
-        public async Task<ReceivedFriendRequestDto> GetFriendRequestByUser(string senderId, string receiverId)
+        public async Task<ReceivedFriendRequestDto> GetLastFriendRequestByUser(string senderId, string receiverId)
         {
             return await _context.FriendRequests
                 .Include(fr => fr.Sender)
@@ -118,7 +124,7 @@ namespace BKConnectBE.Repository.FriendRequests
                     SenderAvatar = fr.Sender.Avatar,
                     Status = (int)fr.Status.ToEnum<FriendRequestStatus>(),
                     SenderClassName = fr.Sender.Class.Name
-                }).FirstOrDefaultAsync();
+                }).OrderBy(fr => fr.SendTime).LastOrDefaultAsync();
         }
     }
 }

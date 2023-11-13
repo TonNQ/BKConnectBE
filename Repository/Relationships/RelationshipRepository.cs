@@ -28,7 +28,8 @@ namespace BKConnectBE.Repository.Relationships
                 {
                     User1Id = userId1,
                     User2Id = userId2,
-                    BlockBy = userId1
+                    BlockBy = userId1,
+                    CreatedDate = DateTime.Now
                 });
             }
         }
@@ -38,7 +39,8 @@ namespace BKConnectBE.Repository.Relationships
             await _context.Relationships.AddAsync(new Relationship()
             {
                 User1Id = userId1,
-                User2Id = userId2
+                User2Id = userId2,
+                CreatedDate = DateTime.Now
             });
         }
 

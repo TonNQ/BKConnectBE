@@ -17,14 +17,21 @@ namespace BKConnectBE.Repository.Rooms
             _context = context;
         }
 
-        public async Task CreateNewPrivateRoom(string userId1, string userId2)
+        public async Task CreateNewPrivateRoom(string userId1, string userId2, string serverMessage)
         {
-            await _context.AddAsync(new Room()
+            var room = await _context.Rooms
+                .FirstOrDefaultAsync(r => r.RoomType == RoomType.PrivateRoom.ToString() &&
+                    r.UsersOfRoom.Any(u => u.UserId == userId1) &&
+                    r.UsersOfRoom.Any(u => u.UserId == userId2));
+
+            if (room is null)
             {
-                RoomType = RoomType.PrivateRoom.ToString(),
-                Name = null,
-                Avatar = null,
-                UsersOfRoom = new List<UserOfRoom>()
+                await _context.AddAsync(new Room()
+                {
+                    RoomType = RoomType.PrivateRoom.ToString(),
+                    Name = null,
+                    Avatar = null,
+                    UsersOfRoom = new List<UserOfRoom>()
                 {
                     new ()
                     {
@@ -37,16 +44,19 @@ namespace BKConnectBE.Repository.Rooms
                         ReadMessageId = null
                     }
                 },
-                Messages = new List<Message>(){
+                    Messages = new List<Message>(){
                     new ()
                     {
                         TypeOfMessage = MessageType.Text.ToString(),
-                        Content = Constants.FRIEND_ACCEPTED_NOTIFICATION,
+                        Content = serverMessage,
                         SendTime = DateTime.Now,
                         SenderId = null
                     }
-                }
-            });
+                },
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now
+                });
+            }
         }
 
         public async Task<Room> GetInformationOfRoom(long roomId)

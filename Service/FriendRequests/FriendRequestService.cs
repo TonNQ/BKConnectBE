@@ -1,4 +1,5 @@
 using BKConnect.BKConnectBE.Common;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Entities;
@@ -64,7 +65,7 @@ namespace BKConnectBE.Service.FriendRequests
             if (!await CheckCanSendFriendRequest(senderId, receiverId)) throw new Exception(MsgNo.ERROR_CREATE_FRIEND_REQUEST);
             await _friendRequestRepository.CreateFriendRequest(senderId, receiverId);
             await _genericRepositoryForFriendRequest.SaveChangeAsync();
-            return await _friendRequestRepository.GetFriendRequestByUser(senderId, receiverId);
+            return await _friendRequestRepository.GetLastFriendRequestByUser(senderId, receiverId);
         }
 
         public async Task AcceptFriendRequest(long friendRequestId, string userId)
@@ -77,7 +78,7 @@ namespace BKConnectBE.Service.FriendRequests
             }
 
             friendRequest.Status = FriendRequestStatus.Accepted.ToString();
-            await _roomRepository.CreateNewPrivateRoom(friendRequest.SenderId, friendRequest.ReceiverId);
+            await _roomRepository.CreateNewPrivateRoom(friendRequest.SenderId, friendRequest.ReceiverId, Constants.FRIEND_ACCEPTED_NOTIFICATION);
             await _relationshipRepository.CreateNewRelationship(friendRequest.SenderId, friendRequest.ReceiverId);
             await _genericRepositoryForFriendRequest.SaveChangeAsync();
         }

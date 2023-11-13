@@ -6,7 +6,7 @@ namespace BKConnectBE.Repository.FriendRequests
     {
         Task<List<ReceivedFriendRequestDto>> GetListOfReceivedFriendRequestsOfUser(string userId);
         Task<List<SentFriendRequestDto>> GetListOfAcceptedFriendRequestsOfUser(string userId);
-        Task<ReceivedFriendRequestDto> GetFriendRequestByUser(string senderId, string receiverId);
+        Task<ReceivedFriendRequestDto> GetLastFriendRequestByUser(string senderId, string receiverId);
         Task<bool> CheckFriendRequest(string senderId, string receiverId);
         Task<bool> CheckCanSendFriendRequest(string senderId, string receiverId);
         Task CreateFriendRequest(string senderId, string receiverId);
