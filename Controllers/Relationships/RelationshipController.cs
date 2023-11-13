@@ -58,7 +58,7 @@ namespace BKConnectBE.Controllers.Relationships
         }
 
         [HttpDelete("unfriend")]
-        public async Task<ActionResult<Responses>> Unfriend(SearchKeyCondition friend)
+        public async Task<ActionResult<Responses>> Unfriend([FromQuery] SearchKeyCondition friend)
         {
             try
             {

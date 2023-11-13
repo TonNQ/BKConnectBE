@@ -78,7 +78,7 @@ namespace BKConnectBE.Controllers.FriendRequests
         }
 
         [HttpDelete("removeFriendRequest")]
-        public async Task<ActionResult<Responses>> RemoveFriendRequest(LongKeyCondition friendRequest)
+        public async Task<ActionResult<Responses>> RemoveFriendRequest([FromQuery] LongKeyCondition friendRequest)
         {
             try
             {
