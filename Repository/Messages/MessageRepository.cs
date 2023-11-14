@@ -16,7 +16,7 @@ namespace BKConnectBE.Repository.Messages
         public async Task<List<Message>> GetAllMessagesInRoomAsync(long roomId)
         {
             return await _context.Rooms.Where(r => r.Id == roomId).SelectMany(r => r.Messages)
-                .Include(m => m.Sender).Include(m => m.RootMessage).ToListAsync();
+                .Include(m => m.Sender).Include(m => m.RootMessage).OrderByDescending(m => m.Id).ToListAsync();
         }
 
         public async Task<Message> GetMessageByIdAsync(long messageId)
