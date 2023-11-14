@@ -6,6 +6,9 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
 {
     public class SendMessageDto
     {
+        [JsonPropertyName("temp_id")]
+        public string TempId { get; set; }
+
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }
 

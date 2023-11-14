@@ -33,7 +33,9 @@ namespace BKConnectBE.Service.Messages
             await _genericRepositoryForMessage.AddAsync(sendMsg);
             await _genericRepositoryForMessage.SaveChangeAsync();
             Message newMsg = await _messageRepository.GetMessageByIdAsync(sendMsg.Id);
-            return _mapper.Map<ReceiveMessageDto>(newMsg);
+            var receiveMsg = _mapper.Map<ReceiveMessageDto>(newMsg);
+            receiveMsg.TempId = messageDto.TempId;
+            return receiveMsg;
         }
 
         public async Task<List<ReceiveMessageDto>> GetAllMessagesInRoomAsync(string userId, long roomId)
