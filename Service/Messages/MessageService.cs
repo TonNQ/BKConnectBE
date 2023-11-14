@@ -87,5 +87,10 @@ namespace BKConnectBE.Service.Messages
             return await _messageRepository.GetRootMessageSenderIdAsync(messageId);
         }
 
+        public async Task<List<ImageMessageDto>> GetAllImageMessagesInRoomAsync(long roomId, string userId)
+        {
+            var list = await _messageRepository.GetAllImageMessagesInRoomAsync(roomId, userId);
+            return _mapper.Map<List<ImageMessageDto>>(list);
+        }
     }
 }

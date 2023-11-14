@@ -1,4 +1,6 @@
 using System.Net.Http.Headers;
+using BKConnect.BKConnectBE.Common;
+using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +18,18 @@ namespace BKConnectBE.Repository.Messages
         public async Task<List<Message>> GetAllMessagesInRoomAsync(long roomId)
         {
             return await _context.Rooms.Where(r => r.Id == roomId).SelectMany(r => r.Messages)
-                .Include(m => m.Sender).Include(m => m.RootMessage).OrderByDescending(m => m.Id).ToListAsync();
+                .Include(m => m.Sender).Include(m => m.RootMessage).OrderByDescending(m => m.SendTime).ToListAsync();
+        }
+
+        public async Task<List<Message>> GetAllImageMessagesInRoomAsync(long roomId, string userId)
+        {
+            if (!await _context.UsersOfRoom.AnyAsync(ur => ur.RoomId == roomId && ur.UserId == userId))
+            {
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+            }
+            return await _context.Messages
+                .Where(r => r.RoomId == roomId && r.TypeOfMessage == MessageType.Image.ToString())
+                .Include(m => m.RootMessage).OrderByDescending(m => m.SendTime).ToListAsync();
         }
 
         public async Task<Message> GetMessageByIdAsync(long messageId)
