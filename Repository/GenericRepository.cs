@@ -46,6 +46,11 @@ namespace BKConnectBE.Repository
             }
         }
 
+        public void Remove(T entity)
+        {
+            _db.Remove(entity);
+        }
+
         public async Task SaveChangeAsync()
         {
             IDbContextTransaction transaction = null;

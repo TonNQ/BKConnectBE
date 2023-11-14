@@ -5,7 +5,7 @@ namespace BKConnectBE.Common.Enumeration
     public enum NotificationType
     {
         [Description("lời mời kết bạn")]
-        IsFriendRequest,
+        IsSendFriendRequest,
 
         [Description("chấp nhận lời mời kết bạn")]
         IsAcceptFriendRequest,

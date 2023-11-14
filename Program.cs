@@ -27,6 +27,8 @@ using BKConnectBE.Repository.FriendRequests;
 using BKConnectBE.Service.FriendRequests;
 using BKConnectBE.Service.WebSocket;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
+using BKConnectBE.Repository.Notifications;
+using BKConnectBE.Service.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -74,6 +76,7 @@ builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<IRelationshipRepository, RelationshipRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -85,6 +88,7 @@ builder.Services.AddScoped<IFacultyService, FacultyService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IWebSocketService, WebSocketService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);

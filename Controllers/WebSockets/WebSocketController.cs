@@ -66,13 +66,13 @@ public class WebSocketController : ControllerBase
             var receivedData = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
             var receivedObject = JsonSerializer.Deserialize<SendWebSocketData>(receivedData);
 
-            if (receivedObject.DataType == "IsMessage")
+            if (receivedObject.DataType == WebSocketDataType.IsMessage.ToString())
             {
                 await _webSocketService.SendTextMessage(receivedObject, cnn.UserId);
             }
-            else if (receivedObject.DataType == "IsFriendRequest")
+            else if (receivedObject.DataType == WebSocketDataType.IsNotification.ToString())
             {
-                await _webSocketService.SendFriendRequest(receivedObject, cnn.UserId);
+                await _webSocketService.SendNotification(receivedObject, cnn.UserId);
             }
 
             buffer = new byte[1024 * 4];

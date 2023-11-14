@@ -37,25 +37,6 @@ namespace BKConnectBE.Controllers.FriendRequests
             }
         }
 
-        [HttpGet("getListOfAcceptedFriendRequests")]
-        public async Task<ActionResult<Responses>> GetListOfAcceptedFriendRequests()
-        {
-            try
-            {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
-                {
-                    var list = await _friendRequestService.GetListOfAcceptedFriendRequestsOfUser(userId);
-                    return this.Success(list, MsgNo.SUCCESS_GET_FRIEND_REQUESTS);
-                }
-
-                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(this.Error(e.Message));
-            }
-        }
-
         [HttpGet("checkCanSendFriendRequest")]
         public async Task<ActionResult<Responses>> CheckCanSendFriendRequest([FromQuery] SearchKeyCondition condition)
         {
@@ -78,52 +59,14 @@ namespace BKConnectBE.Controllers.FriendRequests
         }
 
         [HttpDelete("removeFriendRequest")]
-        public async Task<ActionResult<Responses>> RemoveFriendRequest([FromQuery] LongKeyCondition friendRequest)
+        public async Task<ActionResult<Responses>> RemoveFriendRequest([FromQuery] SearchKeyCondition sender)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    await _friendRequestService.RemoveFriendRequestById(friendRequest.SearchKey, userId);
+                    await _friendRequestService.RemoveFriendRequestById(sender.SearchKey, userId);
                     return this.Success(null, MsgNo.SUCCESS_REMOVE_FRIEND_REQUEST);
-                }
-
-                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(this.Error(e.Message));
-            }
-        }
-
-        [HttpPost("acceptFriendRequest")]
-        public async Task<ActionResult<Responses>> AcceptFriendRequest(LongKeyCondition friendRequest)
-        {
-            try
-            {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
-                {
-                    await _friendRequestService.AcceptFriendRequest(friendRequest.SearchKey, userId);
-                    return this.Success(null, MsgNo.SUCCESS_RESPONSE_FRIEND_REQUEST);
-                }
-
-                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(this.Error(e.Message));
-            }
-        }
-
-        [HttpPut("updateStatusOfFriendRequests")]
-        public async Task<ActionResult<Responses>> UpdateStatusOfListFriendRequests()
-        {
-            try
-            {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
-                {
-                    await _friendRequestService.UpdateStatusOfListFriendRequests(userId);
-                    return this.Success(null, MsgNo.SUCCESS_UPDATE_FRIEND_REQUEST);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

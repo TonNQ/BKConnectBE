@@ -17,6 +17,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_GET_LIST_MESSAGES = "Lấy danh sách tin nhắn thành công";
         public static readonly string SUCCESS_GET_INFORMATION_OF_ROOM = "Lấy thông tin của phòng thành công";
         public static readonly string SUCCESS_GET_LIST_OF_MEMBERS_IN_ROOM = "Lấy danh sách thành viên trong phòng thành công";
+        public static readonly string SUCCESS_GET_LIST_OF_NOTIFICATIONS = "Lấy danh sách thông báo thành công";
         public static readonly string SUCCESS_EMAIL_FORGOT_PASSWORD = "Vui lòng kiểm tra email để đặt lại mật khẩu";
         public static readonly string SUCCESS_RESET_PASSWORD = "Đặt lại mật khẩu thành công";
         public static readonly string SUCCESS_TOKEN_VALID = "Đường dẫn hợp lệ";
@@ -26,6 +27,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_CHECK_FRIEND_REQUEST = "Kiểm tra việc lời mời kết bạn thành công";
         public static readonly string SUCCESS_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thành công";
         public static readonly string SUCCESS_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thành công";
+        public static readonly string SUCCESS_UPDATE_NOTIFICATION_STATUS = "Cập nhật trạng thái thông báo thành công";
         public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
 
         //Error
@@ -35,6 +37,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_CLASS_NOT_FOUND = "Lớp học không tồn tại";
         public static readonly string ERROR_FACULTY_NOT_FOUND = "Khoa không tồn tại";
         public static readonly string ERROR_ROOM_NOT_FOUND = "Phòng không tồn tại";
+        public static readonly string ERROR_NOTIFICATION_NOT_FOUND = "Thông báo không tồn tại";
         public static readonly string ERROR_USER_HAD_ACTIVED = "Tài khoản này đã được kích hoạt rồi";
         public static readonly string ERROR_SEND_EMAIL = "Gửi email thất bại. Vui lòng thử lại sau";
         public static readonly string ERROR_INPUT_INVALID = "Dữ liệu nhập vào không hợp lệ";

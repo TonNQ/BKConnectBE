@@ -7,8 +7,8 @@ using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
-using BKConnectBE.Service.FriendRequests;
 using BKConnectBE.Service.Messages;
+using BKConnectBE.Service.Notifications;
 using BKConnectBE.Service.Rooms;
 using BKConnectBE.Service.Users;
 
@@ -19,17 +19,17 @@ namespace BKConnectBE.Service.WebSocket
         private readonly IUserService _userService;
         private readonly IMessageService _messageService;
         private readonly IRoomService _roomService;
-        private readonly IFriendRequestService _friendRequestService;
+        private readonly INotificationService _notificationService;
 
-        public WebSocketService(IUserService userService, 
-            IMessageService messageService, 
-            IRoomService roomService, 
-            IFriendRequestService friendRequestService)
+        public WebSocketService(IUserService userService,
+            IMessageService messageService,
+            IRoomService roomService,
+            INotificationService notificationService)
         {
             _userService = userService;
             _messageService = messageService;
             _roomService = roomService;
-            _friendRequestService = friendRequestService;
+            _notificationService = notificationService;
         }
 
         public void AddWebSocketConnection(WebSocketConnection connection)
@@ -108,10 +108,22 @@ namespace BKConnectBE.Service.WebSocket
             await Task.WhenAll(tasks);
         }
 
-        public async Task SendFriendRequest(SendWebSocketData websocketData, string userId)
+        public async Task SendNotification(SendWebSocketData websocketData, string userId)
         {
-            var friendRequest = await _friendRequestService.CreateFriendRequest(userId, websocketData.FriendRequest.ReceiverId);
-            var webSocket = WebSockets.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.FriendRequest.ReceiverId);
+            if (websocketData.Notification.NotificationType == NotificationType.IsSendFriendRequest.ToString())
+            {
+                await SendFriendRequest(websocketData, userId);
+            }
+            else if (websocketData.Notification.NotificationType == NotificationType.IsAcceptFriendRequest.ToString())
+            {
+                await SendFriendRequestAcception(websocketData, userId);
+            }
+        }
+
+        private async Task SendFriendRequest(SendWebSocketData websocketData, string userId)
+        {
+            var notification = await _notificationService.AddSendFriendRequestNotification(userId, websocketData.Notification.ReceiverId);
+            var webSocket = WebSockets.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.Notification.ReceiverId);
 
             if (webSocket is not null)
             {
@@ -119,7 +131,37 @@ namespace BKConnectBE.Service.WebSocket
                 {
                     UserId = userId,
                     DataType = websocketData.DataType,
-                    FriendRequest = friendRequest
+                    Notification = notification
+                };
+
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var tasks = new List<Task>();
+
+                await webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
+        }
+
+        private async Task SendFriendRequestAcception(SendWebSocketData websocketData, string userId)
+        {
+            var notification = await _notificationService.AddAcceptedFriendRequestNotification(userId, websocketData.Notification.ReceiverId);
+            var webSocket = WebSockets.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.Notification.ReceiverId);
+
+            if (webSocket is not null)
+            {
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    Notification = notification
                 };
 
                 var options = new JsonSerializerOptions

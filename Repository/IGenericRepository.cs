@@ -11,6 +11,8 @@
         Task<T> GetByIdAsync(string id);
 
         Task RemoveByIdAsync(long id);
+        
+        void Remove(T entity);
 
         Task SaveChangeAsync();
     }

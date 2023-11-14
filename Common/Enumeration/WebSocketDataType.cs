@@ -5,7 +5,7 @@ namespace BKConnectBE.Common.Enumeration
     public enum WebSocketDataType
     {
         IsMessage,
-        IsFriendRequest,
+        IsNotification,
         IsOnline,
         IsOffline
     }
