@@ -28,7 +28,7 @@ namespace BKConnectBE.Repository.Messages
         public async Task<string> GetRootMessageSenderIdAsync(long? messageId)
         {
             Message message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == messageId);
-            return message.SenderId;
+            return message?.SenderId;
         }
     }
 }
