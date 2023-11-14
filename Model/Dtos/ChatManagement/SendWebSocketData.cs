@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
+using BKConnectBE.Model.Dtos.NotificationManagement;
 
 namespace BKConnectBE.Model.Dtos.ChatManagement
 {
@@ -15,7 +16,7 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
         [JsonPropertyName("message")]
         public SendMessageDto Message { get; set; } = null;
 
-        [JsonPropertyName("friend_request")]
-        public SendServerFriendRequestDto FriendRequest { get; set; } = null;
+        [JsonPropertyName("notification")]
+        public SendNotificationDto Notification { get; set; } = null;
     }
 }

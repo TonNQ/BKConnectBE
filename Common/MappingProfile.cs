@@ -4,6 +4,7 @@ using BKConnectBE.Model.Dtos.Authentication;
 using BKConnectBE.Model.Dtos.ClassManagement;
 using BKConnectBE.Model.Dtos.FacultyManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
+using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.UserManagement;
@@ -65,6 +66,9 @@ namespace BKConnectBE.Common
             CreateMap<Room, RoomDetailDto>()
                 .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count))
                 .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(x => false));
+
+            CreateMap<Notification, ReceiveNotificationDto>()
+                .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
         }
     }
 }

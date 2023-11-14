@@ -1,5 +1,3 @@
-using BKConnectBE.Common;
-using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Entities;
@@ -16,36 +14,17 @@ namespace BKConnectBE.Repository.FriendRequests
             _context = context;
         }
 
-        public async Task<List<SentFriendRequestDto>> GetListOfAcceptedFriendRequestsOfUser(string userId)
-        {
-            return await _context.FriendRequests
-                .Include(fr => fr.Receiver)
-                .ThenInclude(r => r.Class)
-                .Where(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Accepted.ToString())
-                .Select(fr => new SentFriendRequestDto()
-                {
-                    Id = fr.Id,
-                    SendTime = fr.SendTime,
-                    Status = (int)fr.Status.ToEnum<FriendRequestStatus>(),
-                    ReceiverId = fr.ReceiverId,
-                    ReceiverName = fr.Receiver.Name,
-                    ReceiverAvatar = fr.Receiver.Avatar,
-                    ReceiverClassName = fr.Receiver.Class.Name
-                }).ToListAsync();
-        }
-
         public Task<List<ReceivedFriendRequestDto>> GetListOfReceivedFriendRequestsOfUser(string userId)
         {
             return _context.FriendRequests
                 .Include(fr => fr.Sender)
                 .ThenInclude(sd => sd.Class)
-                .Where(fr => fr.ReceiverId == userId && fr.Status != FriendRequestStatus.Accepted.ToString())
+                .Where(fr => fr.ReceiverId == userId)
                 .OrderByDescending(fr => fr.SendTime)
                 .Select(fr => new ReceivedFriendRequestDto()
                 {
                     Id = fr.Id,
                     SendTime = fr.SendTime,
-                    Status = (int)fr.Status.ToEnum<FriendRequestStatus>(),
                     SenderId = fr.SenderId,
                     SenderName = fr.Sender.Name,
                     SenderAvatar = fr.Sender.Avatar,
@@ -70,30 +49,8 @@ namespace BKConnectBE.Repository.FriendRequests
                 return false;
             }
 
-            return !await _context.FriendRequests.AnyAsync(fr => fr.Status != FriendRequestStatus.Accepted.ToString()
-                && listId.Contains(fr.ReceiverId) && listId.Contains(fr.SenderId))
+            return !await _context.FriendRequests.AnyAsync(fr => listId.Contains(fr.ReceiverId) && listId.Contains(fr.SenderId))
                 && !await _context.Relationships.AnyAsync(r => listId.Contains(r.User1Id) && listId.Contains(r.User2Id));
-        }
-
-        public async Task UpdateStatusOfListFriendRequests(string userId)
-        {
-            var friendRequests = await _context.FriendRequests
-            .Where(fr => (fr.SenderId == userId && fr.Status == FriendRequestStatus.Accepted.ToString())
-                || (fr.ReceiverId == userId && fr.Status == FriendRequestStatus.NotRead.ToString()))
-            .ToListAsync();
-
-            foreach (FriendRequest friendRequest in friendRequests)
-            {
-                switch (friendRequest.Status)
-                {
-                    case nameof(FriendRequestStatus.NotRead):
-                        friendRequest.Status = FriendRequestStatus.Pending.ToString();
-                        break;
-                    case nameof(FriendRequestStatus.Accepted):
-                        _context.FriendRequests.Remove(friendRequest);
-                        break;
-                }
-            }
         }
 
         public async Task CreateFriendRequest(string senderId, string receiverId)
@@ -103,26 +60,17 @@ namespace BKConnectBE.Repository.FriendRequests
                 SenderId = senderId,
                 ReceiverId = receiverId,
                 SendTime = DateTime.Now,
-                Status = FriendRequestStatus.NotRead.ToString()
             });
         }
 
-        public async Task<ReceivedFriendRequestDto> GetLastFriendRequestByUser(string senderId, string receiverId)
+        public async Task<FriendRequest> GetFriendRequestByUser(string user1Id, string user2Id)
         {
+            var list = new List<string> { user1Id, user2Id };
+
             return await _context.FriendRequests
                 .Include(fr => fr.Sender)
                 .ThenInclude(sd => sd.Class)
-                .Where(fr => fr.SenderId == senderId && fr.ReceiverId == receiverId)
-                .Select(fr => new ReceivedFriendRequestDto()
-                {
-                    Id = fr.Id,
-                    SendTime = fr.SendTime,
-                    SenderId = fr.SenderId,
-                    SenderName = fr.Sender.Name,
-                    SenderAvatar = fr.Sender.Avatar,
-                    Status = (int)fr.Status.ToEnum<FriendRequestStatus>(),
-                    SenderClassName = fr.Sender.Class.Name
-                }).OrderBy(fr => fr.SendTime).LastOrDefaultAsync();
+                .FirstOrDefaultAsync(fr => list.Contains(fr.SenderId) && list.Contains(fr.ReceiverId));
         }
     }
 }
