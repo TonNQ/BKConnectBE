@@ -36,5 +36,23 @@ namespace BKConnectBE.Controllers.Messages
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpGet("getAllImageMessages")]
+        public async Task<ActionResult<Responses>> GetAllImageMessagesInRoom([FromQuery] LongKeyCondition longKeyCondition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var listMessages = await _messageSerive.GetAllImageMessagesInRoomAsync(longKeyCondition.SearchKey, userId);
+                    return this.Success(listMessages, MsgNo.SUCCESS_GET_LIST_MESSAGES);
+                }
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }
