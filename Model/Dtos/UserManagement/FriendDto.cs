@@ -15,5 +15,8 @@ namespace BKConnectBE.Model.Dtos.UserManagement
 
         [JsonPropertyName("avatar")]
         public string Avatar { get; set; }
+
+        [JsonPropertyName("friend_time")]
+        public DateTime FriendTime { get; set; }
     }
 }

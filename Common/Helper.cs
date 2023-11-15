@@ -17,6 +17,10 @@ namespace BKConnectBE.Common
         {
             try
             {
+                if (string.IsNullOrEmpty(word))
+                {
+                    return "";
+                }
                 string temp = word.Normalize(NormalizationForm.FormD);
                 string result = Regex.Replace(temp, @"\p{M}", string.Empty);
                 result = result.Replace('đ', 'd').Replace('Đ', 'D').ToLower();
