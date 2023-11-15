@@ -69,6 +69,9 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count))
                 .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(x => false));
 
+            CreateMap<Room, RoomSidebarDto>()
+                .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(x => false));
+
             CreateMap<Notification, ReceiveNotificationDto>()
                 .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
         }

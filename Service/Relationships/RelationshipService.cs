@@ -1,4 +1,5 @@
 using AutoMapper;
+using BKConnectBE.Common;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
@@ -23,14 +24,15 @@ namespace BKConnectBE.Service.Relationships
 
         public async Task<List<FriendDto>> GetListOfFriendsByUserId(string userId)
         {
-            List<User> users = await _relationshipRepository.GetListOfFriendsByUserId(userId);
-            return _mapper.Map<List<FriendDto>>(users);
+            return await _relationshipRepository.GetListOfFriendsByUserId(userId);
         }
 
         public async Task<List<FriendDto>> SearchListOfFriendsByUserId(string userId, string searchKey)
         {
-            List<User> users = await _relationshipRepository.SearchListOfFriendsByUserId(userId, searchKey);
-            return _mapper.Map<List<FriendDto>>(users);
+            searchKey = Helper.RemoveUnicodeSymbol(searchKey);
+            var friends = await _relationshipRepository.GetListOfFriendsByUserId(userId);
+            return friends.Where(f => f.Id.Contains(searchKey)
+                || Helper.RemoveUnicodeSymbol(f.Name).Contains(searchKey)).ToList();
         }
 
         public async Task UnfriendAsync(string userId1, string userId2)

@@ -7,7 +7,6 @@ using BKConnectBE.Repository;
 using BKConnectBE.Repository.Users;
 using BKConnectBE.Common;
 using BKConnectBE.Model.Dtos.Parameters;
-using BKConnectBE.Model.Dtos.MessageManagement;
 
 namespace BKConnectBE.Service.Users
 {
