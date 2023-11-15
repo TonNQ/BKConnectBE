@@ -59,7 +59,7 @@ namespace BKConnectBE.Service.Rooms
 
             foreach (Room room in rooms)
             {
-                var lastMessage = room.Messages.OrderByDescending(m => m.SendTime).LastOrDefault()
+                var lastMessage = room.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault()
                     ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
                 var roomDto = _mapper.Map<RoomSidebarDto>(room);
                 if (room.RoomType != nameof(RoomType.PrivateRoom) && Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
@@ -73,7 +73,8 @@ namespace BKConnectBE.Service.Rooms
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > user.ReadMessageId);
                         roomDto.LastMessageTime = lastMessage.SendTime;
-                        roomDto.LastMessage = (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: ")
+                        roomDto.LastMessage = (lastMessage.SenderId == null ? ""
+                            : (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: "))
                             + (lastMessage.TypeOfMessage == nameof(MessageType.Text)
                                 ? lastMessage.Content
                                 : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}");
@@ -99,8 +100,8 @@ namespace BKConnectBE.Service.Rooms
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > user.ReadMessageId);
                         roomDto.LastMessageTime = lastMessage.SendTime;
-                        roomDto.LastMessage = lastMessage.SenderId == null ? ""
-                            : (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: ")
+                        roomDto.LastMessage = (lastMessage.SenderId == null ? ""
+                            : (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: "))
                             + (lastMessage.TypeOfMessage == nameof(MessageType.Text)
                                 ? lastMessage.Content
                                 : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}");
