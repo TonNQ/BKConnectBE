@@ -86,5 +86,12 @@ namespace BKConnectBE.Repository.Rooms
                 ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
             return room.UsersOfRoom.ToList();
         }
+
+        public async Task<List<Room>> GetListOfRoomsByTypeAndUserId(string type, string userId)
+        {
+            return await _context.Rooms.Include(r => r.UsersOfRoom)
+                .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId) && r.RoomType == type)
+                .ToListAsync();
+        }
     }
 };

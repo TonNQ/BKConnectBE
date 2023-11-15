@@ -121,5 +121,11 @@ namespace BKConnectBE.Service.Rooms
             var members = await _roomRepository.GetListOfMembersInRoomAsync(roomId, userId);
             return _mapper.Map<List<MemberOfRoomDto>>(members);
         }
+
+        public async Task<List<GroupRoomDto>> GetListOfRoomsByTypeAndUserId(string type, string userId)
+        {
+            var rooms = await _roomRepository.GetListOfRoomsByTypeAndUserId(type, userId);
+            return _mapper.Map<List<GroupRoomDto>>(rooms);
+        }
     }
 }
