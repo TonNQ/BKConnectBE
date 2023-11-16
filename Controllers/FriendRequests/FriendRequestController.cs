@@ -37,6 +37,25 @@ namespace BKConnectBE.Controllers.FriendRequests
             }
         }
 
+        [HttpGet("searchListOfReceivedFriendRequests")]
+        public async Task<ActionResult<Responses>> SearchListOfReceivedFriendRequests([FromQuery] SearchKeyCondition condition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var list = await _friendRequestService.SearchListOfReceivedFriendRequestsOfUser(userId, condition.SearchKey);
+                    return this.Success(list, MsgNo.SUCCESS_GET_FRIEND_REQUESTS);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
         [HttpGet("checkCanSendFriendRequest")]
         public async Task<ActionResult<Responses>> CheckCanSendFriendRequest([FromQuery] SearchKeyCondition condition)
         {
