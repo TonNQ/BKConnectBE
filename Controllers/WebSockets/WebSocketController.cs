@@ -68,7 +68,7 @@ public class WebSocketController : ControllerBase
 
             if (receivedObject.DataType == WebSocketDataType.IsMessage.ToString())
             {
-                await _webSocketService.SendTextMessage(receivedObject, cnn.UserId);
+                await _webSocketService.SendMessage(receivedObject, cnn.UserId);
             }
             else if (receivedObject.DataType == WebSocketDataType.IsNotification.ToString())
             {

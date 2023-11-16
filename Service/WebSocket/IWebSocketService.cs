@@ -8,7 +8,7 @@ namespace BKConnectBE.Service.WebSocket
         void AddWebSocketConnection(WebSocketConnection connection);
         Task CloseConnection(WebSocketConnection cnn);
         Task SendStatusMessage(ReceiveWebSocketData websocketData);
-        Task SendTextMessage(SendWebSocketData websocketData, string userId);
+        Task SendMessage(SendWebSocketData websocketData, string userId);
         Task SendNotification(SendWebSocketData websocketData, string userId);
         Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId);
         Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId);
