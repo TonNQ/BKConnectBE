@@ -2,8 +2,12 @@ using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Common.Enumeration;
+using BKConnectBE.Model.Dtos.ChatManagement;
+using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.Parameters;
+using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Service.Rooms;
+using BKConnectBE.Service.WebSocket;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKConnectBE.Controllers.Rooms
@@ -14,10 +18,12 @@ namespace BKConnectBE.Controllers.Rooms
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _roomService;
+        private readonly IWebSocketService _webSocketService;
 
-        public RoomController(IRoomService roomService)
+        public RoomController(IRoomService roomService, IWebSocketService webSocketService)
         {
             _roomService = roomService;
+            _webSocketService = webSocketService;
         }
 
         [HttpGet("getRoomsOfUser")]
@@ -162,6 +168,48 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var listOfRooms = await _roomService.SearchListOfRoomsByTypeAndUserId(nameof(RoomType.ClassRoom), userId, condition.SearchKey);
                     return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("addUserToRoom")]
+        public async Task<ActionResult<Responses>> AddUserToRoom(AddMemberDto addMemberDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var addMsg = await _roomService.AddUserToRoomAsync(addMemberDto.RoomId, addMemberDto.UserId, userId);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = addMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId);
+
+                    var notification = new SendNotificationDto
+                    {
+                        NotificationType = NotificationType.IsInRoom.ToString(),
+                        ReceiverId = addMemberDto.UserId
+                    };
+
+                    var websocketDataNotify = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsNotification.ToString(),
+                        Notification = notification
+                    };
+
+                    await _webSocketService.SendRoomNotification(websocketDataNotify, userId, addMemberDto.RoomId);
+
+                    return this.Success(addMemberDto.UserId, MsgNo.SUCCESS_ADD_USER_TO_ROOM);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

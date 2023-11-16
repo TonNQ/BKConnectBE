@@ -1,3 +1,4 @@
+using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
 
 namespace BKConnectBE.Service.Rooms
@@ -10,5 +11,6 @@ namespace BKConnectBE.Service.Rooms
         Task<List<string>> GetListOfUserIdInRoomAsync(long roomId);
         Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId);
         Task<List<MemberOfRoomDto>> GetListOfMembersInRoomAsync(long roomId, string userId);
+        Task<SendMessageDto> AddUserToRoomAsync(long roomId, string addUserId, string userId);
     }
 }

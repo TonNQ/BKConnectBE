@@ -14,5 +14,6 @@ namespace BKConnectBE.Repository.Users
         Task UpdateLastOnlineAsync(string userId);
         Task<string> GetUsernameById(string userId);
         Task<bool> GetUserGenderById(string userId);
+        Task<bool> IsLecturer(string userId);
     }
 }

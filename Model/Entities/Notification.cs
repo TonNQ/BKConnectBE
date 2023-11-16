@@ -19,6 +19,8 @@ namespace BKConnectBE.Model.Entities
 
         public string ReceiverId { get; set; }
 
+        public long? RoomId { get; set; }
+
         public bool IsRead { get; set; }
     }
 }

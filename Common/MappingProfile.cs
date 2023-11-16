@@ -76,7 +76,8 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count));
 
             CreateMap<Notification, ReceiveNotificationDto>()
-                .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
+                .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type))
+                .ForMember(dest => dest.SenderId, opt => opt.MapFrom(src => src.Content));
         }
     }
 }

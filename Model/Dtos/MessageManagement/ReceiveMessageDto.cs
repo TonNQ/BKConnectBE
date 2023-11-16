@@ -27,7 +27,7 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
         [JsonPropertyName("send_time")]
         public DateTime SendTime { get; set; }
 
-        [JsonPropertyName("type_message")]
+        [JsonPropertyName("message_type")]
         [EnumDataType(typeof(MessageType))]
         public string TypeOfMessage { get; set; }
 

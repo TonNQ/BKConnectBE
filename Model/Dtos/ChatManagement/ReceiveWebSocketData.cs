@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using BKConnectBE.Common.Enumeration;
-using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 

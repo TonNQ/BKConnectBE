@@ -17,6 +17,6 @@ namespace BKConnectBE.Common.Enumeration
         File,
 
         [Description("hệ thống")]
-        System,
+        System
     }
 }

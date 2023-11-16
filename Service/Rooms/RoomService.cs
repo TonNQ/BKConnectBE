@@ -2,20 +2,40 @@ using AutoMapper;
 using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
+using BKConnectBE.Model.Dtos.ChatManagement;
+using BKConnectBE.Model.Dtos.MessageManagement;
+using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Entities;
+using BKConnectBE.Repository;
+using BKConnectBE.Repository.Messages;
 using BKConnectBE.Repository.Rooms;
+using BKConnectBE.Repository.Users;
+using BKConnectBE.Service.Messages;
+using BKConnectBE.Service.WebSocket;
 
 namespace BKConnectBE.Service.Rooms
 {
     public class RoomService : IRoomService
     {
         private readonly IRoomRepository _roomRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IGenericRepository<Room> _genericRepositoryForRoom;
+        private readonly IGenericRepository<UserOfRoom> _genericRepositoryForUserOfRoom;
+        private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
 
-        public RoomService(IRoomRepository roomRepository, IMapper mapper)
+        public RoomService(IRoomRepository roomRepository, IUserRepository userRepository,
+            IMessageService messageService,
+            IGenericRepository<Room> genericRepositoryForRoom,
+            IGenericRepository<UserOfRoom> genericRepositoryForUserOfRoom,
+            IMapper mapper)
         {
             _roomRepository = roomRepository;
+            _userRepository = userRepository;
+            _messageService = messageService;
+            _genericRepositoryForRoom = genericRepositoryForRoom;
+            _genericRepositoryForUserOfRoom = genericRepositoryForUserOfRoom;
             _mapper = mapper;
         }
 
@@ -161,6 +181,66 @@ namespace BKConnectBE.Service.Rooms
                 }
             }
             return roomDtos;
+        }
+
+        public async Task<SendMessageDto> AddUserToRoomAsync(long roomId, string addedUserId, string userId)
+        {
+            if (!await _roomRepository.IsInRoomAsync(roomId, userId))
+            {
+                throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            }
+
+            if (await _roomRepository.IsInRoomAsync(roomId, addedUserId))
+            {
+                throw new Exception(MsgNo.ERROR_USER_ALREADY_IN_ROOM);
+            }
+
+            var room = await _genericRepositoryForRoom.GetByIdAsync(roomId) ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+
+            if (room.RoomType == RoomType.PrivateRoom.ToString())
+            {
+                throw new Exception(MsgNo.ERROR_ADD_USER_TO_ROOM);
+            }
+            else if (room.RoomType == RoomType.ClassRoom.ToString())
+            {
+                if (!await _userRepository.IsLecturer(userId))
+                {
+                    throw new Exception(MsgNo.ERROR_ADD_USER_TO_ROOM);
+                }
+
+                return await AddingUserToRoomAsync(roomId, addedUserId, userId);
+            }
+            else
+            {
+                return await AddingUserToRoomAsync(roomId, addedUserId, userId);
+            }
+
+            
+        }
+
+        private async Task<SendMessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)
+        {
+            var member = new UserOfRoom
+            {
+                IsAdmin = false,
+                UserId = addedUserId,
+                RoomId = roomId
+            };
+            await _genericRepositoryForUserOfRoom.AddAsync(member);
+            await _genericRepositoryForUserOfRoom.SaveChangeAsync();
+
+            var addUsername = await _userRepository.GetUsernameById(addedUserId);
+            var username = await _userRepository.GetUsernameById(userId);
+
+            var addMsg = new SendMessageDto {
+                RoomId = roomId,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = username + " đã thêm " + addUsername + " vào nhóm"
+            };
+
+            await _messageService.AddMessageAsync(addMsg, userId);
+
+            return addMsg;
         }
     }
 }

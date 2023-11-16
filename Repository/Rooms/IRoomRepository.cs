@@ -10,5 +10,6 @@ namespace BKConnectBE.Repository.Rooms
         Task<Room> GetInformationOfRoom(long roomId);
         Task CreateNewPrivateRoom(string userId1, string userId2, string serverMessage);
         Task<List<UserOfRoom>> GetListOfMembersInRoomAsync(long roomId, string userId);
+        Task<bool> IsInRoomAsync(long roomId, string userId);
     }
 }
