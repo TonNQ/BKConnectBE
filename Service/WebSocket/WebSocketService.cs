@@ -71,7 +71,7 @@ namespace BKConnectBE.Service.WebSocket
             await Task.WhenAll(tasks);
         }
 
-        public async Task SendTextMessage(SendWebSocketData websocketData, string userId)
+        public async Task SendMessage(SendWebSocketData websocketData, string userId)
         {
             var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
             var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
