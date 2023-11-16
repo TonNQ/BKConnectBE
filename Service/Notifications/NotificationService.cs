@@ -51,7 +51,7 @@ namespace BKConnectBE.Service.Notifications
             {
                 var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
 
-                if (notification.Type == NotificationType.IsInRoom.ToString())
+                if (notification.Type == NotificationType.IsInRoom.ToString() || notification.Type == NotificationType.IsOutRoom.ToString())
                 {
                     if(notification.RoomId == null)
                     {
@@ -146,6 +146,7 @@ namespace BKConnectBE.Service.Notifications
 
             var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
             notificationDto.Id = notification.Id;
+            notificationDto.SenderName = sender.Name;
 
             return notificationDto;
         }

@@ -13,6 +13,9 @@ namespace BKConnectBE.Model.Dtos.NotificationManagement
         [JsonPropertyName("sender_id")]
         public string SenderId { get; set; }
 
+        [JsonPropertyName("sender_name")]
+        public string SenderName { get; set; }
+
         [JsonPropertyName("send_time")]
         public DateTime SendTime { get; set; }
 
