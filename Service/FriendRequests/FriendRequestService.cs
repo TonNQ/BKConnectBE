@@ -36,6 +36,13 @@ namespace BKConnectBE.Service.FriendRequests
             return await _friendRequestRepository.GetListOfReceivedFriendRequestsOfUser(userId);
         }
 
+        public async Task<List<ReceivedFriendRequestDto>> SearchListOfReceivedFriendRequestsOfUser(string userId, string searchKey = "")
+        {
+            searchKey = Helper.RemoveUnicodeSymbol(searchKey);
+            var list = await _friendRequestRepository.GetListOfReceivedFriendRequestsOfUser(userId);
+            return list.Where(l => Helper.RemoveUnicodeSymbol(l.SenderName).Contains(searchKey)).ToList();
+        }
+
         public async Task RemoveFriendRequestById(string senderId, string receiverId)
         {
             var friendRequest = await _friendRequestRepository.GetFriendRequestByUser(senderId, receiverId)
