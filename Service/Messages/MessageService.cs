@@ -1,4 +1,7 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
+using BKConnect.BKConnectBE.Common;
+using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
@@ -33,9 +36,7 @@ namespace BKConnectBE.Service.Messages
             await _genericRepositoryForMessage.AddAsync(sendMsg);
             await _genericRepositoryForMessage.SaveChangeAsync();
             Message newMsg = await _messageRepository.GetMessageByIdAsync(sendMsg.Id);
-            var receiveMsg = _mapper.Map<ReceiveMessageDto>(newMsg);
-            receiveMsg.TempId = messageDto.TempId;
-            return receiveMsg;
+            return _mapper.Map<ReceiveMessageDto>(newMsg);
         }
 
         public async Task<List<ReceiveMessageDto>> GetAllMessagesInRoomAsync(string userId, long roomId)
@@ -93,6 +94,29 @@ namespace BKConnectBE.Service.Messages
         {
             var list = await _messageRepository.GetAllImageMessagesInRoomAsync(roomId, userId);
             return _mapper.Map<List<ImageMessageDto>>(list);
+        }
+        public async Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId)
+        {
+            if (receiveMsg.SenderId == userId)
+            {
+                receiveMsg.SenderName = "Bạn";
+            }
+            else
+            {
+                receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
+            }
+
+            if (receiverId == userId)
+            {
+                receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
+            }
+            else
+            {
+                var receiverName = await _userRepository.GetUsernameById(receiverId);
+                receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
+            }
+
+            return receiveMsg;
         }
     }
 }

@@ -29,6 +29,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thành công";
         public static readonly string SUCCESS_UPDATE_NOTIFICATION_STATUS = "Cập nhật trạng thái thông báo thành công";
         public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
+        public static readonly string SUCCESS_ADD_USER_TO_ROOM = "Thêm người dùng vào nhóm thành công";
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";
@@ -55,6 +56,10 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thất bại";
         public static readonly string ERROR_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thất bại";
         public static readonly string ERROR_RELATIONSHIP_NOT_FOUND = "Các bạn hiện không phải là bạn bè";
+        public static readonly string ERROR_USER_NOT_IN_ROOM = "Bạn không có trong nhóm này";
+        public static readonly string ERROR_ADD_USER_TO_ROOM = "Bạn không thể thêm người dùng vào nhóm";
+        public static readonly string ERROR_USER_ALREADY_IN_ROOM = "Người dùng đã ở trong nhóm này rồi";
+
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

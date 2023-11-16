@@ -51,15 +51,19 @@ namespace BKConnectBE.Service.Notifications
             {
                 var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
 
-                if (notification.Type == NotificationType.IsSendFriendRequest.ToString()
-                    || notification.Type == NotificationType.IsAcceptFriendRequest.ToString())
+                if (notification.Type == NotificationType.IsInRoom.ToString())
                 {
-                    var sender = await _userRepository.GetByIdAsync(notification.Content);
-                    notificationDto.FriendRequest = new()
+                    if(notification.RoomId == null)
                     {
-                        UserId = sender.Id,
-                        UserName = sender.Name,
-                        UserClass = sender.Class?.Name ?? ""
+                        throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+                    }
+
+                    var room = await _roomRepository.GetInformationOfRoom((long)notification.RoomId);
+
+                    notificationDto.RoomMessage = new()
+                    {
+                        RoomName = room.Name,
+                        RoomType = room.RoomType
                     };
                 }
 
@@ -82,7 +86,8 @@ namespace BKConnectBE.Service.Notifications
             }
 
             await _friendRequestRepository.CreateFriendRequest(senderId, receiverId);
-            return await AddFriendRequestNotification(senderId, receiverId, NotificationType.IsSendFriendRequest.ToString());
+
+            return await AddNotification(senderId, receiverId, NotificationType.IsSendFriendRequest.ToString(), null);
         }
 
         public async Task<ReceiveNotificationDto> AddAcceptedFriendRequestNotification(string senderId, string receiverId)
@@ -100,10 +105,23 @@ namespace BKConnectBE.Service.Notifications
             await _roomRepository.CreateNewPrivateRoom(senderId, receiverId, Constants.FRIEND_ACCEPTED_NOTIFICATION);
             await _relationshipRepository.CreateNewRelationship(senderId, receiverId);
 
-            return await AddFriendRequestNotification(senderId, receiverId, NotificationType.IsAcceptFriendRequest.ToString());
+            return await AddNotification(senderId, receiverId, NotificationType.IsAcceptFriendRequest.ToString(), null);
         }
 
-        private async Task<ReceiveNotificationDto> AddFriendRequestNotification(string senderId, string receiverId, string type)
+        public async Task<ReceiveNotificationDto> AddInsertToRoomNotification(string senderId, string receiverId, long roomId)
+        {
+            var notification = await AddNotification(senderId, receiverId, NotificationType.IsInRoom.ToString(), roomId);
+            var room = await _roomRepository.GetInformationOfRoom(roomId);
+            
+            notification.RoomMessage = new NotifyRoomMessage();
+            notification.RoomMessage.RoomName = room.Name;
+            notification.RoomMessage.RoomType = room.RoomType;
+
+            return notification;
+
+        }
+
+        private async Task<ReceiveNotificationDto> AddNotification(string senderId, string receiverId, string type, long? roomId)
         {
             var sender = await _userRepository.GetByIdAsync(senderId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
@@ -117,16 +135,18 @@ namespace BKConnectBE.Service.Notifications
                 IsRead = false,
                 Content = senderId
             };
+            
+            if (type == NotificationType.IsInRoom.ToString())
+            {
+                notification.RoomId = roomId;
+            }
+
             await _genericRepositoryForNotification.AddAsync(notification);
+            await _genericRepositoryForNotification.SaveChangeAsync();
 
             var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
-            notificationDto.FriendRequest = new()
-            {
-                UserId = senderId,
-                UserName = sender.Name,
-                UserClass = sender.Class?.Name ?? ""
-            };
-            await _genericRepositoryForFriendRequest.SaveChangeAsync();
+            notificationDto.Id = notification.Id;
+
             return notificationDto;
         }
     }

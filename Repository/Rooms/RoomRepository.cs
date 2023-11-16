@@ -97,5 +97,10 @@ namespace BKConnectBE.Repository.Rooms
                 .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId) && r.RoomType == type)
                 .ToListAsync();
         }
+
+        public async Task<bool> IsInRoomAsync(long roomId, string userId)
+        {
+            return await _context.UsersOfRoom.AnyAsync(u => u.UserId == userId && u.RoomId == roomId);
+        }
     }
 };

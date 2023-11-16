@@ -15,5 +15,8 @@ namespace BKConnectBE.Common.Enumeration
 
         [Description("giảng viên gửi file")]
         IsPostFile,
+
+        [Description("thêm vào nhóm")]
+        IsInRoom,
     }
 }
