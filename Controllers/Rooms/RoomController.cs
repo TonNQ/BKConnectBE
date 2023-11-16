@@ -179,7 +179,7 @@ namespace BKConnectBE.Controllers.Rooms
         }
 
         [HttpPost("addUserToRoom")]
-        public async Task<ActionResult<Responses>> AddUserToRoom(AddMemberDto addMemberDto)
+        public async Task<ActionResult<Responses>> AddUserToRoom(ChangedMemberDto addMemberDto)
         {
             try
             {
@@ -193,7 +193,7 @@ namespace BKConnectBE.Controllers.Rooms
                         Message = addMsg
                     };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId);
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId, SystemMessageType.IsInRoom.ToString());
 
                     var notification = new SendNotificationDto
                     {
@@ -210,6 +210,48 @@ namespace BKConnectBE.Controllers.Rooms
                     await _webSocketService.SendRoomNotification(websocketDataNotify, userId, addMemberDto.RoomId);
 
                     return this.Success(addMemberDto.UserId, MsgNo.SUCCESS_ADD_USER_TO_ROOM);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("removeUserFromRoom")]
+        public async Task<ActionResult<Responses>> RemoveUserFromRoom(ChangedMemberDto removeMemberDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var removeMsg = await _roomService.RemoveUserFromRoom(removeMemberDto.RoomId, removeMemberDto.UserId, userId);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = removeMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, removeMemberDto.UserId, SystemMessageType.IsOutRoom.ToString());
+
+                    var notification = new SendNotificationDto
+                    {
+                        NotificationType = NotificationType.IsOutRoom.ToString(),
+                        ReceiverId = removeMemberDto.UserId
+                    };
+
+                    var websocketDataNotify = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsNotification.ToString(),
+                        Notification = notification
+                    };
+
+                    await _webSocketService.SendRoomNotification(websocketDataNotify, userId, removeMemberDto.RoomId);
+
+                    return this.Success(removeMemberDto.UserId, MsgNo.SUCCESS_REMOVE_USER_FROM_ROOM);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

@@ -12,5 +12,7 @@ namespace BKConnectBE.Service.Rooms
         Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId);
         Task<List<MemberOfRoomDto>> GetListOfMembersInRoomAsync(long roomId, string userId);
         Task<SendMessageDto> AddUserToRoomAsync(long roomId, string addUserId, string userId);
+        Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId);
+
     }
 }

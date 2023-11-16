@@ -108,9 +108,9 @@ namespace BKConnectBE.Service.Notifications
             return await AddNotification(senderId, receiverId, NotificationType.IsAcceptFriendRequest.ToString(), null);
         }
 
-        public async Task<ReceiveNotificationDto> AddInsertToRoomNotification(string senderId, string receiverId, long roomId)
+        public async Task<ReceiveNotificationDto> AddRoomNotification(string senderId, string receiverId, string type, long roomId)
         {
-            var notification = await AddNotification(senderId, receiverId, NotificationType.IsInRoom.ToString(), roomId);
+            var notification = await AddNotification(senderId, receiverId, type, roomId);
             var room = await _roomRepository.GetInformationOfRoom(roomId);
             
             notification.RoomMessage = new NotifyRoomMessage();
@@ -136,7 +136,7 @@ namespace BKConnectBE.Service.Notifications
                 Content = senderId
             };
             
-            if (type == NotificationType.IsInRoom.ToString())
+            if (type == NotificationType.IsInRoom.ToString() || type == NotificationType.IsOutRoom.ToString())
             {
                 notification.RoomId = roomId;
             }

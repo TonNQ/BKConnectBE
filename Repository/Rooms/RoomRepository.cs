@@ -102,5 +102,11 @@ namespace BKConnectBE.Repository.Rooms
         {
             return await _context.UsersOfRoom.AnyAsync(u => u.UserId == userId && u.RoomId == roomId);
         }
+
+        public async Task<UserOfRoom> GetAnUserOfRoom(long roomId, string userId)
+        {
+            return await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId) 
+                ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+        }
     }
 };

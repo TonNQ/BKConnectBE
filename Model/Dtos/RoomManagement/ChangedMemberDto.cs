@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace BKConnectBE.Model.Dtos.RoomManagement
 {
-    public class AddMemberDto
+    public class ChangedMemberDto
     {
         [JsonPropertyName("user_id")]
         public string UserId { get; set; }

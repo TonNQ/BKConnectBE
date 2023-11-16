@@ -95,7 +95,7 @@ namespace BKConnectBE.Service.Messages
             var list = await _messageRepository.GetAllImageMessagesInRoomAsync(roomId, userId);
             return _mapper.Map<List<ImageMessageDto>>(list);
         }
-        public async Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId)
+        public async Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type)
         {
             if (receiveMsg.SenderId == userId)
             {
@@ -108,12 +108,28 @@ namespace BKConnectBE.Service.Messages
 
             if (receiverId == userId)
             {
-                receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
+                if (type == SystemMessageType.IsInRoom.ToString())
+                {
+                    receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
+                }
+                else if (type == SystemMessageType.IsOutRoom.ToString())
+                {
+                    receiveMsg.Content = receiveMsg.SenderName + " đã xoá bạn ra khỏi nhóm";
+                }
             }
             else
             {
                 var receiverName = await _userRepository.GetUsernameById(receiverId);
-                receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
+                if (type == SystemMessageType.IsInRoom.ToString())
+                {
+                    receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
+
+                }
+                else if (type == SystemMessageType.IsOutRoom.ToString())
+                {
+                    receiveMsg.Content = receiveMsg.SenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+
+                }
             }
 
             return receiveMsg;

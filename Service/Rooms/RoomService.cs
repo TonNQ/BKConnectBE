@@ -242,5 +242,30 @@ namespace BKConnectBE.Service.Rooms
 
             return addMsg;
         }
+
+        public async Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId)
+        {
+            if (!await _roomRepository.IsInRoomAsync(roomId, removeId)) 
+            {
+                throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            }
+
+            var member = await _roomRepository.GetAnUserOfRoom(roomId, removeId);
+            await _genericRepositoryForUserOfRoom.RemoveByIdAsync(member.Id);
+            await _genericRepositoryForUserOfRoom.SaveChangeAsync();
+
+            var removeUsername = await _userRepository.GetUsernameById(removeId);
+            var username = await _userRepository.GetUsernameById(userId);
+
+            var removeMsg = new SendMessageDto {
+                RoomId = roomId,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = username + " đã xoá " + removeUsername + " ra khỏi nhóm"
+            };
+
+            await _messageService.AddMessageAsync(removeMsg, userId);
+
+            return removeMsg;
+        }
     }
 }

@@ -109,7 +109,7 @@ namespace BKConnectBE.Service.WebSocket
             await Task.WhenAll(tasks);
         }
 
-        public async Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId)
+        public async Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type)
         {
             var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
             var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
@@ -132,7 +132,7 @@ namespace BKConnectBE.Service.WebSocket
 
             foreach (WebSocketConnection webSocket in listOfWebSocket)
             {
-                receiveWebSocketData.Message = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId);
+                receiveWebSocketData.Message = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, type);
 
                 var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
 
@@ -220,7 +220,7 @@ namespace BKConnectBE.Service.WebSocket
 
         public async Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId)
         {
-            var notification = await _notificationService.AddInsertToRoomNotification(userId, websocketData.Notification.ReceiverId, roomId);
+            var notification = await _notificationService.AddRoomNotification(userId, websocketData.Notification.ReceiverId, websocketData.Notification.NotificationType, roomId);
             var webSocket = WebSockets.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.Notification.ReceiverId);
 
             if (webSocket is not null)
