@@ -30,6 +30,8 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_UPDATE_NOTIFICATION_STATUS = "Cập nhật trạng thái thông báo thành công";
         public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
         public static readonly string SUCCESS_ADD_USER_TO_ROOM = "Thêm người dùng vào nhóm thành công";
+        public static readonly string SUCCESS_REMOVE_USER_FROM_ROOM = "Xoá người dùng ra khỏi nhóm thành công";
+
 
         //Error
         public static readonly string ERROR_REGISTER = "Đăng ký tài khoản thất bại";

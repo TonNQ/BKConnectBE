@@ -10,7 +10,7 @@ namespace BKConnectBE.Service.WebSocket
         Task SendStatusMessage(ReceiveWebSocketData websocketData);
         Task SendMessage(SendWebSocketData websocketData, string userId);
         Task SendNotification(SendWebSocketData websocketData, string userId);
-        Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId);
+        Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type);
         Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId);
     }
 }

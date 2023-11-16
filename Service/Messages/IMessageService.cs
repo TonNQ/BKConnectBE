@@ -9,7 +9,7 @@ namespace BKConnectBE.Service.Messages
         Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto, string userId);
         Task<string> GetRootMessageSenderId(long? messageId);
         Task<ReceiveMessageDto> RenameUser(ReceiveMessageDto receiveMsg, string userId, string rootSenderId);
-        Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId);
+        Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type);
 
     }
 }
