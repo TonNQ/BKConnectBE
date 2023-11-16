@@ -14,6 +14,9 @@ namespace BKConnectBE.Common.Enumeration
         Audio,
 
         [Description("tệp đính kèm")]
-        File
+        File,
+
+        [Description("hệ thống")]
+        System,
     }
 }
