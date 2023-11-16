@@ -15,5 +15,8 @@ namespace BKConnectBE.Model.Dtos.RoomManagement
 
         [JsonPropertyName("total_member")]
         public long TotalMember { get; set; }
+
+        [JsonPropertyName("join_time")]
+        public DateTime JoinTime { get; set; }
     }
 }

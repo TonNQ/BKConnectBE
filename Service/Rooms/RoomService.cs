@@ -130,7 +130,17 @@ namespace BKConnectBE.Service.Rooms
         public async Task<List<GroupRoomDto>> GetListOfRoomsByTypeAndUserId(string type, string userId)
         {
             var rooms = await _roomRepository.GetListOfRoomsByTypeAndUserId(type, userId);
-            return _mapper.Map<List<GroupRoomDto>>(rooms);
+            var roomDtos = new List<GroupRoomDto>();
+
+            foreach (Room room in rooms)
+            {
+                var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
+                    ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
+                var roomDto = _mapper.Map<GroupRoomDto>(room);
+                roomDto.JoinTime = user.JoinTime;
+                roomDtos.Add(roomDto);
+            }
+            return roomDtos;
         }
     }
 }

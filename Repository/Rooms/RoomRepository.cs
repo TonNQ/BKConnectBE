@@ -30,27 +30,30 @@ namespace BKConnectBE.Repository.Rooms
                     Name = null,
                     Avatar = null,
                     UsersOfRoom = new List<UserOfRoom>()
-                {
-                    new ()
                     {
-                        UserId = userId1,
-                        ReadMessageId = null
+                        new ()
+                        {
+                            UserId = userId1,
+                            JoinTime = DateTime.Now,
+                            ReadMessageId = null
+                        },
+                        new ()
+                        {
+                            UserId = userId2,
+                            JoinTime = DateTime.Now,
+                            ReadMessageId = null
+                        }
                     },
-                    new ()
+                    Messages = new List<Message>()
                     {
-                        UserId = userId2,
-                        ReadMessageId = null
-                    }
-                },
-                    Messages = new List<Message>(){
-                    new ()
-                    {
-                        TypeOfMessage = MessageType.Text.ToString(),
-                        Content = serverMessage,
-                        SendTime = DateTime.Now,
-                        SenderId = null
-                    }
-                },
+                        new ()
+                        {
+                            TypeOfMessage = MessageType.System.ToString(),
+                            Content = serverMessage,
+                            SendTime = DateTime.Now,
+                            SenderId = null
+                        }
+                    },
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now
                 });
@@ -75,7 +78,8 @@ namespace BKConnectBE.Repository.Rooms
 
         public async Task<List<string>> GetListOfUserIdInRoomAsync(long roomId)
         {
-            var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId) ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+            var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
             return room.UsersOfRoom.Select(u => u.UserId).ToList();
         }
 

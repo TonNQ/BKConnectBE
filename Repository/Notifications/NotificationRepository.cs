@@ -36,9 +36,11 @@ namespace BKConnectBE.Repository.Notifications
             var list = new List<string> { senderId, receiverId };
             var notification = await _context.Notifications
                 .FirstOrDefaultAsync(n => n.Type == NotificationType.IsSendFriendRequest.ToString()
-                    && list.Contains(n.ReceiverId) && list.Contains(n.Content))
-                    ?? throw new Exception(MsgNo.ERROR_NOTIFICATION_NOT_FOUND);
-            _context.Notifications.Remove(notification);
+                    && list.Contains(n.ReceiverId) && list.Contains(n.Content));
+            if (notification is not null)
+            {
+                _context.Notifications.Remove(notification);
+            }
         }
     }
 }

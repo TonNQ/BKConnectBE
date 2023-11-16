@@ -10,9 +10,6 @@ namespace BKConnectBE.Model.Dtos.FriendRequestManagement
         [JsonPropertyName("send_time")]
         public DateTime SendTime { get; set; }
 
-        [JsonPropertyName("status")]
-        public int Status { get; set; }
-
         [JsonPropertyName("sender_id")]
         public string SenderId { get; set; }
 
