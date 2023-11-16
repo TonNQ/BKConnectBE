@@ -52,7 +52,8 @@ namespace BKConnectBE.Repository.Users
                     ClassName = u.Class?.Name,
                     IsFriend = relationships.Any(r => r.BlockBy == null
                         && (r.User1Id == u.Id || r.User2Id == u.Id)),
-                    HasFriendRequest = friendRequest.Any(r => r.SenderId == u.Id || r.ReceiverId == u.Id)
+                    SenderFriendRequest = friendRequest.Any(r => r.SenderId == u.Id) ? u.Id
+                        : (friendRequest.Any(r => r.ReceiverId == u.Id) ? userId : null)
                 }).ToList();
         }
 

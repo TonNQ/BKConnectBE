@@ -19,7 +19,7 @@ namespace BKConnectBE.Model.Dtos.UserManagement
         [JsonPropertyName("is_friend")]
         public bool IsFriend { get; set; }
 
-        [JsonPropertyName("has_friend_request")]
-        public bool HasFriendRequest { get; set; }
+        [JsonPropertyName("sender_friend_request")]
+        public String SenderFriendRequest { get; set; } = null;
     }
 }
