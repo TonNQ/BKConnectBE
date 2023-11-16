@@ -18,8 +18,8 @@ namespace BKConnectBE.Controllers.FriendRequests
             _friendRequestService = friendRequestService;
         }
 
-        [HttpGet("getListOfRecievedFriendRequests")]
-        public async Task<ActionResult<Responses>> GetListOfRecievedFriendRequests()
+        [HttpGet("getListOfReceivedFriendRequests")]
+        public async Task<ActionResult<Responses>> GetListOfReceivedFriendRequests()
         {
             try
             {
