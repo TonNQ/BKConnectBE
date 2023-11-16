@@ -133,5 +133,43 @@ namespace BKConnectBE.Controllers.Rooms
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpGet("searchListOfPublicRooms")]
+        public async Task<ActionResult<Responses>> SearchListOfPublicRooms([FromQuery] SearchKeyCondition condition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var listOfRooms = await _roomService.SearchListOfRoomsByTypeAndUserId(nameof(RoomType.PublicRoom), userId, condition.SearchKey);
+                    return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpGet("searchListOfClassRooms")]
+        public async Task<ActionResult<Responses>> SearchListOfClassRooms([FromQuery] SearchKeyCondition condition)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var listOfRooms = await _roomService.SearchListOfRoomsByTypeAndUserId(nameof(RoomType.ClassRoom), userId, condition.SearchKey);
+                    return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }
