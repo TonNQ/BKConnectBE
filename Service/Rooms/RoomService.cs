@@ -142,5 +142,25 @@ namespace BKConnectBE.Service.Rooms
             }
             return roomDtos;
         }
+
+        public async Task<List<GroupRoomDto>> SearchListOfRoomsByTypeAndUserId(string type, string userId, string searchKey = "")
+        {
+            var rooms = await _roomRepository.GetListOfRoomsByTypeAndUserId(type, userId);
+            var roomDtos = new List<GroupRoomDto>();
+            searchKey = Helper.RemoveUnicodeSymbol(searchKey);
+
+            foreach (Room room in rooms)
+            {
+                if (Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
+                {
+                    var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
+                        ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
+                    var roomDto = _mapper.Map<GroupRoomDto>(room);
+                    roomDto.JoinTime = user.JoinTime;
+                    roomDtos.Add(roomDto);
+                }
+            }
+            return roomDtos;
+        }
     }
 }
