@@ -55,6 +55,11 @@ namespace BKConnectBE.Service.Messages
 
         public async Task<ReceiveMessageDto> RenameUser(ReceiveMessageDto receiveMsg, string userId, string rootSenderId)
         {
+            if (receiveMsg.SenderId == null)
+            {
+                return receiveMsg;
+            }
+            
             if (receiveMsg.SenderId == userId)
             {
                 receiveMsg.SenderName = "Bạn";
