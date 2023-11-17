@@ -58,28 +58,35 @@ public class WebSocketController : ControllerBase
 
     private async Task Echo(WebSocketConnection cnn)
     {
-        var buffer = new byte[1024 * 4];
-        var receiveResult = await cnn.WebSocket.ReceiveAsync(
-                new ArraySegment<byte>(buffer), CancellationToken.None);
-        while (!cnn.WebSocket.CloseStatus.HasValue)
+        try
         {
-            var receivedData = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
-            var receivedObject = JsonSerializer.Deserialize<SendWebSocketData>(receivedData);
-
-            if (receivedObject.DataType == WebSocketDataType.IsMessage.ToString())
+            var buffer = new byte[1024 * 4];
+            var receiveResult = await cnn.WebSocket.ReceiveAsync(
+                    new ArraySegment<byte>(buffer), CancellationToken.None);
+            while (!cnn.WebSocket.CloseStatus.HasValue)
             {
-                await _webSocketService.SendMessage(receivedObject, cnn.UserId);
-            }
-            else if (receivedObject.DataType == WebSocketDataType.IsNotification.ToString())
-            {
-                await _webSocketService.SendNotification(receivedObject, cnn.UserId);
+                var receivedData = Encoding.UTF8.GetString(buffer, 0, receiveResult.Count);
+                var receivedObject = JsonSerializer.Deserialize<SendWebSocketData>(receivedData);
+
+                if (receivedObject.DataType == WebSocketDataType.IsMessage.ToString())
+                {
+                    await _webSocketService.SendMessage(receivedObject, cnn.UserId);
+                }
+                else if (receivedObject.DataType == WebSocketDataType.IsNotification.ToString())
+                {
+                    await _webSocketService.SendNotification(receivedObject, cnn.UserId);
+                }
+
+                buffer = new byte[1024 * 4];
+                receiveResult = await cnn.WebSocket.ReceiveAsync(
+                    new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            buffer = new byte[1024 * 4];
-            receiveResult = await cnn.WebSocket.ReceiveAsync(
-                new ArraySegment<byte>(buffer), CancellationToken.None);
+            await _webSocketService.CloseConnection(cnn);
         }
-
-        await _webSocketService.CloseConnection(cnn);
+        catch (Exception)
+        {
+            await _webSocketService.CloseConnection(cnn);
+        }
     }
 }
