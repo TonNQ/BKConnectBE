@@ -57,7 +57,7 @@ namespace BKConnect.Service.Jwt
             {
                 new ("UserId", userId),
                 new ("RefreshTokenId", "0"),
-                new ("Date", DateTime.Now.ToString("dd-MM-yyyy")),
+                new ("Date", DateTime.UtcNow.AddHours(7).ToString("dd-MM-yyyy")),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.AccessTokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -90,7 +90,7 @@ namespace BKConnect.Service.Jwt
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMonths(_config.RefreshTokenExpireMonths),
+                expires: DateTime.UtcNow.AddHours(7).AddMonths(_config.RefreshTokenExpireMonths),
                 signingCredentials: credentials
             );
             var tokenHandler = new JwtSecurityTokenHandler();

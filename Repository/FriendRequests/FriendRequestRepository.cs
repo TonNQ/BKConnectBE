@@ -59,7 +59,7 @@ namespace BKConnectBE.Repository.FriendRequests
             {
                 SenderId = senderId,
                 ReceiverId = receiverId,
-                SendTime = DateTime.Now,
+                SendTime = DateTime.UtcNow.AddHours(7),
             });
         }
 

@@ -84,7 +84,7 @@ namespace BKConnectBE.Repository.Users
         {
             var updatedUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
-            updatedUser.LastOnline = DateTime.Now;
+            updatedUser.LastOnline = DateTime.UtcNow.AddHours(7);
         }
 
         public async Task<string> GetUsernameById(string userId)
