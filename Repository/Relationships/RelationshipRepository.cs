@@ -30,7 +30,7 @@ namespace BKConnectBE.Repository.Relationships
                     User1Id = userId1,
                     User2Id = userId2,
                     BlockBy = userId1,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.UtcNow
                 });
             }
         }
@@ -41,7 +41,7 @@ namespace BKConnectBE.Repository.Relationships
             {
                 User1Id = userId1,
                 User2Id = userId2,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.UtcNow
             });
         }
 
