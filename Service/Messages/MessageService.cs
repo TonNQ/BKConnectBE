@@ -32,7 +32,7 @@ namespace BKConnectBE.Service.Messages
         {
             Message sendMsg = _mapper.Map<Message>(messageDto);
             sendMsg.SenderId = userId;
-            sendMsg.SendTime = DateTime.Now;
+            sendMsg.SendTime = DateTime.UtcNow;
             await _genericRepositoryForMessage.AddAsync(sendMsg);
             await _genericRepositoryForMessage.SaveChangeAsync();
             Message newMsg = await _messageRepository.GetMessageByIdAsync(sendMsg.Id);

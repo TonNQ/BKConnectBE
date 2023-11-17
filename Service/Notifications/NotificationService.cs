@@ -132,7 +132,7 @@ namespace BKConnectBE.Service.Notifications
                 Avatar = sender.Avatar,
                 ReceiverId = receiverId,
                 Type = type,
-                SendTime = DateTime.Now,
+                SendTime = DateTime.UtcNow,
                 IsRead = false,
                 Content = senderId
             };
