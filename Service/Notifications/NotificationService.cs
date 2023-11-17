@@ -50,6 +50,7 @@ namespace BKConnectBE.Service.Notifications
             foreach (var notification in notifications)
             {
                 var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
+                notificationDto.SenderName = await _userRepository.GetUsernameById(notificationDto.SenderId);
 
                 if (notification.Type == NotificationType.IsInRoom.ToString() || notification.Type == NotificationType.IsOutRoom.ToString())
                 {
