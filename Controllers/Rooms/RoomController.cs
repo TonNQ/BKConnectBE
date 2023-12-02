@@ -261,5 +261,33 @@ namespace BKConnectBE.Controllers.Rooms
                 return BadRequest(this.Error(e.Message));
             }
         }
+
+        [HttpPost("createGroupRoom")]
+        public async Task<ActionResult<Responses>> CreateGroupRoom(AddGroupRoomDto addGroupRoomDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var addMsg = await _roomService.CreateGroupRoomAsync(addGroupRoomDto, userId);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = addMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, "", SystemMessageType.IsCreateGroupRoom.ToString());
+
+                    return this.Success(addMsg.RoomId, MsgNo.SUCCESS_CREATE_GROUP_ROOM);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
     }
 }
