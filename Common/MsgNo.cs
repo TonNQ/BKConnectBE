@@ -31,6 +31,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_UNFRIEND = "Hủy kết bạn thành công";
         public static readonly string SUCCESS_ADD_USER_TO_ROOM = "Thêm người dùng vào nhóm thành công";
         public static readonly string SUCCESS_REMOVE_USER_FROM_ROOM = "Xoá người dùng ra khỏi nhóm thành công";
+        public static readonly string SUCCESS_CREATE_GROUP_ROOM = "Tạo nhóm thành công";
 
 
         //Error
@@ -61,6 +62,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_USER_NOT_IN_ROOM = "Bạn không có trong nhóm này";
         public static readonly string ERROR_ADD_USER_TO_ROOM = "Bạn không thể thêm người dùng vào nhóm";
         public static readonly string ERROR_USER_ALREADY_IN_ROOM = "Người dùng đã ở trong nhóm này rồi";
+        public static readonly string ERROR_CREATE_GROUP_ROOM = "Tạo nhóm thất bại. Hãy kiểm tra lại số người và loại nhóm";
 
 
         //Error internal service

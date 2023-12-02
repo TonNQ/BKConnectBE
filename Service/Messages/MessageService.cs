@@ -59,7 +59,7 @@ namespace BKConnectBE.Service.Messages
             {
                 return receiveMsg;
             }
-            
+
             if (receiveMsg.SenderId == userId)
             {
                 receiveMsg.SenderName = "Bạn";
@@ -111,29 +111,36 @@ namespace BKConnectBE.Service.Messages
                 receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
 
-            if (receiverId == userId)
+            if (type == SystemMessageType.IsCreateGroupRoom.ToString())
             {
-                if (type == SystemMessageType.IsInRoom.ToString())
-                {
-                    receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
-                }
-                else if (type == SystemMessageType.IsOutRoom.ToString())
-                {
-                    receiveMsg.Content = receiveMsg.SenderName + " đã xoá bạn ra khỏi nhóm";
-                }
+                receiveMsg.Content = receiveMsg.SenderName + " đã tạo nhóm này";
             }
             else
             {
-                var receiverName = await _userRepository.GetUsernameById(receiverId);
-                if (type == SystemMessageType.IsInRoom.ToString())
+                if (receiverId == userId)
                 {
-                    receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
-
+                    if (type == SystemMessageType.IsInRoom.ToString())
+                    {
+                        receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
+                    }
+                    else if (type == SystemMessageType.IsOutRoom.ToString())
+                    {
+                        receiveMsg.Content = receiveMsg.SenderName + " đã xoá bạn ra khỏi nhóm";
+                    }
                 }
-                else if (type == SystemMessageType.IsOutRoom.ToString())
+                else
                 {
-                    receiveMsg.Content = receiveMsg.SenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+                    var receiverName = await _userRepository.GetUsernameById(receiverId);
+                    if (type == SystemMessageType.IsInRoom.ToString())
+                    {
+                        receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
 
+                    }
+                    else if (type == SystemMessageType.IsOutRoom.ToString())
+                    {
+                        receiveMsg.Content = receiveMsg.SenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+
+                    }
                 }
             }
 

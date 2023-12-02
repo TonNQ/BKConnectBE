@@ -214,8 +214,49 @@ namespace BKConnectBE.Service.Rooms
             {
                 return await AddingUserToRoomAsync(roomId, addedUserId, userId);
             }
+        }
 
-            
+        public async Task<SendMessageDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId)
+        {
+            if (addGroupRoomDto.UserIds.Count < 2
+                || addGroupRoomDto.RoomType == RoomType.PrivateRoom.ToString())
+            {
+                throw new Exception(MsgNo.ERROR_CREATE_GROUP_ROOM);
+            }
+
+            var room = _mapper.Map<Room>(addGroupRoomDto);
+
+            await _userRepository.GetByIdAsync(userId);
+            room.UsersOfRoom.Add(new UserOfRoom
+            {
+                IsAdmin = true,
+                UserId = userId,
+                RoomId = room.Id,
+                JoinTime = DateTime.UtcNow.AddHours(7)
+            });
+
+            foreach (var id in addGroupRoomDto.UserIds)
+            {
+                await _userRepository.GetByIdAsync(id);
+                room.UsersOfRoom.Add(new UserOfRoom
+                {
+                    IsAdmin = false,
+                    UserId = id,
+                    RoomId = room.Id,
+                    JoinTime = DateTime.UtcNow.AddHours(7)
+                });
+            };
+
+            await _genericRepositoryForRoom.AddAsync(room);
+            await _genericRepositoryForUserOfRoom.SaveChangeAsync();
+
+            var addMsg = new SendMessageDto
+            {
+                RoomId = room.Id,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = "Nhóm vừa được tạo"
+            };
+            return addMsg;
         }
 
         private async Task<SendMessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)
@@ -232,20 +273,19 @@ namespace BKConnectBE.Service.Rooms
             var addUsername = await _userRepository.GetUsernameById(addedUserId);
             var username = await _userRepository.GetUsernameById(userId);
 
-            var addMsg = new SendMessageDto {
+            var addMsg = new SendMessageDto
+            {
                 RoomId = roomId,
                 TypeOfMessage = MessageType.System.ToString(),
                 Content = username + " đã thêm " + addUsername + " vào nhóm"
             };
-
-            await _messageService.AddMessageAsync(addMsg, userId);
 
             return addMsg;
         }
 
         public async Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId)
         {
-            if (!await _roomRepository.IsInRoomAsync(roomId, removeId)) 
+            if (!await _roomRepository.IsInRoomAsync(roomId, removeId))
             {
                 throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             }
@@ -257,13 +297,12 @@ namespace BKConnectBE.Service.Rooms
             var removeUsername = await _userRepository.GetUsernameById(removeId);
             var username = await _userRepository.GetUsernameById(userId);
 
-            var removeMsg = new SendMessageDto {
+            var removeMsg = new SendMessageDto
+            {
                 RoomId = roomId,
                 TypeOfMessage = MessageType.System.ToString(),
                 Content = username + " đã xoá " + removeUsername + " ra khỏi nhóm"
             };
-
-            await _messageService.AddMessageAsync(removeMsg, userId);
 
             return removeMsg;
         }
