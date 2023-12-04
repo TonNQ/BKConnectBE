@@ -148,6 +148,7 @@ namespace BKConnectBE.Service.Notifications
             var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
             notificationDto.Id = notification.Id;
             notificationDto.SenderName = sender.Name;
+            notificationDto.SendTime = notificationDto.SendTime.AddHours(-7);
 
             return notificationDto;
         }
