@@ -34,13 +34,13 @@ namespace BKConnectBE.Repository.Rooms
                         new ()
                         {
                             UserId = userId1,
-                            JoinTime = DateTime.UtcNow,
+                            JoinTime = DateTime.UtcNow.AddHours(7),
                             ReadMessageId = null
                         },
                         new ()
                         {
                             UserId = userId2,
-                            JoinTime = DateTime.UtcNow,
+                            JoinTime = DateTime.UtcNow.AddHours(7),
                             ReadMessageId = null
                         }
                     },
@@ -50,12 +50,12 @@ namespace BKConnectBE.Repository.Rooms
                         {
                             TypeOfMessage = MessageType.System.ToString(),
                             Content = serverMessage,
-                            SendTime = DateTime.UtcNow,
+                            SendTime = DateTime.UtcNow.AddHours(7),
                             SenderId = null
                         }
                     },
-                    CreatedDate = DateTime.UtcNow,
-                    UpdatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                    UpdatedDate = DateTime.UtcNow.AddHours(7)
                 });
             }
         }
