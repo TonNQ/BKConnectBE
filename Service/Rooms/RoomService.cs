@@ -55,6 +55,8 @@ namespace BKConnectBE.Service.Rooms
 
                 roomDto.Name = friend.Name;
                 roomDto.Avatar = friend.Avatar;
+                roomDto.FriendId = friend.Id;
+
                 if (WebSockets.WebsocketList.Any(w => w.UserId == friend.Id))
                 {
                     roomDto.IsOnline = true;
