@@ -24,5 +24,8 @@ namespace BKConnectBE.Model.Dtos.RoomManagement
 
         [JsonPropertyName("is_online")]
         public bool IsOnline { get; set; }
+
+        [JsonPropertyName("friend_id")]
+        public string FriendId { get; set; }
     }
 }
