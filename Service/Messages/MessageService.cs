@@ -90,6 +90,19 @@ namespace BKConnectBE.Service.Messages
                 }
             }
 
+            if (receiveMsg.TypeOfMessage == MessageType.Image.ToString())
+            {
+                receiveMsg.LastMessage = receiveMsg.SenderName + " đã gửi một ảnh đính kèm";
+            }
+            else if (receiveMsg.TypeOfMessage == MessageType.File.ToString())
+            {
+                receiveMsg.LastMessage = receiveMsg.SenderName + " đã gửi một file đính kèm";
+            }
+            else
+            {
+                receiveMsg.LastMessage = receiveMsg.SenderName + ": " + receiveMsg.Content;
+            }
+
             return receiveMsg;
         }
         public async Task<string> GetRootMessageSenderId(long? messageId)
@@ -145,6 +158,7 @@ namespace BKConnectBE.Service.Messages
                     }
                 }
             }
+            receiveMsg.LastMessage = receiveMsg.Content;
 
             return receiveMsg;
         }

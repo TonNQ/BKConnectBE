@@ -34,6 +34,9 @@ namespace BKConnectBE.Model.Dtos.MessageManagement
         [JsonPropertyName("content")]
         public string Content { get; set; }
 
+        [JsonPropertyName("last_message")]
+        public string LastMessage { get; set; }
+
         [JsonPropertyName("root_sender")]
         public string RootSender { get; set; }
 
