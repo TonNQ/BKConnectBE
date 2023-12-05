@@ -4,6 +4,8 @@ namespace BKConnectBE.Common.Enumeration
 {
     public enum SystemMessageType
     {
+        IsBecomeFriend,
+        
         [Description("thêm vào nhóm")]
         IsInRoom,
 

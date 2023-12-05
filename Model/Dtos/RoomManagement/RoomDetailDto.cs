@@ -27,5 +27,14 @@ namespace BKConnectBE.Model.Dtos.RoomManagement
 
         [JsonPropertyName("friend_id")]
         public string FriendId { get; set; }
+
+        [JsonPropertyName("last_message")]
+        public string LastMessage { get; set; }
+
+        [JsonPropertyName("last_message_time")]
+        public DateTime LastMessageTime { get; set; }
+
+        [JsonPropertyName("is_read")]
+        public bool IsRead { get; set; }
     }
 }

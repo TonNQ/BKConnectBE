@@ -1,6 +1,8 @@
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Entities;
@@ -48,14 +50,20 @@ namespace BKConnectBE.Service.Messages
             foreach (var msg in listMessages)
             {
                 var msgDto = _mapper.Map<ReceiveMessageDto>(msg);
-                msgDto = await RenameUser(msgDto, userId, msg.RootMessage?.SenderId);
+                if (msg.TypeOfMessage == MessageType.System.ToString())
+                {
+                    msgDto = await ChangeSystemMessage(msgDto, userId, "102210135", msg.Content);
+                }
+                else
+                {
+                    msgDto = await ChangeMessage(msgDto, userId, msg.RootMessage?.SenderId);
+                }
                 listMessagesDto.Add(msgDto);
             }
 
             return listMessagesDto;
         }
-
-        public async Task<ReceiveMessageDto> RenameUser(ReceiveMessageDto receiveMsg, string userId, string rootSenderId)
+        public async Task<ReceiveMessageDto> ChangeMessage(ReceiveMessageDto receiveMsg, string userId, string rootSenderId)
         {
             if (receiveMsg.SenderId == null)
             {
@@ -70,6 +78,7 @@ namespace BKConnectBE.Service.Messages
             {
                 receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
+
             if (rootSenderId != null)
             {
                 if (rootSenderId == userId && receiveMsg.SenderId == userId)
@@ -105,6 +114,7 @@ namespace BKConnectBE.Service.Messages
 
             return receiveMsg;
         }
+
         public async Task<string> GetRootMessageSenderId(long? messageId)
         {
             return await _messageRepository.GetRootMessageSenderIdAsync(messageId);
@@ -115,52 +125,78 @@ namespace BKConnectBE.Service.Messages
             var list = await _messageRepository.GetAllImageMessagesInRoomAsync(roomId, userId);
             return _mapper.Map<List<ImageMessageDto>>(list);
         }
-        public async Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type)
+
+        public async Task<ReceiveMessageDto> ChangeSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type)
         {
             if (receiveMsg.SenderId == userId)
             {
                 receiveMsg.SenderName = "Bạn";
             }
-            else
+            else if (receiveMsg.SenderId != null)
             {
                 receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
 
-            if (type == SystemMessageType.IsCreateGroupRoom.ToString())
+            if (receiveMsg.TypeOfMessage != MessageType.System.ToString())
             {
-                receiveMsg.Content = receiveMsg.SenderName + " đã tạo nhóm này";
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
-            else
-            {
-                if (receiverId == userId)
-                {
-                    if (type == SystemMessageType.IsInRoom.ToString())
-                    {
-                        receiveMsg.Content = receiveMsg.SenderName + " đã thêm bạn vào nhóm";
-                    }
-                    else if (type == SystemMessageType.IsOutRoom.ToString())
-                    {
-                        receiveMsg.Content = receiveMsg.SenderName + " đã xoá bạn ra khỏi nhóm";
-                    }
-                }
-                else
-                {
-                    var receiverName = await _userRepository.GetUsernameById(receiverId);
-                    if (type == SystemMessageType.IsInRoom.ToString())
-                    {
-                        receiveMsg.Content = receiveMsg.SenderName + " đã thêm " + receiverName + " vào nhóm";
 
-                    }
-                    else if (type == SystemMessageType.IsOutRoom.ToString())
-                    {
-                        receiveMsg.Content = receiveMsg.SenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
-
-                    }
-                }
-            }
+            receiveMsg.Content = await ChangeContentSystemMessage(userId, receiveMsg.SenderName, receiverId, type);
             receiveMsg.LastMessage = receiveMsg.Content;
 
             return receiveMsg;
+        }
+
+        public async Task<string> ChangeContentSystemMessage(long messageId, string userId)
+        {
+            var msg = await _messageRepository.GetMessageByIdAsync(messageId)
+                ?? throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+
+            if (msg.TypeOfMessage != MessageType.System.ToString())
+            {
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+            }
+
+            return await ChangeContentSystemMessage(userId, msg.Sender?.Name, "102210135", msg.Content);
+        }
+
+        private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string receiverId, string type)
+        {
+
+            if (type == SystemMessageType.IsBecomeFriend.ToString())
+            {
+                return Constants.FRIEND_ACCEPTED_NOTIFICATION;
+            }
+
+            if (type == SystemMessageType.IsCreateGroupRoom.ToString())
+            {
+                return msgSenderName + " đã tạo nhóm này";
+            }
+
+            if (receiverId == userId)
+            {
+                if (type == SystemMessageType.IsInRoom.ToString())
+                {
+                    return msgSenderName + " đã thêm bạn vào nhóm";
+                }
+                if (type == SystemMessageType.IsOutRoom.ToString())
+                {
+                    return msgSenderName + " đã xoá bạn ra khỏi nhóm";
+                }
+            }
+            var receiverName = await _userRepository.GetUsernameById(receiverId);
+            if (type == SystemMessageType.IsInRoom.ToString())
+            {
+                return msgSenderName + " đã thêm " + receiverName + " vào nhóm";
+
+            }
+            if (type == SystemMessageType.IsOutRoom.ToString())
+            {
+                return msgSenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+            }
+
+            return "";
         }
     }
 }

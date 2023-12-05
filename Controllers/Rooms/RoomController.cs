@@ -27,52 +27,14 @@ namespace BKConnectBE.Controllers.Rooms
         }
 
         [HttpGet("getRoomsOfUser")]
-        public async Task<ActionResult<Responses>> GetListOfRoomsByUserId()
+        public async Task<ActionResult<Responses>> GetRoomsOfUser([FromQuery] SearchKeyCondition searchKeyCondition)
         {
             try
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId);
+                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchKeyCondition);
                     return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
-                }
-
-                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(this.Error(e.Message));
-            }
-        }
-
-        [HttpGet("searchRoomsOfUser")]
-        public async Task<ActionResult<Responses>> SearchListOfRoomsByUserId([FromQuery] SearchKeyCondition searchKeyCondition)
-        {
-            try
-            {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
-                {
-                    var listOfRooms = await _roomService.GetListOfRoomsByUserId(userId, searchKeyCondition.SearchKey);
-                    return this.Success(listOfRooms, MsgNo.SUCCESS_GET_ROOMS_OF_USER);
-                }
-
-                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(this.Error(e.Message));
-            }
-        }
-
-        [HttpGet("getInformationOfRoom")]
-        public async Task<ActionResult<Responses>> GetInformationOfRoom([FromQuery] LongKeyCondition condition)
-        {
-            try
-            {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
-                {
-                    var room = await _roomService.GetInformationOfRoom(condition.SearchKey, userId);
-                    return this.Success(room, MsgNo.SUCCESS_GET_INFORMATION_OF_ROOM);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
