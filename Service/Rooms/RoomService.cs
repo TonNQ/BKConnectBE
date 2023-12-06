@@ -2,17 +2,14 @@ using AutoMapper;
 using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
-using BKConnectBE.Model.Dtos.ChatManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
-using BKConnectBE.Model.Dtos.NotificationManagement;
+using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
-using BKConnectBE.Repository.Messages;
 using BKConnectBE.Repository.Rooms;
 using BKConnectBE.Repository.Users;
 using BKConnectBE.Service.Messages;
-using BKConnectBE.Service.WebSocket;
 
 namespace BKConnectBE.Service.Rooms
 {
@@ -39,71 +36,38 @@ namespace BKConnectBE.Service.Rooms
             _mapper = mapper;
         }
 
-        public async Task<RoomDetailDto> GetInformationOfRoom(long roomId, string userId)
+        public async Task<List<RoomDetailDto>> GetListOfRoomsByUserId(string userId, SearchKeyCondition? condition)
         {
-            var room = await _roomRepository.GetInformationOfRoom(roomId);
-            if (!room.UsersOfRoom.Any(u => u.UserId == userId))
-            {
-                throw new Exception(MsgNo.ERROR_UNAUTHORIZED);
-            }
-
-            var roomDto = _mapper.Map<RoomDetailDto>(room);
-            if (room.RoomType == nameof(RoomType.PrivateRoom))
-            {
-                var friend = room.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User
-                    ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
-
-                roomDto.Name = friend.Name;
-                roomDto.Avatar = friend.Avatar;
-                roomDto.FriendId = friend.Id;
-
-                if (WebSockets.WebsocketList.Any(w => w.UserId == friend.Id))
-                {
-                    roomDto.IsOnline = true;
-                }
-                else
-                {
-                    roomDto.LastOnline = friend.LastOnline;
-                }
-            }
-            else
-            {
-                roomDto.TotalMember = room.UsersOfRoom.Count;
-            }
-            return roomDto;
-        }
-
-        public async Task<List<RoomSidebarDto>> GetListOfRoomsByUserId(string userId, string searchKey = "")
-        {
-            searchKey = Helper.RemoveUnicodeSymbol(searchKey);
+            condition ??= new SearchKeyCondition();
+            var searchKey = Helper.RemoveUnicodeSymbol(condition.SearchKey);
             var rooms = await _roomRepository.GetListOfRoomsByUserId(userId);
-            var roomDtos = new List<RoomSidebarDto>();
+            var roomDtos = new List<RoomDetailDto>();
 
             foreach (Room room in rooms)
             {
                 var lastMessage = room.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault()
                     ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
-                var roomDto = _mapper.Map<RoomSidebarDto>(room);
-                if (room.RoomType != nameof(RoomType.PrivateRoom) && Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
+                var roomDto = _mapper.Map<RoomDetailDto>(room);
+
+                if (room.RoomType != nameof(RoomType.PrivateRoom) &&
+                    ((Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey) && condition.LongKey == 0)
+                    || room.Id == condition.LongKey))
                 {
                     var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
 
-                    if (Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
-                    {
-                        roomDto.IsRead = user.ReadMessage != null
+                    roomDto.IsRead = user.ReadMessage != null
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > user.ReadMessageId);
-                        roomDto.LastMessageTime = lastMessage.SendTime;
+                    roomDto.LastMessageTime = lastMessage.SendTime;
 
-                        var textType = new List<string> { nameof(MessageType.Text), nameof(MessageType.System) };
-                        roomDto.LastMessage = (lastMessage.SenderId == null || lastMessage.TypeOfMessage == MessageType.System.ToString() ? ""
-                            : (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: "))
-                            + (textType.Contains(lastMessage.TypeOfMessage)
+                    roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
+                        ? await _messageService.ChangeContentSystemMessage(lastMessage.Id, userId)
+                        : ((lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: ")
+                            + (lastMessage.TypeOfMessage == nameof(MessageType.Text)
                                 ? lastMessage.Content
-                                : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}");
-                        roomDtos.Add(roomDto);
-                    }
+                                : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}"));
+                    roomDtos.Add(roomDto);
                 }
                 else if (room.RoomType == nameof(RoomType.PrivateRoom))
                 {
@@ -112,26 +76,32 @@ namespace BKConnectBE.Service.Rooms
                     var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
 
-                    if (Helper.RemoveUnicodeSymbol(friend.Name).Contains(searchKey))
+                    if ((Helper.RemoveUnicodeSymbol(friend.Name).Contains(searchKey) && condition.LongKey == 0)
+                    || room.Id == condition.LongKey)
                     {
                         roomDto.Name = friend.Name;
                         roomDto.Avatar = friend.Avatar;
                         roomDto.FriendId = friend.Id;
+
                         if (WebSockets.WebsocketList.Any(w => w.UserId == friend.Id))
                         {
                             roomDto.IsOnline = true;
                         }
+                        else
+                        {
+                            roomDto.LastOnline = friend.LastOnline;
+                        }
 
-                        var textType = new List<string> { nameof(MessageType.Text), nameof(MessageType.System) };
                         roomDto.IsRead = user.ReadMessage != null
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > user.ReadMessageId);
                         roomDto.LastMessageTime = lastMessage.SendTime;
-                        roomDto.LastMessage = (lastMessage.SenderId == null || lastMessage.TypeOfMessage == MessageType.System.ToString() ? ""
-                            : (lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: "))
-                            + (textType.Contains(lastMessage.TypeOfMessage)
-                                ? lastMessage.Content
-                                : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}");
+                        roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
+                            ? await _messageService.ChangeContentSystemMessage(lastMessage.Id, userId)
+                            : ((lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: ")
+                                + (lastMessage.TypeOfMessage == nameof(MessageType.Text)
+                                    ? lastMessage.Content
+                                    : $"Đã gửi một {Helper.GetEnumDescription(lastMessage.TypeOfMessage.ToEnum<MessageType>())}"));
                         roomDtos.Add(roomDto);
                     }
                 }

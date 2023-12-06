@@ -8,8 +8,8 @@ namespace BKConnectBE.Service.Messages
         Task<List<ImageMessageDto>> GetAllImageMessagesInRoomAsync(long roomId, string userId);
         Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto, string userId);
         Task<string> GetRootMessageSenderId(long? messageId);
-        Task<ReceiveMessageDto> RenameUser(ReceiveMessageDto receiveMsg, string userId, string rootSenderId);
-        Task<ReceiveMessageDto> ChangeContentSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type);
-
+        Task<ReceiveMessageDto> ChangeMessage(ReceiveMessageDto receiveMsg, string userId, string rootSenderId);
+        Task<ReceiveMessageDto> ChangeSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type);
+        Task<string> ChangeContentSystemMessage(long messageId, string userId);
     }
 }

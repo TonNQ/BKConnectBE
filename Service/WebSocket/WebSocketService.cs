@@ -95,7 +95,7 @@ namespace BKConnectBE.Service.WebSocket
 
             foreach (WebSocketConnection webSocket in listOfWebSocket)
             {
-                receiveWebSocketData.Message = await _messageService.RenameUser(receiveWebSocketData.Message, webSocket.UserId, rootMessageSenderId);
+                receiveWebSocketData.Message = await _messageService.ChangeMessage(receiveWebSocketData.Message, webSocket.UserId, rootMessageSenderId);
 
                 var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
 
@@ -132,7 +132,7 @@ namespace BKConnectBE.Service.WebSocket
 
             foreach (WebSocketConnection webSocket in listOfWebSocket)
             {
-                receiveWebSocketData.Message = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, type);
+                receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, type);
 
                 var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
 
