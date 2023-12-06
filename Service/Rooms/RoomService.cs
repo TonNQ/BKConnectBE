@@ -50,8 +50,7 @@ namespace BKConnectBE.Service.Rooms
                 var roomDto = _mapper.Map<RoomDetailDto>(room);
 
                 if (room.RoomType != nameof(RoomType.PrivateRoom) &&
-                    ((Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey) && condition.LongKey == 0)
-                    || room.Id == condition.LongKey))
+                    Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
                 {
                     var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
@@ -76,8 +75,7 @@ namespace BKConnectBE.Service.Rooms
                     var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
 
-                    if ((Helper.RemoveUnicodeSymbol(friend.Name).Contains(searchKey) && condition.LongKey == 0)
-                    || room.Id == condition.LongKey)
+                    if (Helper.RemoveUnicodeSymbol(friend.Name).Contains(searchKey))
                     {
                         roomDto.Name = friend.Name;
                         roomDto.Avatar = friend.Avatar;
@@ -227,7 +225,7 @@ namespace BKConnectBE.Service.Rooms
             {
                 RoomId = room.Id,
                 TypeOfMessage = MessageType.System.ToString(),
-                Content = "Nhóm vừa được tạo"
+                Content = SystemMessageType.IsCreateGroupRoom.ToString()
             };
             return addMsg;
         }
@@ -250,7 +248,7 @@ namespace BKConnectBE.Service.Rooms
             {
                 RoomId = roomId,
                 TypeOfMessage = MessageType.System.ToString(),
-                Content = username + " đã thêm " + addUsername + " vào nhóm"
+                Content = SystemMessageType.IsInRoom.ToString()
             };
 
             return addMsg;
@@ -274,7 +272,7 @@ namespace BKConnectBE.Service.Rooms
             {
                 RoomId = roomId,
                 TypeOfMessage = MessageType.System.ToString(),
-                Content = username + " đã xoá " + removeUsername + " ra khỏi nhóm"
+                Content = SystemMessageType.IsOutRoom.ToString()
             };
 
             return removeMsg;

@@ -18,6 +18,8 @@ namespace BKConnectBE.Model.Entities
 
         public DateTime SendTime { get; set; }
 
+        public string AffectedId { get; set; }
+
         public string SenderId { get; set; }
         public virtual User Sender { get; set; }
 
