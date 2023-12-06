@@ -30,11 +30,23 @@ namespace BKConnectBE.Service.Messages
             _mapper = mapper;
         }
 
-        public async Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto, string userId)
+        public async Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto, string userId, string? affectedId = null)
         {
             Message sendMsg = _mapper.Map<Message>(messageDto);
             sendMsg.SenderId = userId;
             sendMsg.SendTime = DateTime.UtcNow.AddHours(7);
+
+            var list = new List<string> {
+                SystemMessageType.IsInRoom.ToString(),
+                SystemMessageType.IsOutRoom.ToString()
+            };
+
+            if (sendMsg.TypeOfMessage == MessageType.System.ToString()
+                && list.Contains(sendMsg.Content) && affectedId != null)
+            {
+                sendMsg.AffectedId = affectedId;
+            }
+
             await _genericRepositoryForMessage.AddAsync(sendMsg);
             await _genericRepositoryForMessage.SaveChangeAsync();
             Message newMsg = await _messageRepository.GetMessageByIdAsync(sendMsg.Id);
@@ -52,7 +64,7 @@ namespace BKConnectBE.Service.Messages
                 var msgDto = _mapper.Map<ReceiveMessageDto>(msg);
                 if (msg.TypeOfMessage == MessageType.System.ToString())
                 {
-                    msgDto = await ChangeSystemMessage(msgDto, userId, "102210135", msg.Content);
+                    msgDto = await ChangeSystemMessage(msgDto, userId, msg.AffectedId, msg.Content);
                 }
                 else
                 {
@@ -126,7 +138,7 @@ namespace BKConnectBE.Service.Messages
             return _mapper.Map<List<ImageMessageDto>>(list);
         }
 
-        public async Task<ReceiveMessageDto> ChangeSystemMessage(ReceiveMessageDto receiveMsg, string userId, string receiverId, string type)
+        public async Task<ReceiveMessageDto> ChangeSystemMessage(ReceiveMessageDto receiveMsg, string userId, string? receiverId, string type)
         {
             if (receiveMsg.SenderId == userId)
             {
@@ -158,10 +170,10 @@ namespace BKConnectBE.Service.Messages
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
 
-            return await ChangeContentSystemMessage(userId, msg.Sender?.Name, "102210135", msg.Content);
+            return await ChangeContentSystemMessage(userId, msg.Sender?.Name, msg.AffectedId, msg.Content);
         }
 
-        private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string receiverId, string type)
+        private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type)
         {
 
             if (type == SystemMessageType.IsBecomeFriend.ToString())
@@ -185,6 +197,12 @@ namespace BKConnectBE.Service.Messages
                     return msgSenderName + " đã xoá bạn ra khỏi nhóm";
                 }
             }
+
+            if (receiverId == null)
+            {
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+            }
+
             var receiverName = await _userRepository.GetUsernameById(receiverId);
             if (type == SystemMessageType.IsInRoom.ToString())
             {

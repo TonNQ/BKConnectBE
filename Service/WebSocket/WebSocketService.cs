@@ -111,7 +111,7 @@ namespace BKConnectBE.Service.WebSocket
 
         public async Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type)
         {
-            var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
+            var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId, receiverId);
             var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
             var listOfWebSocket = WebSockets.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 

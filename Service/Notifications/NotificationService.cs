@@ -54,7 +54,7 @@ namespace BKConnectBE.Service.Notifications
 
                 if (notification.Type == NotificationType.IsInRoom.ToString() || notification.Type == NotificationType.IsOutRoom.ToString())
                 {
-                    if(notification.RoomId == null)
+                    if (notification.RoomId == null)
                     {
                         throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
                     }
@@ -103,7 +103,7 @@ namespace BKConnectBE.Service.Notifications
 
             await _genericRepositoryForFriendRequest.RemoveByIdAsync(friendRequest.Id);
             await _notificationRepository.RemoveFriendRequestNotificationAsync(senderId, receiverId);
-            await _roomRepository.CreateNewPrivateRoom(senderId, receiverId, Constants.FRIEND_ACCEPTED_NOTIFICATION);
+            await _roomRepository.CreateNewPrivateRoom(senderId, receiverId, SystemMessageType.IsBecomeFriend.ToString());
             await _relationshipRepository.CreateNewRelationship(senderId, receiverId);
 
             return await AddNotification(senderId, receiverId, NotificationType.IsAcceptFriendRequest.ToString(), null);
@@ -113,10 +113,13 @@ namespace BKConnectBE.Service.Notifications
         {
             var notification = await AddNotification(senderId, receiverId, type, roomId);
             var room = await _roomRepository.GetInformationOfRoom(roomId);
-            
-            notification.RoomMessage = new NotifyRoomMessage();
-            notification.RoomMessage.RoomName = room.Name;
-            notification.RoomMessage.RoomType = room.RoomType;
+
+            notification.RoomMessage = new NotifyRoomMessage
+            {
+                RoomId = room.Id,
+                RoomName = room.Name,
+                RoomType = room.RoomType
+            };
 
             return notification;
 
@@ -136,7 +139,7 @@ namespace BKConnectBE.Service.Notifications
                 IsRead = false,
                 Content = senderId
             };
-            
+
             if (type == NotificationType.IsInRoom.ToString() || type == NotificationType.IsOutRoom.ToString())
             {
                 notification.RoomId = roomId;
