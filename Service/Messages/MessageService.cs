@@ -132,10 +132,10 @@ namespace BKConnectBE.Service.Messages
             return await _messageRepository.GetRootMessageSenderIdAsync(messageId);
         }
 
-        public async Task<List<ImageMessageDto>> GetAllImageMessagesInRoomAsync(long roomId, string userId)
+        public async Task<List<FileDto>> GetAllNoneTextMessagesInRoomAsync(long roomId, string messageType, string userId)
         {
-            var list = await _messageRepository.GetAllImageMessagesInRoomAsync(roomId, userId);
-            return _mapper.Map<List<ImageMessageDto>>(list);
+            var list = await _messageRepository.GetAllNoneTextMessagesInRoomAsync(roomId, messageType, userId);
+            return _mapper.Map<List<FileDto>>(list);
         }
 
         public async Task<ReceiveMessageDto> ChangeSystemMessage(ReceiveMessageDto receiveMsg, string userId, string? receiverId, string type)

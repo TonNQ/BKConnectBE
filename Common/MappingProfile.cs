@@ -53,7 +53,9 @@ namespace BKConnectBE.Common
 
             CreateMap<SendMessageDto, Message>();
 
-            CreateMap<Message, ImageMessageDto>();
+            CreateMap<Message, FileDto>();
+            
+            CreateMap<ClassFile, FileDto>();
 
             CreateMap<Class, ClassDto>()
                 .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.Id))

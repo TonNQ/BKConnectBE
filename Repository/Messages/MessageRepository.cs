@@ -21,14 +21,14 @@ namespace BKConnectBE.Repository.Messages
                 .Include(m => m.Sender).Include(m => m.RootMessage).OrderByDescending(m => m.SendTime).ToListAsync();
         }
 
-        public async Task<List<Message>> GetAllImageMessagesInRoomAsync(long roomId, string userId)
+        public async Task<List<Message>> GetAllNoneTextMessagesInRoomAsync(long roomId, string messageType, string userId)
         {
             if (!await _context.UsersOfRoom.AnyAsync(ur => ur.RoomId == roomId && ur.UserId == userId))
             {
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
             return await _context.Messages
-                .Where(r => r.RoomId == roomId && r.TypeOfMessage == MessageType.Image.ToString())
+                .Where(r => r.RoomId == roomId && r.TypeOfMessage == messageType)
                 .Include(m => m.RootMessage).OrderByDescending(m => m.SendTime).ToListAsync();
         }
 

@@ -5,7 +5,7 @@ namespace BKConnectBE.Service.Messages
     public interface IMessageService
     {
         Task<List<ReceiveMessageDto>> GetAllMessagesInRoomAsync(string userId, long roomId);
-        Task<List<ImageMessageDto>> GetAllImageMessagesInRoomAsync(long roomId, string userId);
+        Task<List<FileDto>> GetAllNoneTextMessagesInRoomAsync(long roomId, string messageType, string userId);
         Task<ReceiveMessageDto> AddMessageAsync(SendMessageDto messageDto, string userId, string? affectedId = null);
         Task<string> GetRootMessageSenderId(long? messageId);
         Task<ReceiveMessageDto> ChangeMessage(ReceiveMessageDto receiveMsg, string userId, string rootSenderId);
