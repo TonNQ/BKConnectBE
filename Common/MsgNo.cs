@@ -15,6 +15,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_GET_USERS = "Tìm kiếm danh sách người dùng thành công";
         public static readonly string SUCCESS_GET_FRIENDS_OF_USER = "Tìm kiếm danh sách bạn bè của người dùng thành công";
         public static readonly string SUCCESS_GET_LIST_MESSAGES = "Lấy danh sách tin nhắn thành công";
+        public static readonly string SUCCESS_GET_LIST_FILES = "Lấy danh sách file thành công";
         public static readonly string SUCCESS_GET_INFORMATION_OF_ROOM = "Lấy thông tin của phòng thành công";
         public static readonly string SUCCESS_GET_LIST_OF_MEMBERS_IN_ROOM = "Lấy danh sách thành viên trong phòng thành công";
         public static readonly string SUCCESS_GET_LIST_OF_NOTIFICATIONS = "Lấy danh sách thông báo thành công";

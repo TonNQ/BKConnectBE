@@ -19,6 +19,7 @@ namespace BKConnectBE.Model
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOfRoom> UsersOfRoom { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<ClassFile> ClassFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,12 +28,12 @@ namespace BKConnectBE.Model
                 entity.HasOne(r => r.Faculty)
                     .WithMany(r => r.Classes)
                     .HasForeignKey(r => r.FacultyId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(r => r.Users)
                     .WithOne(r => r.Class)
                     .HasForeignKey(r => r.ClassId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<FriendRequest>(entity =>
@@ -40,12 +41,12 @@ namespace BKConnectBE.Model
                 entity.HasOne(r => r.Sender)
                     .WithMany()
                     .HasForeignKey(r => r.SenderId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(r => r.Receiver)
                     .WithMany()
                     .HasForeignKey(r => r.ReceiverId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Message>(entity =>
@@ -53,17 +54,17 @@ namespace BKConnectBE.Model
                 entity.HasOne(e => e.RootMessage)
                     .WithMany(e => e.ReplyMessage)
                     .HasForeignKey(e => e.RootMessageId)
-                    .OnDelete(DeleteBehavior.Restrict);
-                
+                    .OnDelete(DeleteBehavior.NoAction);
+
                 entity.HasOne(e => e.Sender)
                     .WithMany(e => e.SentMessages)
                     .HasForeignKey(e => e.SenderId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.Room)
                     .WithMany(e => e.Messages)
                     .HasForeignKey(e => e.RoomId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<RefreshToken>(entity =>
@@ -71,7 +72,7 @@ namespace BKConnectBE.Model
                 entity.HasOne(e => e.User)
                     .WithMany(e => e.RefreshTokens)
                     .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Relationship>(entity =>
@@ -79,12 +80,12 @@ namespace BKConnectBE.Model
                 entity.HasOne(r => r.User1)
                     .WithMany()
                     .HasForeignKey(r => r.User1Id)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(r => r.User2)
                     .WithMany()
                     .HasForeignKey(r => r.User2Id)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Room>(entity =>
@@ -92,17 +93,22 @@ namespace BKConnectBE.Model
                 entity.HasMany(r => r.UsersOfRoom)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(r => r.UploadedFiles)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(r => r.RoomInvitations)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(r => r.ClassFiles)
+                    .WithOne(r => r.Room)
+                    .HasForeignKey(r => r.RoomId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<RoomInvitation>(entity =>
@@ -110,12 +116,12 @@ namespace BKConnectBE.Model
                 entity.HasOne(r => r.Sender)
                     .WithMany()
                     .HasForeignKey(r => r.SenderId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(r => r.Receiver)
                     .WithMany()
                     .HasForeignKey(r => r.ReceiverId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -123,7 +129,7 @@ namespace BKConnectBE.Model
                 entity.HasMany(r => r.UsersOfRoom)
                     .WithOne(r => r.User)
                     .HasForeignKey(r => r.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
             });
         }
     }

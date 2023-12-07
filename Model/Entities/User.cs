@@ -11,6 +11,7 @@ namespace BKConnectBE.Model.Entities
             UsersOfRoom = new HashSet<UserOfRoom>();
             SentMessages = new HashSet<Message>();
             RefreshTokens = new HashSet<RefreshToken>();
+            ClassFiles = new HashSet<ClassFile>();
         }
 
         [Key]
@@ -53,5 +54,6 @@ namespace BKConnectBE.Model.Entities
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<Message> SentMessages { set; get; }
         public virtual ICollection<RefreshToken> RefreshTokens { set; get; }
+        public virtual ICollection<ClassFile> ClassFiles { set; get; }
     }
 }
