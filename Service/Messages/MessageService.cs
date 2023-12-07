@@ -170,7 +170,10 @@ namespace BKConnectBE.Service.Messages
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
 
-            return await ChangeContentSystemMessage(userId, msg.Sender?.Name, msg.AffectedId, msg.Content);
+            var msgSenderName = (msg.SenderId == null || msg.SenderId == userId)
+                ? "Bạn" : await _userRepository.GetUsernameById(msg.SenderId);
+
+            return await ChangeContentSystemMessage(userId, msgSenderName, msg.AffectedId, msg.Content);
         }
 
         private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type)
