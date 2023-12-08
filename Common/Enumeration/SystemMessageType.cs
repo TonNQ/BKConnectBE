@@ -5,7 +5,7 @@ namespace BKConnectBE.Common.Enumeration
     public enum SystemMessageType
     {
         IsBecomeFriend,
-        
+
         [Description("thêm vào nhóm")]
         IsInRoom,
 
@@ -17,5 +17,13 @@ namespace BKConnectBE.Common.Enumeration
 
         [Description("tạo nhóm")]
         IsCreateGroupRoom,
+
+        IsStartCall,
+
+        IsJoinCall,
+
+        IsLeaveCall,
+
+        IsEndCall,
     }
 }
