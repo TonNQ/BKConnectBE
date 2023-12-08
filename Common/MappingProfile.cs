@@ -73,7 +73,7 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.FriendId, opt => opt.MapFrom(x => ""));
 
             CreateMap<Room, GroupRoomDto>()
-                .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count));
+                .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Where(x => !x.IsDeleted).Count()));
 
             CreateMap<AddGroupRoomDto, Room>()
                 .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow.AddHours(7)))

@@ -236,13 +236,11 @@ namespace BKConnectBE.Service.Rooms
             {
                 IsAdmin = false,
                 UserId = addedUserId,
-                RoomId = roomId
+                RoomId = roomId,
+                JoinTime = DateTime.UtcNow.AddHours(7)
             };
             await _genericRepositoryForUserOfRoom.AddAsync(member);
             await _genericRepositoryForUserOfRoom.SaveChangeAsync();
-
-            var addUsername = await _userRepository.GetUsernameById(addedUserId);
-            var username = await _userRepository.GetUsernameById(userId);
 
             var addMsg = new SendMessageDto
             {
@@ -256,17 +254,17 @@ namespace BKConnectBE.Service.Rooms
 
         public async Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId)
         {
+            if (!await _roomRepository.IsAdmin(roomId, userId))
+            {
+                throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
+            }
+
             if (!await _roomRepository.IsInRoomAsync(roomId, removeId))
             {
                 throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             }
 
-            var member = await _roomRepository.GetAnUserOfRoom(roomId, removeId);
-            await _genericRepositoryForUserOfRoom.RemoveByIdAsync(member.Id);
-            await _genericRepositoryForUserOfRoom.SaveChangeAsync();
-
-            var removeUsername = await _userRepository.GetUsernameById(removeId);
-            var username = await _userRepository.GetUsernameById(userId);
+            await _roomRepository.RemoveUserById(roomId, removeId);
 
             var removeMsg = new SendMessageDto
             {
@@ -276,6 +274,47 @@ namespace BKConnectBE.Service.Rooms
             };
 
             return removeMsg;
+        }
+
+        public async Task<SendMessageDto> LeaveRoom(long roomId, string userId)
+        {
+            if (!await _roomRepository.IsInRoomAsync(roomId, userId))
+            {
+                throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            }
+
+            var leaveMsg = new SendMessageDto
+            {
+                RoomId = roomId,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = SystemMessageType.IsLeaveRoom.ToString()
+            };
+
+            return leaveMsg;
+        }
+        
+        public async Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId)
+        {
+            var changedRoomInfo = new ChangedRoomDto{
+                RoomId = roomId,
+                TotalMember = await _roomRepository.GetTotalMemberOfRoom(roomId)
+            };
+            string[] ids = affectedId.Split(", ");
+            if (ids.Length == 1)
+            {
+                changedRoomInfo.LeftMemberId = ids[0];
+            }
+            else
+            {
+                changedRoomInfo.NewMemberList = new List<MemberOfRoomDto>();
+                
+                for(int i = 0; i < ids.Length; i++)
+                {
+                    var newMember = await _roomRepository.GetUserOfRoomInfo(roomId, ids[i]);
+                    changedRoomInfo.NewMemberList.Add(_mapper.Map<MemberOfRoomDto>(newMember));
+                }
+            }
+            return changedRoomInfo;
         }
     }
 }

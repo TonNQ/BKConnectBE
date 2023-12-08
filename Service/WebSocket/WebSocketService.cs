@@ -247,5 +247,37 @@ namespace BKConnectBE.Service.WebSocket
                     CancellationToken.None);
             }
         }
+
+        public async Task SendChangedRoomInfo(SendWebSocketData websocketData, string userId)
+        {
+            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId);
+            var listOfWebSocket = WebSockets.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                ChangedRoomInfo = websocketData.ChangedRoomInfo
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            var tasks = new List<Task>();
+            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+            foreach (WebSocketConnection webSocket in listOfWebSocket)
+            {
+                tasks.Add(webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None));
+            }
+
+            await Task.WhenAll(tasks);
+        }
     }
 }

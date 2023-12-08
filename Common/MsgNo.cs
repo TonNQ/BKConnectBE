@@ -33,6 +33,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_ADD_USER_TO_ROOM = "Thêm người dùng vào nhóm thành công";
         public static readonly string SUCCESS_REMOVE_USER_FROM_ROOM = "Xoá người dùng ra khỏi nhóm thành công";
         public static readonly string SUCCESS_CREATE_GROUP_ROOM = "Tạo nhóm thành công";
+        public static readonly string SUCCESS_LEAVE_ROOM = "Rời khỏi nhóm thành công";
 
 
         //Error

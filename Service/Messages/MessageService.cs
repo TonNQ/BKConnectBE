@@ -186,6 +186,11 @@ namespace BKConnectBE.Service.Messages
                 return msgSenderName + " đã tạo nhóm này";
             }
 
+            if (type == SystemMessageType.IsLeaveRoom.ToString())
+            {
+                return msgSenderName + " đã rời khỏi nhóm";
+            }
+
             if (receiverId == userId)
             {
                 if (type == SystemMessageType.IsInRoom.ToString())

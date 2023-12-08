@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
+using BKConnectBE.Model.Dtos.RoomManagement;
 
 namespace BKConnectBE.Model.Dtos.ChatManagement
 {
@@ -20,5 +21,8 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("notification")]
         public ReceiveNotificationDto Notification { get; set; } = null;
+
+        [JsonPropertyName("changed_room_info")]
+        public ChangedRoomDto ChangedRoomInfo { get; set; } = null;
     }
 }
