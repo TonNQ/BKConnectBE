@@ -68,7 +68,7 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.FacultyName, opt => opt.MapFrom(src => src.Name));
 
             CreateMap<Room, RoomDetailDto>()
-                .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Count))
+                .ForMember(dest => dest.TotalMember, opt => opt.MapFrom(x => x.UsersOfRoom.Where(x => !x.IsDeleted).Count()))
                 .ForMember(dest => dest.IsOnline, opt => opt.MapFrom(x => false))
                 .ForMember(dest => dest.FriendId, opt => opt.MapFrom(x => ""));
 
