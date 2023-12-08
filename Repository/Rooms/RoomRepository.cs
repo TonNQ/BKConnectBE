@@ -72,7 +72,7 @@ namespace BKConnectBE.Repository.Rooms
             return await _context.Rooms
                 .Include(m => m.Messages)
                 .Include(r => r.UsersOfRoom).ThenInclude(u => u.User)
-                .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId)).ToListAsync();
+                .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted)).ToListAsync();
 
         }
 
@@ -80,7 +80,7 @@ namespace BKConnectBE.Repository.Rooms
         {
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId)
                 ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
-            return room.UsersOfRoom.Select(u => u.UserId).ToList();
+            return room.UsersOfRoom.Where(u => !u.IsDeleted).Select(u => u.UserId).ToList();
         }
 
         public async Task<List<UserOfRoom>> GetListOfMembersInRoomAsync(long roomId, string userId)
@@ -88,25 +88,52 @@ namespace BKConnectBE.Repository.Rooms
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(r => r.Id == roomId && r.UsersOfRoom.Any(u => u.UserId == userId))
                 ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
-            return room.UsersOfRoom.ToList();
+            return room.UsersOfRoom.Where(u => !u.IsDeleted).ToList();
+        }
+
+        public async Task<UserOfRoom> GetUserOfRoomInfo(long roomId, string userId)
+        {
+            var member = await _context.UsersOfRoom.Include(m => m.User)
+            .FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId);
+            return member;
         }
 
         public async Task<List<Room>> GetListOfRoomsByTypeAndUserId(string type, string userId)
         {
             return await _context.Rooms.Include(r => r.UsersOfRoom)
-                .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId) && r.RoomType == type)
+                .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted) && r.RoomType == type)
                 .ToListAsync();
+        }
+        
+        public async Task<int?> GetTotalMemberOfRoom(long roomId)
+        {
+            var usersOfRoom = await _context.UsersOfRoom.Where(u => u.RoomId == roomId && !u.IsDeleted).ToListAsync();
+            return usersOfRoom.Count;
         }
 
         public async Task<bool> IsInRoomAsync(long roomId, string userId)
         {
+            return await _context.UsersOfRoom.AnyAsync(u => u.UserId == userId && u.RoomId == roomId && !u.IsDeleted);
+        }
+
+        public async Task<bool> IsExistBefore(long roomId, string userId)
+        {
             return await _context.UsersOfRoom.AnyAsync(u => u.UserId == userId && u.RoomId == roomId);
         }
 
-        public async Task<UserOfRoom> GetAnUserOfRoom(long roomId, string userId)
+        public async Task<bool> IsAdmin(long roomId, string userId)
         {
-            return await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId) 
+            var member =  await _context.UsersOfRoom.FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == roomId && !u.IsDeleted)
+            ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            return member.IsAdmin;
+        }
+
+        public async Task RemoveUserById(long roomId, string userId)
+        {
+            var member = await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId) 
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            member.IsDeleted = true;
+            await _context.SaveChangesAsync();
         }
     }
 };

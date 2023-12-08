@@ -12,6 +12,9 @@ namespace BKConnectBE.Common.Enumeration
         [Description("xoá khỏi nhóm")]
         IsOutRoom,
 
+        [Description("rời khỏi nhóm")]
+        IsLeaveRoom,
+
         [Description("tạo nhóm")]
         IsCreateGroupRoom,
     }

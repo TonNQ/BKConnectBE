@@ -7,6 +7,7 @@ namespace BKConnectBE.Common.Enumeration
         IsMessage,
         IsNotification,
         IsOnline,
-        IsOffline
+        IsOffline,
+        IsChangedRoomInfo
     }
 }

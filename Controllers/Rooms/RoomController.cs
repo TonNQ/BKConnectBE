@@ -213,7 +213,51 @@ namespace BKConnectBE.Controllers.Rooms
 
                     await _webSocketService.SendRoomNotification(websocketDataNotify, userId, removeMemberDto.RoomId);
 
+                    var websocketDataRoomInfo = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(removeMemberDto.RoomId, removeMemberDto.UserId)
+                    };
+
+                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
+
                     return this.Success(removeMemberDto.UserId, MsgNo.SUCCESS_REMOVE_USER_FROM_ROOM);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPost("leaveRoom")]
+        public async Task<ActionResult<Responses>> LeaveRoom(ChangedMemberDto leaveMemberDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var leaveMsg = await _roomService.LeaveRoom(leaveMemberDto.RoomId, leaveMemberDto.UserId);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = leaveMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, leaveMemberDto.UserId, SystemMessageType.IsLeaveRoom.ToString());
+
+                    var websocketDataRoomInfo = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(leaveMemberDto.RoomId, leaveMemberDto.UserId)
+                    };
+
+                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
+
+                    return this.Success(leaveMemberDto.UserId, MsgNo.SUCCESS_LEAVE_ROOM);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
