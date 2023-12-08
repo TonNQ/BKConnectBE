@@ -190,6 +190,41 @@ namespace BKConnectBE.Service.WebSocket
             }
         }
 
+        public async Task SendRoomInfo(SendWebSocketData websocketData, string userId)
+        {
+            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.RoomInfo.Id);
+            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                RoomInfo = websocketData.RoomInfo
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            var tasks = new List<Task>();
+            foreach (WebSocketConnection webSocket in listOfWebSocket)
+            {
+                receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
+
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                tasks.Add(webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
         public async Task CallVideo(SendWebSocketData websocketData, string userId)
         {
             if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsLeaveCall.ToString())

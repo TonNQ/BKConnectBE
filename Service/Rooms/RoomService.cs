@@ -187,7 +187,7 @@ namespace BKConnectBE.Service.Rooms
             }
         }
 
-        public async Task<SendMessageDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId)
+        public async Task<RoomDetailDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId)
         {
             if (addGroupRoomDto.UserIds.Count < 2
                 || addGroupRoomDto.RoomType == RoomType.PrivateRoom.ToString())
@@ -196,6 +196,15 @@ namespace BKConnectBE.Service.Rooms
             }
 
             var room = _mapper.Map<Room>(addGroupRoomDto);
+            var msg = new Message()
+            {
+                SenderId = userId,
+                RoomId = room.Id,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = SystemMessageType.IsCreateGroupRoom.ToString(),
+                SendTime = DateTime.UtcNow.AddHours(7)
+            };
+            room.Messages.Add(msg);
 
             await _userRepository.GetByIdAsync(userId);
             room.UsersOfRoom.Add(new UserOfRoom
@@ -221,13 +230,10 @@ namespace BKConnectBE.Service.Rooms
             await _genericRepositoryForRoom.AddAsync(room);
             await _genericRepositoryForUserOfRoom.SaveChangeAsync();
 
-            var addMsg = new SendMessageDto
-            {
-                RoomId = room.Id,
-                TypeOfMessage = MessageType.System.ToString(),
-                Content = SystemMessageType.IsCreateGroupRoom.ToString()
-            };
-            return addMsg;
+            var roomDto = _mapper.Map<RoomDetailDto>(room);
+            roomDto.LastMessageId = msg.Id;
+            roomDto.LastMessageTime = msg.SendTime;
+            return roomDto;
         }
 
         private async Task<SendMessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)

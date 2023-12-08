@@ -8,5 +8,6 @@ namespace BKConnectBE.Common.Enumeration
         IsOffline,
         IsChangedRoomInfo,
         IsVideoCall,
+        IsCreateGroupRoom,
     }
 }

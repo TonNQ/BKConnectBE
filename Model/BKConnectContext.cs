@@ -14,7 +14,6 @@ namespace BKConnectBE.Model
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
         public virtual DbSet<RoomInvitation> RoomInvitations { get; set; }
-        public virtual DbSet<SchoolYear> SchoolYears { get; set; }
         public virtual DbSet<UploadedFile> UploadedFiles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOfRoom> UsersOfRoom { get; set; }

@@ -269,17 +269,17 @@ namespace BKConnectBE.Controllers.Rooms
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var addMsg = await _roomService.CreateGroupRoomAsync(addGroupRoomDto, userId);
+                    var roomInfo = await _roomService.CreateGroupRoomAsync(addGroupRoomDto, userId);
 
                     var websocketDataMsg = new SendWebSocketData
                     {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = addMsg
+                        DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                        RoomInfo = roomInfo
                     };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, "", SystemMessageType.IsCreateGroupRoom.ToString());
+                    await _webSocketService.SendRoomInfo(websocketDataMsg, userId);
 
-                    return this.Success(addMsg.RoomId, MsgNo.SUCCESS_CREATE_GROUP_ROOM);
+                    return this.Success(roomInfo.Id, MsgNo.SUCCESS_CREATE_GROUP_ROOM);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
