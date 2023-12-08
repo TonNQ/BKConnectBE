@@ -4,6 +4,7 @@ using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
+using BKConnectBE.Model.Dtos.VideoCallManagement;
 
 namespace BKConnectBE.Model.Dtos.ChatManagement
 {
@@ -24,5 +25,8 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("changed_room_info")]
         public ChangedRoomDto ChangedRoomInfo { get; set; } = null;
+        
+        [JsonPropertyName("video_call")]
+        public VideoCallData VideoCall { get; set; }
     }
 }

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using BKConnectBE.Common.Enumeration;
-using BKConnectBE.Model.Dtos.FriendRequestManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
+using BKConnectBE.Model.Dtos.VideoCallManagement;
 
 namespace BKConnectBE.Model.Dtos.ChatManagement
 {
@@ -13,6 +13,9 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
         [JsonPropertyName("data_type")]
         [EnumDataType(typeof(WebSocketDataType))]
         public string DataType { get; set; }
+
+        [JsonPropertyName("video_call")]
+        public VideoCallData VideoCall { get; set; }
 
         [JsonPropertyName("message")]
         public SendMessageDto Message { get; set; } = null;

@@ -209,15 +209,35 @@ namespace BKConnectBE.Service.Messages
             {
                 return Constants.FRIEND_ACCEPTED_NOTIFICATION;
             }
-
-            if (type == SystemMessageType.IsCreateGroupRoom.ToString())
+            
+            if (type == SystemMessageType.IsEndCall.ToString())
             {
-                return msgSenderName + " đã tạo nhóm này";
+                return Constants.END_VIDEO_CALL;
             }
 
             if (type == SystemMessageType.IsLeaveRoom.ToString())
             {
                 return msgSenderName + " đã rời khỏi nhóm";
+            }
+
+            if (type == SystemMessageType.IsStartCall.ToString())
+            {
+                return msgSenderName + " đã bắt đầu cuộc gọi";
+            }
+
+            if (type == SystemMessageType.IsJoinCall.ToString())
+            {
+                return msgSenderName + " đã tham gia cuộc gọi";
+            }
+
+            if (type == SystemMessageType.IsLeaveCall.ToString())
+            {
+                return msgSenderName + " đã rời khỏi cuộc gọi";
+            }
+
+            if (type == SystemMessageType.IsCreateGroupRoom.ToString())
+            {
+                return msgSenderName + " đã tạo nhóm này";
             }
 
             if (receiverId == null)

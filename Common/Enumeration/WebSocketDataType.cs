@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace BKConnectBE.Common.Enumeration
 {
     public enum WebSocketDataType
@@ -8,6 +6,7 @@ namespace BKConnectBE.Common.Enumeration
         IsNotification,
         IsOnline,
         IsOffline,
-        IsChangedRoomInfo
+        IsChangedRoomInfo,
+        IsVideoCall,
     }
 }
