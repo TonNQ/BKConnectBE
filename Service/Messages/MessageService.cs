@@ -194,12 +194,15 @@ namespace BKConnectBE.Service.Messages
                 }
             }
 
-            if (names[1] == "bạn")
+            if (size == 2)
             {
-                names[1] = names[0];
-                names[0] = "bạn";
+                if (names[1] == "bạn")
+                {
+                    names[1] = names[0];
+                    names[0] = "bạn";
+                }
             }
-            
+
             return names;
         }
         private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type)
@@ -209,7 +212,7 @@ namespace BKConnectBE.Service.Messages
             {
                 return Constants.FRIEND_ACCEPTED_NOTIFICATION;
             }
-            
+
             if (type == SystemMessageType.IsEndCall.ToString())
             {
                 return Constants.END_VIDEO_CALL;
