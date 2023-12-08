@@ -232,14 +232,29 @@ namespace BKConnectBE.Service.Rooms
 
         private async Task<SendMessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)
         {
-            var member = new UserOfRoom
+            string[] ids = addedUserId.Split(", ");
+            var tasks = new List<Task>();
+            for (int i = 0; i < ids.Length; i++)
             {
-                IsAdmin = false,
-                UserId = addedUserId,
-                RoomId = roomId,
-                JoinTime = DateTime.UtcNow.AddHours(7)
-            };
-            await _genericRepositoryForUserOfRoom.AddAsync(member);
+                if (await _roomRepository.IsExistBefore(roomId, ids[i]))
+                {
+                    var userInfo = await _roomRepository.GetUserOfRoomInfo(roomId, ids[i]);
+                    userInfo.IsDeleted = false;
+                }
+                else
+                {
+                    var member = new UserOfRoom
+                    {
+                        IsAdmin = false,
+                        UserId = ids[i],
+                        RoomId = roomId,
+                        JoinTime = DateTime.UtcNow.AddHours(7)
+                    };
+                    tasks.Add(_genericRepositoryForUserOfRoom.AddAsync(member));
+                }
+            }
+            await Task.WhenAll(tasks);
+
             await _genericRepositoryForUserOfRoom.SaveChangeAsync();
 
             var addMsg = new SendMessageDto
@@ -292,23 +307,24 @@ namespace BKConnectBE.Service.Rooms
 
             return leaveMsg;
         }
-        
-        public async Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId)
+
+        public async Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId, bool isAdd = true)
         {
-            var changedRoomInfo = new ChangedRoomDto{
+            var changedRoomInfo = new ChangedRoomDto
+            {
                 RoomId = roomId,
                 TotalMember = await _roomRepository.GetTotalMemberOfRoom(roomId)
             };
             string[] ids = affectedId.Split(", ");
-            if (ids.Length == 1)
+            if (!isAdd)
             {
                 changedRoomInfo.LeftMemberId = ids[0];
             }
             else
             {
                 changedRoomInfo.NewMemberList = new List<MemberOfRoomDto>();
-                
-                for(int i = 0; i < ids.Length; i++)
+
+                for (int i = 0; i < ids.Length; i++)
                 {
                     var newMember = await _roomRepository.GetUserOfRoomInfo(roomId, ids[i]);
                     changedRoomInfo.NewMemberList.Add(_mapper.Map<MemberOfRoomDto>(newMember));
