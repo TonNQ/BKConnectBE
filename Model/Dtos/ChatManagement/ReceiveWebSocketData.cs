@@ -25,8 +25,11 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("changed_room_info")]
         public ChangedRoomDto ChangedRoomInfo { get; set; } = null;
-        
+
         [JsonPropertyName("video_call")]
         public VideoCallData VideoCall { get; set; }
+
+        [JsonPropertyName("room_info")]
+        public RoomDetailDto RoomInfo { get; set; }
     }
 }

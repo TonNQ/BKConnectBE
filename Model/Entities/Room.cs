@@ -32,9 +32,6 @@ namespace BKConnectBE.Model.Entities
 
         public DateTime CreatedDate { get; set; }
 
-        public long? SchoolYearId { get; set; }
-        public virtual SchoolYear? SchoolYear { get; set; }
-
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<UploadedFile> UploadedFiles { set; get; }
         public virtual ICollection<RoomInvitation> RoomInvitations { set; get; }

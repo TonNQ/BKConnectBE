@@ -11,6 +11,7 @@ namespace BKConnectBE.Service.WebSocket
         Task SendMessage(SendWebSocketData websocketData, string userId);
         Task SendNotification(SendWebSocketData websocketData, string userId);
         Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type);
+        Task SendRoomInfo(SendWebSocketData websocketData, string userId);
         Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId);
         Task SendChangedRoomInfo(SendWebSocketData websocketData, string userId);
         Task CallVideo(SendWebSocketData websocketData, string userId);
