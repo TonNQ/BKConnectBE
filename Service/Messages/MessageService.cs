@@ -9,6 +9,7 @@ using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
 using BKConnectBE.Repository.Messages;
 using BKConnectBE.Repository.Users;
+using Microsoft.AspNetCore.Components.Server;
 
 namespace BKConnectBE.Service.Messages
 {
@@ -176,6 +177,31 @@ namespace BKConnectBE.Service.Messages
             return await ChangeContentSystemMessage(userId, msgSenderName, msg.AffectedId, msg.Content);
         }
 
+        private async Task<string[]> GetAllReceiverName(string[] ids, string userId)
+        {
+            int size = (ids.Length >= 2) ? 2 : 1;
+            string[] names = new string[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                if (ids[i] == userId)
+                {
+                    names[i] = "bạn";
+                }
+                else
+                {
+                    names[i] = await _userRepository.GetUsernameById(ids[i]);
+                }
+            }
+
+            if (names[1] == "bạn")
+            {
+                names[1] = names[0];
+                names[0] = "bạn";
+            }
+            
+            return names;
+        }
         private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type)
         {
 
@@ -194,32 +220,38 @@ namespace BKConnectBE.Service.Messages
                 return msgSenderName + " đã rời khỏi nhóm";
             }
 
-            if (receiverId == userId)
-            {
-                if (type == SystemMessageType.IsInRoom.ToString())
-                {
-                    return msgSenderName + " đã thêm bạn vào nhóm";
-                }
-                if (type == SystemMessageType.IsOutRoom.ToString())
-                {
-                    return msgSenderName + " đã xoá bạn ra khỏi nhóm";
-                }
-            }
-
             if (receiverId == null)
             {
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
 
-            var receiverName = await _userRepository.GetUsernameById(receiverId);
             if (type == SystemMessageType.IsInRoom.ToString())
             {
-                return msgSenderName + " đã thêm " + receiverName + " vào nhóm";
+                string[] ids = receiverId.Split(", ");
+                string[] names = await GetAllReceiverName(ids, userId);
 
+                switch (ids.Length)
+                {
+                    case 1:
+                        return msgSenderName + " đã thêm " + names[0] + " vào nhóm";
+                    case 2:
+                        return msgSenderName + " đã thêm " + names[0] + " và " + names[1] + " vào nhóm";
+                    default:
+                        return msgSenderName + " đã thêm " + names[0] + ", " + names[1] + " và những người khác vào nhóm";
+                }
             }
+
             if (type == SystemMessageType.IsOutRoom.ToString())
             {
-                return msgSenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+                if (receiverId == userId)
+                {
+                    return msgSenderName + " đã xoá bạn ra khỏi nhóm";
+                }
+                else
+                {
+                    var receiverName = await _userRepository.GetUsernameById(receiverId);
+                    return msgSenderName + " đã xoá " + receiverName + " ra khỏi nhóm";
+                }
             }
 
             return "";

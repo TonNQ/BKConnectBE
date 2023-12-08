@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;
@@ -15,6 +16,6 @@ namespace BKConnectBE.Service.Rooms
         Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId);
         Task<SendMessageDto> LeaveRoom(long roomId, string userId);
         Task<SendMessageDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId);
-        Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId);
+        Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId, bool isAdd = true);
     }
 }
