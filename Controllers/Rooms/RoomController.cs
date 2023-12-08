@@ -157,24 +157,6 @@ namespace BKConnectBE.Controllers.Rooms
 
                     await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId, SystemMessageType.IsInRoom.ToString());
 
-                    string[] addIds = addMemberDto.UserId.Split(", ");
-                    for (int i = 0; i < addIds.Length; i++)
-                    {
-                        var notification = new SendNotificationDto
-                        {
-                            NotificationType = NotificationType.IsInRoom.ToString(),
-                            ReceiverId = addIds[i]
-                        };
-
-                        var websocketDataNotify = new SendWebSocketData
-                        {
-                            DataType = WebSocketDataType.IsNotification.ToString(),
-                            Notification = notification
-                        };
-
-                        await _webSocketService.SendRoomNotification(websocketDataNotify, userId, addMemberDto.RoomId);
-                    }
-
                     var websocketDataRoomInfo = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),

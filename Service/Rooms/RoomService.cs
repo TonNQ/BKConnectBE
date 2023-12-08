@@ -298,6 +298,8 @@ namespace BKConnectBE.Service.Rooms
                 throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             }
 
+            await _roomRepository.RemoveUserById(roomId, userId);
+
             var leaveMsg = new SendMessageDto
             {
                 RoomId = roomId,
