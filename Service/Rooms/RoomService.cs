@@ -232,7 +232,7 @@ namespace BKConnectBE.Service.Rooms
 
             var roomDto = _mapper.Map<RoomDetailDto>(room);
             roomDto.LastMessageId = msg.Id;
-            roomDto.LastMessageTime = msg.SendTime;
+            roomDto.LastMessageTime = msg.SendTime.AddHours(-7);
             return roomDto;
         }
 
