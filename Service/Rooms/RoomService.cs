@@ -158,7 +158,7 @@ namespace BKConnectBE.Service.Rooms
             return roomDtos;
         }
 
-        public async Task<SendMessageDto> AddUserToRoomAsync(long roomId, string addedUserId, string userId)
+        public async Task<MessageDto> AddUserToRoomAsync(long roomId, string addedUserId, string userId)
         {
             if (!await _roomRepository.IsInRoomAsync(roomId, userId))
             {
@@ -240,7 +240,7 @@ namespace BKConnectBE.Service.Rooms
             return roomDto;
         }
 
-        private async Task<SendMessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)
+        private async Task<MessageDto> AddingUserToRoomAsync(long roomId, string addedUserId, string userId)
         {
             string[] ids = addedUserId.Split(", ");
             var tasks = new List<Task>();
@@ -267,14 +267,20 @@ namespace BKConnectBE.Service.Rooms
 
             await _genericRepositoryForUserOfRoom.SaveChangeAsync();
 
-            var addMsg = new SendMessageDto
+            var room = await _genericRepositoryForRoom.GetByIdAsync(roomId);
+            var msg = new Message()
             {
+                SenderId = userId,
                 RoomId = roomId,
                 TypeOfMessage = MessageType.System.ToString(),
-                Content = SystemMessageType.IsInRoom.ToString()
+                Content = SystemMessageType.IsInRoom.ToString(),
+                SendTime = DateTime.UtcNow.AddHours(7),
+                AffectedId = addedUserId
             };
+            room.Messages.Add(msg);
+            await _genericRepositoryForRoom.SaveChangeAsync();
 
-            return addMsg;
+            return _mapper.Map<MessageDto>(msg);
         }
 
         public async Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId)
