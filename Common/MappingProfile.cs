@@ -1,6 +1,7 @@
 using AutoMapper;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.Authentication;
+using BKConnectBE.Model.Dtos.ClassFileManagement;
 using BKConnectBE.Model.Dtos.ClassManagement;
 using BKConnectBE.Model.Dtos.FacultyManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
@@ -54,8 +55,10 @@ namespace BKConnectBE.Common
             CreateMap<SendMessageDto, Message>();
 
             CreateMap<Message, FileDto>();
-            
-            CreateMap<ClassFile, FileDto>();
+
+            CreateMap<ClassFile, ClassFileDto>();
+
+            CreateMap<AddFileDto, ClassFile>();
 
             CreateMap<Class, ClassDto>()
                 .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.Id))
@@ -81,8 +84,7 @@ namespace BKConnectBE.Common
                 .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => new List<Message>()));
 
             CreateMap<Notification, ReceiveNotificationDto>()
-                .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type))
-                .ForMember(dest => dest.SenderId, opt => opt.MapFrom(src => src.Content));
+                .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
         }
     }
 }

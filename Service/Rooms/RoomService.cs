@@ -7,6 +7,7 @@ using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
+using BKConnectBE.Repository.Messages;
 using BKConnectBE.Repository.Rooms;
 using BKConnectBE.Repository.Users;
 using BKConnectBE.Service.Messages;
@@ -17,12 +18,15 @@ namespace BKConnectBE.Service.Rooms
     {
         private readonly IRoomRepository _roomRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
         private readonly IGenericRepository<Room> _genericRepositoryForRoom;
         private readonly IGenericRepository<UserOfRoom> _genericRepositoryForUserOfRoom;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
 
-        public RoomService(IRoomRepository roomRepository, IUserRepository userRepository,
+        public RoomService(IRoomRepository roomRepository,
+            IUserRepository userRepository,
+            IMessageRepository messageRepository,
             IMessageService messageService,
             IGenericRepository<Room> genericRepositoryForRoom,
             IGenericRepository<UserOfRoom> genericRepositoryForUserOfRoom,
@@ -30,6 +34,7 @@ namespace BKConnectBE.Service.Rooms
         {
             _roomRepository = roomRepository;
             _userRepository = userRepository;
+            _messageRepository = messageRepository;
             _messageService = messageService;
             _genericRepositoryForRoom = genericRepositoryForRoom;
             _genericRepositoryForUserOfRoom = genericRepositoryForUserOfRoom;
@@ -45,19 +50,19 @@ namespace BKConnectBE.Service.Rooms
 
             foreach (Room room in rooms)
             {
-                var lastMessage = room.Messages.OrderByDescending(m => m.SendTime).FirstOrDefault()
+                var lastMessage = await _messageRepository.GetLastMessageInRoomAsync(room.Id)
                     ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
                 var roomDto = _mapper.Map<RoomDetailDto>(room);
 
                 if (room.RoomType != nameof(RoomType.PrivateRoom) &&
                     Helper.RemoveUnicodeSymbol(room.Name).Contains(searchKey))
                 {
-                    var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
+                    var userOfRoom = await _roomRepository.GetUserOfRoomInfo(room.Id, userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
 
-                    roomDto.IsRead = user.ReadMessage != null
+                    roomDto.IsRead = userOfRoom.ReadMessage != null
                             && !room.Messages.Any(m => m.SenderId != userId
-                                && m.Id > user.ReadMessageId);
+                                && m.Id > userOfRoom.ReadMessageId);
                     roomDto.LastMessageTime = lastMessage.SendTime;
 
                     roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
@@ -70,9 +75,10 @@ namespace BKConnectBE.Service.Rooms
                 }
                 else if (room.RoomType == nameof(RoomType.PrivateRoom))
                 {
-                    var friend = room.UsersOfRoom.FirstOrDefault(u => u.UserId != userId).User
+                    var friend = await _roomRepository.GetFriendInRoom(room.Id, userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
-                    var user = room.UsersOfRoom.FirstOrDefault(u => u.UserId == userId)
+
+                    var userOfRoom = await _roomRepository.GetUserOfRoomInfo(room.Id, userId)
                         ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
 
                     if (Helper.RemoveUnicodeSymbol(friend.Name).Contains(searchKey))
@@ -90,9 +96,9 @@ namespace BKConnectBE.Service.Rooms
                             roomDto.LastOnline = friend.LastOnline;
                         }
 
-                        roomDto.IsRead = user.ReadMessage != null
+                        roomDto.IsRead = userOfRoom.ReadMessage != null
                             && !room.Messages.Any(m => m.SenderId != userId
-                                && m.Id > user.ReadMessageId);
+                                && m.Id > userOfRoom.ReadMessageId);
                         roomDto.LastMessageTime = lastMessage.SendTime;
                         roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
                             ? await _messageService.ChangeContentSystemMessage(lastMessage.Id, userId)
@@ -195,6 +201,12 @@ namespace BKConnectBE.Service.Rooms
         {
             if (addGroupRoomDto.UserIds.Count < 2
                 || addGroupRoomDto.RoomType == RoomType.PrivateRoom.ToString())
+            {
+                throw new Exception(MsgNo.ERROR_CREATE_GROUP_ROOM);
+            }
+
+            if (addGroupRoomDto.RoomType == RoomType.ClassRoom.ToString()
+                && !await _userRepository.IsLecturer(userId))
             {
                 throw new Exception(MsgNo.ERROR_CREATE_GROUP_ROOM);
             }
@@ -347,7 +359,7 @@ namespace BKConnectBE.Service.Rooms
 
         public async Task<RoomDetailDto> GetRoomInformation(long roomId)
         {
-            return  _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
+            return _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
         }
     }
 }

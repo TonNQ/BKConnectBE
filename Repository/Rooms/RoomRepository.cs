@@ -70,8 +70,6 @@ namespace BKConnectBE.Repository.Rooms
         public async Task<List<Room>> GetListOfRoomsByUserId(string userId)
         {
             return await _context.Rooms
-                .Include(m => m.Messages)
-                .Include(r => r.UsersOfRoom).ThenInclude(u => u.User)
                 .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted)).ToListAsync();
 
         }
@@ -104,13 +102,20 @@ namespace BKConnectBE.Repository.Rooms
             return member;
         }
 
+        public async Task<User> GetFriendInRoom(long roomId, string userId)
+        {
+            var member = await _context.UsersOfRoom.Include(m => m.User)
+            .FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId != userId);
+            return member?.User;
+        }
+
         public async Task<List<Room>> GetListOfRoomsByTypeAndUserId(string type, string userId)
         {
             return await _context.Rooms.Include(r => r.UsersOfRoom)
                 .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted) && r.RoomType == type)
                 .ToListAsync();
         }
-        
+
         public async Task<int?> GetTotalMemberOfRoom(long roomId)
         {
             var usersOfRoom = await _context.UsersOfRoom.Where(u => u.RoomId == roomId && !u.IsDeleted).ToListAsync();
@@ -129,14 +134,14 @@ namespace BKConnectBE.Repository.Rooms
 
         public async Task<bool> IsAdmin(long roomId, string userId)
         {
-            var member =  await _context.UsersOfRoom.FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == roomId && !u.IsDeleted)
+            var member = await _context.UsersOfRoom.FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == roomId && !u.IsDeleted)
             ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             return member.IsAdmin;
         }
 
         public async Task RemoveUserById(long roomId, string userId)
         {
-            var member = await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId) 
+            var member = await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             member.IsDeleted = true;
             await _context.SaveChangesAsync();

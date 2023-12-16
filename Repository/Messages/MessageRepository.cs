@@ -21,6 +21,12 @@ namespace BKConnectBE.Repository.Messages
                 .Include(m => m.Sender).Include(m => m.RootMessage).OrderByDescending(m => m.SendTime).ToListAsync();
         }
 
+        public async Task<Message> GetLastMessageInRoomAsync(long roomId)
+        {
+            return await _context.Messages.Where(m => m.RoomId == roomId)
+                .Include(m => m.Sender).OrderByDescending(m => m.SendTime).FirstOrDefaultAsync();
+        }
+
         public async Task<List<Message>> GetAllNoneTextMessagesInRoomAsync(long roomId, string messageType, string userId)
         {
             if (!await _context.UsersOfRoom.AnyAsync(ur => ur.RoomId == roomId && ur.UserId == userId))

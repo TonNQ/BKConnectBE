@@ -103,8 +103,9 @@ namespace BKConnectBE.Repository.Users
 
         public async Task<bool> IsLecturer(string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
-            return user.ClassId == null;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId)
+                ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+            return user.Role == Role.Teacher.ToString();
         }
     }
 }

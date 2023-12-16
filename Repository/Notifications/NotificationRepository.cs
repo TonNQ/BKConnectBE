@@ -18,7 +18,8 @@ namespace BKConnectBE.Repository.Notifications
         public async Task<List<Notification>> GetListOfNotificationsByUserIdAsync(string userId)
         {
             return await _context.Notifications
-                .Where(n => n.ReceiverId == userId)
+                .Where(n => n.ReceiverId == userId
+                    || (n.Type == NotificationType.IsPostFile.ToString()))
                 .OrderByDescending(n => n.SendTime)
                 .ToListAsync();
         }
@@ -36,7 +37,7 @@ namespace BKConnectBE.Repository.Notifications
             var list = new List<string> { senderId, receiverId };
             var notification = await _context.Notifications
                 .FirstOrDefaultAsync(n => n.Type == NotificationType.IsSendFriendRequest.ToString()
-                    && list.Contains(n.ReceiverId) && list.Contains(n.Content));
+                    && list.Contains(n.ReceiverId) && list.Contains(n.SenderId));
             if (notification is not null)
             {
                 _context.Notifications.Remove(notification);
