@@ -3,6 +3,7 @@ using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
+using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;
@@ -147,7 +148,7 @@ namespace BKConnectBE.Controllers.Rooms
             {
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    var addMsg = await _roomService.AddUserToRoomAsync(addMemberDto.RoomId, addMemberDto.UserId, userId);
+                    var addMsgDto = await _roomService.AddUserToRoomAsync(addMemberDto.RoomId, addMemberDto.UserId, userId);
 
                     var websocketDataRoomInfo1 = new SendWebSocketData
                     {
@@ -158,6 +159,9 @@ namespace BKConnectBE.Controllers.Rooms
                     await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo1, userId);
 
                     var roomInfo = await _roomService.GetRoomInformation(addMemberDto.RoomId);
+                    roomInfo.LastMessageId = addMsgDto.Id;
+                    roomInfo.LastMessageTime = addMsgDto.SendTime;
+
                     var websocketDataRoomInfo2 = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
@@ -166,13 +170,19 @@ namespace BKConnectBE.Controllers.Rooms
 
                     await _webSocketService.SendRoomInfoForNewMember(websocketDataRoomInfo2, addMemberDto.UserId, userId);
 
+                    var sendAddMsg = new SendMessageDto
+                    {
+                        RoomId = addMsgDto.RoomId,
+                        TypeOfMessage = MessageType.System.ToString(),
+                        Content = SystemMessageType.IsInRoom.ToString()
+                    };
                     var websocketDataMsg = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = addMsg
+                        Message = sendAddMsg
                     };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId, SystemMessageType.IsInRoom.ToString());
+                    await _webSocketService.SendSystemMessageForAddMember(websocketDataMsg, userId, addMemberDto.UserId, addMsgDto.Id);
 
                     return this.Success(addMemberDto.UserId, MsgNo.SUCCESS_ADD_USER_TO_ROOM);
                 }

@@ -3,12 +3,15 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using AutoMapper;
 using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.VideoCallManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
+using BKConnectBE.Model.Entities;
+using BKConnectBE.Repository;
 using BKConnectBE.Service.Messages;
 using BKConnectBE.Service.Notifications;
 using BKConnectBE.Service.Rooms;
@@ -22,16 +25,22 @@ namespace BKConnectBE.Service.WebSocket
         private readonly IMessageService _messageService;
         private readonly IRoomService _roomService;
         private readonly INotificationService _notificationService;
+        private readonly IGenericRepository<Message> _genericRepositoryForMsg;
+        private readonly IMapper _mapper;
 
         public WebSocketService(IUserService userService,
             IMessageService messageService,
             IRoomService roomService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IGenericRepository<Message> genericRepository,
+            IMapper mapper)
         {
             _userService = userService;
             _messageService = messageService;
             _roomService = roomService;
             _notificationService = notificationService;
+            _genericRepositoryForMsg = genericRepository;
+            _mapper = mapper;
         }
 
         public void AddWebSocketConnection(WebSocketConnection connection)
@@ -147,7 +156,42 @@ namespace BKConnectBE.Service.WebSocket
 
             await Task.WhenAll(tasks);
         }
+        public async Task SendSystemMessageForAddMember(SendWebSocketData websocketData, string userId, string receiverId, long newMsgId)
+        {
+            var newMsg = await _genericRepositoryForMsg.GetByIdAsync(newMsgId);
+            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
+            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                Message = _mapper.Map<ReceiveMessageDto>(newMsg)
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            var tasks = new List<Task>();
+
+            foreach (WebSocketConnection webSocket in listOfWebSocket)
+            {
+                receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, SystemMessageType.IsInRoom.ToString());
+
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                tasks.Add(webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None));
+            }
+
+            await Task.WhenAll(tasks);
+        }
         public async Task SendNotification(SendWebSocketData websocketData, string userId)
         {
             if (websocketData.Notification.NotificationType == NotificationType.IsSendFriendRequest.ToString())
@@ -194,6 +238,42 @@ namespace BKConnectBE.Service.WebSocket
         {
             var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.RoomInfo.Id);
             var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                RoomInfo = websocketData.RoomInfo
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            var tasks = new List<Task>();
+            foreach (WebSocketConnection webSocket in listOfWebSocket)
+            {
+                receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
+
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                tasks.Add(webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        public async Task SendRoomInfoForNewMember(SendWebSocketData websocketData, string newUserId, string userId)
+        {
+            List<string> newUserIdList = newUserId.Split(", ").ToList();
+
+            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => newUserIdList.Contains(ws.UserId)).ToList();
 
             var receiveWebSocketData = new ReceiveWebSocketData
             {
@@ -422,40 +502,6 @@ namespace BKConnectBE.Service.WebSocket
             var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
             foreach (WebSocketConnection webSocket in listOfWebSocket)
             {
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
-        public async Task SendRoomInfoForNewMember(SendWebSocketData websocketData, string newUserId, string userId)
-        {
-            List<string> newUserIdList = newUserId.Split(", ").ToList();
-
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => newUserIdList.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
-            {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                RoomInfo = websocketData.RoomInfo
-            };
-
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
-
-            var tasks = new List<Task>();
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-
                 tasks.Add(webSocket.WebSocket.SendAsync(
                     new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
                     WebSocketMessageType.Text,
