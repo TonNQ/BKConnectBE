@@ -379,6 +379,40 @@ namespace BKConnectBE.Service.WebSocket
             await Task.WhenAll(tasks);
         }
 
+        public async Task SendChangedRoomNameAndAvatar(SendWebSocketData websocketData, string userId)
+        {
+            var notification = await _notificationService.AddPostFileNotification(websocketData.Notification.FileId);
+            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(notification.PostFile.RoomId);
+            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => userId != ws.UserId && listOfUserId.Contains(ws.UserId)).ToList();
+
+            var receiveWebSocketData = new ReceiveWebSocketData
+            {
+                UserId = userId,
+                DataType = websocketData.DataType,
+                Notification = notification
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            var tasks = new List<Task>();
+            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+            foreach (WebSocketConnection webSocket in listOfWebSocket)
+            {
+                tasks.Add(webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
         private async Task JoinVideoCall(SendWebSocketData websocketData, string userId)
         {
             var videoCall = StaticParams.VideoCallList.FirstOrDefault(cr => cr.RoomId == websocketData.VideoCall.RoomId);
@@ -530,39 +564,6 @@ namespace BKConnectBE.Service.WebSocket
         }
 
         private async Task SendPostFileInClassRoom(SendWebSocketData websocketData, string userId)
-        {
-            var notification = await _notificationService.AddPostFileNotification(websocketData.Notification.FileId);
-            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(notification.PostFile.RoomId);
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => userId != ws.UserId && listOfUserId.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
-            {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                Notification = notification
-            };
-
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
-
-            var tasks = new List<Task>();
-            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
-            }
-
-            await Task.WhenAll(tasks);
-        }
-        public async Task SendChangedRoomNameAndAvatar(SendWebSocketData websocketData, string userId)
         {
             var notification = await _notificationService.AddPostFileNotification(websocketData.Notification.FileId);
             var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(notification.PostFile.RoomId);

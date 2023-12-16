@@ -1,7 +1,7 @@
 using AutoMapper;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.Authentication;
-using BKConnectBE.Model.Dtos.ClassFileManagement;
+using BKConnectBE.Model.Dtos.UploadedFileManagement;
 using BKConnectBE.Model.Dtos.ClassManagement;
 using BKConnectBE.Model.Dtos.FacultyManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
@@ -60,9 +60,9 @@ namespace BKConnectBE.Common
 
             CreateMap<Message, FileDto>();
 
-            CreateMap<ClassFile, ClassFileDto>();
+            CreateMap<UploadedFile, UploadedFileDto>();
 
-            CreateMap<AddFileDto, ClassFile>();
+            CreateMap<AddFileDto, UploadedFile>();
 
             CreateMap<Class, ClassDto>()
                 .ForMember(dest => dest.ClassId, opt => opt.MapFrom(src => src.Id))

@@ -1,7 +1,6 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
-using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Service.Notifications;
 using Microsoft.AspNetCore.Mvc;
 

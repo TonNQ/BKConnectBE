@@ -1,17 +1,17 @@
 using System.Text.Json.Serialization;
 
-namespace BKConnectBE.Model.Dtos.ClassFileManagement
+namespace BKConnectBE.Model.Dtos.UploadedFileManagement
 {
-    public class ClassFileDto
+    public class UploadedFileDto
     {
         [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonPropertyName("content")]
-        public string Content { get; set; }
+        [JsonPropertyName("path")]
+        public string Path { get; set; }
 
-        [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
+        [JsonPropertyName("upload_time")]
+        public DateTime UploadTime { get; set; }
 
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }

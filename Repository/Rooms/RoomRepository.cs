@@ -1,7 +1,7 @@
-using AutoMapper.Execution;
 using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
+using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -152,6 +152,21 @@ namespace BKConnectBE.Repository.Rooms
                 ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
             room.Avatar = img;
             await _context.SaveChangesAsync();
+        }
+
+        public async Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage)
+        {
+            var userOfRoom = await _context.UsersOfRoom
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == readMessage.RoomId && !u.IsDeleted)
+                ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
+            if (!_context.Messages.Any(m => m.Id == readMessage.MessageId && m.RoomId == readMessage.RoomId))
+            {
+                throw new Exception(MsgNo.ERROR_MESSAGE_NOT_IN_ROOM);
+            }
+            else
+            {
+                userOfRoom.ReadMessageId = readMessage.MessageId;
+            }
         }
     }
 };

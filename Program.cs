@@ -26,11 +26,14 @@ using BKConnectBE.Service.Messages;
 using BKConnectBE.Repository.FriendRequests;
 using BKConnectBE.Service.FriendRequests;
 using BKConnectBE.Service.WebSocket;
-using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Repository.Notifications;
 using BKConnectBE.Service.Notifications;
 using BKConnectBE.Service.Files;
 using BKConnectBE.Repository.Files;
+using Hangfire;
+using BKConnectBE.Service.BackgroundJobs;
+using BKConnectBE.Filter;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -94,6 +97,7 @@ builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IWebSocketService, WebSocketService>();
+builder.Services.AddScoped<IBackgroundJobService, BackgroundJobService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
@@ -112,6 +116,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(connectionString));
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
@@ -134,12 +144,25 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseWebSockets();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new [] { new DashboardAuthorizeFilter() },
+    IsReadOnlyFunc = (DashboardContext context) => true
+});
+
 app.UseMiddleware<ResultMiddleware>();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<ChatHub>("/chatHub");
+    endpoints.MapHangfireDashboard();
+});
+
+GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute
+{
+    Attempts = Constants.ATTEMPTS_IN_HANGFIRE,
+    DelaysInSeconds = new int[] { Constants.DELAY_IN_HANGFIRE }
 });
 
 app.Run();

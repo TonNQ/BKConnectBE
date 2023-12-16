@@ -1,4 +1,3 @@
-using System.Diagnostics.Eventing.Reader;
 using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;

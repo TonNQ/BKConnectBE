@@ -1,6 +1,4 @@
-using System.Net.Http.Headers;
 using BKConnect.BKConnectBE.Common;
-using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;

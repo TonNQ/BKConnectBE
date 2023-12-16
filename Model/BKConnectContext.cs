@@ -18,7 +18,6 @@ namespace BKConnectBE.Model
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOfRoom> UsersOfRoom { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<ClassFile> ClassFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,7 +103,7 @@ namespace BKConnectBE.Model
                     .HasForeignKey(r => r.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(r => r.ClassFiles)
+                entity.HasMany(r => r.UploadedFiles)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
@@ -126,6 +125,11 @@ namespace BKConnectBE.Model
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasMany(r => r.UsersOfRoom)
+                    .WithOne(r => r.User)
+                    .HasForeignKey(r => r.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+                    
+                entity.HasMany(r => r.UploadedFiles)
                     .WithOne(r => r.User)
                     .HasForeignKey(r => r.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
