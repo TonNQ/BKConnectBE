@@ -7,6 +7,7 @@ namespace BKConnectBE.Repository.Rooms
         Task<List<Room>> GetListOfRoomsByUserId(string userId);
         Task<List<Room>> GetListOfRoomsByTypeAndUserId(string type, string userId);
         Task<List<string>> GetListOfUserIdInRoomAsync(long roomId);
+        Task<List<string>> GetListOfOldUserIdInRoomAsync(long roomId, List<string> newUserId);
         Task<UserOfRoom> GetUserOfRoomInfo(long roomId, string userId);
         Task<Room> GetInformationOfRoom(long roomId);
         Task<int?> GetTotalMemberOfRoom(long roomId);

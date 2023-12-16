@@ -111,6 +111,10 @@ namespace BKConnectBE.Service.Rooms
         {
             return await _roomRepository.GetListOfUserIdInRoomAsync(roomId);
         }
+        public async Task<List<string>> GetListOfOldUserIdInRoomAsync(long roomId, List<string> newUserId)
+        {
+            return await _roomRepository.GetListOfOldUserIdInRoomAsync(roomId, newUserId);
+        }
 
         public async Task<List<MemberOfRoomDto>> GetListOfMembersInRoomAsync(long roomId, string userId)
         {
@@ -339,6 +343,11 @@ namespace BKConnectBE.Service.Rooms
                 }
             }
             return changedRoomInfo;
+        }
+
+        public async Task<RoomDetailDto> GetRoomInformation(long roomId)
+        {
+            return  _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
         }
     }
 }
