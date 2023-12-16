@@ -149,6 +149,23 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var addMsg = await _roomService.AddUserToRoomAsync(addMemberDto.RoomId, addMemberDto.UserId, userId);
 
+                    var websocketDataRoomInfo1 = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId)
+                    };
+
+                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo1, userId);
+
+                    var roomInfo = await _roomService.GetRoomInformation(addMemberDto.RoomId);
+                    var websocketDataRoomInfo2 = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                        RoomInfo = roomInfo
+                    };
+
+                    await _webSocketService.SendRoomInfoForNewMember(websocketDataRoomInfo2, addMemberDto.UserId, userId);
+
                     var websocketDataMsg = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsMessage.ToString(),
@@ -156,14 +173,6 @@ namespace BKConnectBE.Controllers.Rooms
                     };
 
                     await _webSocketService.SendSystemMessage(websocketDataMsg, userId, addMemberDto.UserId, SystemMessageType.IsInRoom.ToString());
-
-                    var websocketDataRoomInfo = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId)
-                    };
-
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
 
                     return this.Success(addMemberDto.UserId, MsgNo.SUCCESS_ADD_USER_TO_ROOM);
                 }

@@ -82,6 +82,12 @@ namespace BKConnectBE.Repository.Rooms
                 ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
             return room.UsersOfRoom.Where(u => !u.IsDeleted).Select(u => u.UserId).ToList();
         }
+        public async Task<List<string>> GetListOfOldUserIdInRoomAsync(long roomId, List<string> newUserId)
+        {
+            var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+            return room.UsersOfRoom.Where(u => !u.IsDeleted && !newUserId.Contains(u.UserId)).Select(u => u.UserId).ToList();
+        }
 
         public async Task<List<UserOfRoom>> GetListOfMembersInRoomAsync(long roomId, string userId)
         {
