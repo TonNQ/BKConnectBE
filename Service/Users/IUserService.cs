@@ -1,7 +1,6 @@
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Dtos.Authentication;
 using BKConnectBE.Model.Dtos.Parameters;
-using BKConnectBE.Model.Dtos.MessageManagement;
 
 namespace BKConnectBE.Service.Users
 {
@@ -13,5 +12,6 @@ namespace BKConnectBE.Service.Users
         Task<UserDto> UpdateUserAsync(string userId, UserInputDto user);
         Task ChangePasswordAsync(string userId, ChangePasswordDto password);
         Task UpdateLastOnlineAsync(string userId);
+        Task UpdateAvatar(string userId, string img);
     }
 }

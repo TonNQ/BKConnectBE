@@ -84,5 +84,10 @@ namespace BKConnectBE.Service.Users
             await _userRepository.UpdateLastOnlineAsync(userId);
             await _genericRepositoryForUser.SaveChangeAsync();
         }
+        public async Task UpdateAvatar(string userId, string img)
+        {
+            await _userRepository.UpdateAvatar(userId, img);
+            await _genericRepositoryForUser.SaveChangeAsync();
+        }
     }
 }

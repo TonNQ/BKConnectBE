@@ -18,6 +18,9 @@ namespace BKConnectBE.Common.Enumeration
         [Description("tạo nhóm")]
         IsCreateGroupRoom,
 
+        [Description("thay đổi ảnh nhóm")]
+        IsUpdateRoomImg,
+
         IsStartCall,
 
         IsJoinCall,

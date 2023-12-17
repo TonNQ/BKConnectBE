@@ -17,7 +17,8 @@ namespace BKConnectBE.Service.Rooms
         Task<SendMessageDto> RemoveUserFromRoom(long roomId, string removeId, string userId);
         Task<SendMessageDto> LeaveRoom(long roomId, string userId);
         Task<RoomDetailDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId);
-        Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId, bool isAdd = true);
+        Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string changeInfo, string type);
         Task<RoomDetailDto> GetRoomInformation(long roomId);
+        Task<SendMessageDto> UpdateAvatar(long roomId, string img);
     }
 }

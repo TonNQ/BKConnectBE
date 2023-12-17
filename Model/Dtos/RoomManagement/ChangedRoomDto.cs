@@ -15,5 +15,11 @@ namespace BKConnectBE.Model.Dtos.RoomManagement
 
         [JsonPropertyName("left_member_id")]
         public string LeftMemberId { get; set; }
+
+        [JsonPropertyName("new_avatar")]
+        public string NewAvatar { get; set; }
+
+        [JsonPropertyName("new_name")]
+        public string NewName { get; set; }
     }
 }

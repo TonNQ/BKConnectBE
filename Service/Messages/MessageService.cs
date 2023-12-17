@@ -243,6 +243,11 @@ namespace BKConnectBE.Service.Messages
                 return msgSenderName + " đã tạo nhóm này";
             }
 
+            if (type == SystemMessageType.IsUpdateRoomImg.ToString())
+            {
+                return msgSenderName + " đã thay đổi ảnh nhóm";
+            }
+
             if (receiverId == null)
             {
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);

@@ -1,5 +1,6 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
+using BKConnect.Migrations;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.UserManagement;
@@ -110,10 +111,29 @@ namespace BKConnectBE.Controllers.User
         {
             try
             {
-                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj))
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
                     UserDto userInfo = await _userService.GetByIdAsync(searchCondition.SearchKey);
                     return this.Success(userInfo, MsgNo.SUCCESS_GET_PROFILE);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPut("changeAvatar")]
+        public async Task<ActionResult<Responses>> ChangeAvatar(ChangeAvatarDto avatarDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    await _userService.UpdateAvatar(userId, avatarDto.Avatar);
+                    return this.Success(avatarDto.Avatar, MsgNo.SUCCESS_UPDATE_AVATAR);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

@@ -338,20 +338,16 @@ namespace BKConnectBE.Service.Rooms
             return leaveMsg;
         }
 
-        public async Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string affectedId, bool isAdd = true)
+        public async Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string changeInfo, string type)
         {
             var changedRoomInfo = new ChangedRoomDto
             {
-                RoomId = roomId,
-                TotalMember = await _roomRepository.GetTotalMemberOfRoom(roomId)
+                RoomId = roomId
             };
-            string[] ids = affectedId.Split(", ");
-            if (!isAdd)
+
+            if (type == ChangedRoomType.NewMember.ToString())
             {
-                changedRoomInfo.LeftMemberId = ids[0];
-            }
-            else
-            {
+                string[] ids = changeInfo.Split(", ");
                 changedRoomInfo.NewMemberList = new List<MemberOfRoomDto>();
 
                 for (int i = 0; i < ids.Length; i++)
@@ -359,7 +355,22 @@ namespace BKConnectBE.Service.Rooms
                     var newMember = await _roomRepository.GetUserOfRoomInfo(roomId, ids[i]);
                     changedRoomInfo.NewMemberList.Add(_mapper.Map<MemberOfRoomDto>(newMember));
                 }
+                changedRoomInfo.TotalMember = await _roomRepository.GetTotalMemberOfRoom(roomId);
             }
+            else if (type == ChangedRoomType.LeftMember.ToString())
+            {
+                changedRoomInfo.LeftMemberId = changeInfo;
+                changedRoomInfo.TotalMember = await _roomRepository.GetTotalMemberOfRoom(roomId);
+            }
+            else if (type == ChangedRoomType.NewAvatar.ToString())
+            {
+                changedRoomInfo.NewAvatar = changeInfo;
+            }
+            else if (type == ChangedRoomType.NewName.ToString())
+            {
+                changedRoomInfo.NewName = changeInfo;
+            }
+
             return changedRoomInfo;
         }
 
@@ -367,5 +378,18 @@ namespace BKConnectBE.Service.Rooms
         {
             return _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
         }
+        public async Task<SendMessageDto> UpdateAvatar(long roomId, string img)
+        {
+            await _roomRepository.UpdateAvatar(roomId, img);
+
+            var updateMsg = new SendMessageDto
+            {
+                RoomId = roomId,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = SystemMessageType.IsUpdateRoomImg.ToString()
+            };
+
+            return updateMsg;
+        } 
     }
 }

@@ -35,6 +35,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_CREATE_GROUP_ROOM = "Tạo nhóm thành công";
         public static readonly string SUCCESS_LEAVE_ROOM = "Rời khỏi nhóm thành công";
         public static readonly string SUCCESS_UP_FILE = "Tải file lên thành công";
+        public static readonly string SUCCESS_UPDATE_AVATAR = "Thay đổi avatar thành công";
 
 
         //Error

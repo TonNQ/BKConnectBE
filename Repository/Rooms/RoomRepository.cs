@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
@@ -71,19 +72,18 @@ namespace BKConnectBE.Repository.Rooms
         {
             return await _context.Rooms
                 .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted)).ToListAsync();
-
         }
 
         public async Task<List<string>> GetListOfUserIdInRoomAsync(long roomId)
         {
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId)
-                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
             return room.UsersOfRoom.Where(u => !u.IsDeleted).Select(u => u.UserId).ToList();
         }
         public async Task<List<string>> GetListOfOldUserIdInRoomAsync(long roomId, List<string> newUserId)
         {
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).FirstOrDefaultAsync(r => r.Id == roomId)
-                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
             return room.UsersOfRoom.Where(u => !u.IsDeleted && !newUserId.Contains(u.UserId)).Select(u => u.UserId).ToList();
         }
 
@@ -91,7 +91,7 @@ namespace BKConnectBE.Repository.Rooms
         {
             var room = await _context.Rooms.Include(r => r.UsersOfRoom).ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(r => r.Id == roomId && r.UsersOfRoom.Any(u => u.UserId == userId))
-                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND); ;
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
             return room.UsersOfRoom.Where(u => !u.IsDeleted).ToList();
         }
 
@@ -144,6 +144,13 @@ namespace BKConnectBE.Repository.Rooms
             var member = await _context.UsersOfRoom.FirstOrDefaultAsync(m => m.RoomId == roomId && m.UserId == userId)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
             member.IsDeleted = true;
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateAvatar(long roomId, string img)
+        {
+            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == roomId)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+            room.Avatar = img;
             await _context.SaveChangesAsync();
         }
     }
