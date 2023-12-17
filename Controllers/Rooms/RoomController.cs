@@ -7,6 +7,7 @@ using BKConnectBE.Model.Dtos.MessageManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.RoomManagement;
+using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Service.Rooms;
 using BKConnectBE.Service.WebSocket;
 using Microsoft.AspNetCore.Mvc;
@@ -154,7 +155,7 @@ namespace BKConnectBE.Controllers.Rooms
                     var websocketDataRoomInfo1 = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId)
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId, ChangedRoomType.NewMember.ToString())
                     };
 
                     await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo1, userId);
@@ -230,7 +231,7 @@ namespace BKConnectBE.Controllers.Rooms
                     var websocketDataRoomInfo = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(removeMemberDto.RoomId, removeMemberDto.UserId, false)
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(removeMemberDto.RoomId, removeMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
                     };
 
                     await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
@@ -266,7 +267,7 @@ namespace BKConnectBE.Controllers.Rooms
                     var websocketDataRoomInfo = new SendWebSocketData
                     {
                         DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(leaveMemberDto.RoomId, leaveMemberDto.UserId, false)
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(leaveMemberDto.RoomId, leaveMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
                     };
 
                     await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
@@ -300,6 +301,41 @@ namespace BKConnectBE.Controllers.Rooms
                     await _webSocketService.SendRoomInfo(websocketDataMsg, userId);
 
                     return this.Success(roomInfo.Id, MsgNo.SUCCESS_CREATE_GROUP_ROOM);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+        [HttpPut("changeAvatar")]
+        public async Task<ActionResult<Responses>> ChangeAvatar(ChangeRoomAvatarDto avatarDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var updateMsg = await _roomService.UpdateAvatar(avatarDto.RoomId, avatarDto.Avatar);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = updateMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, null, SystemMessageType.IsUpdateRoomImg.ToString());
+
+                    var websocketDataRoomInfo = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(avatarDto.RoomId, avatarDto.Avatar, ChangedRoomType.NewAvatar.ToString())
+                    };
+
+                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
+                    
+                    return this.Success(avatarDto.Avatar, MsgNo.SUCCESS_UPDATE_AVATAR);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

@@ -107,5 +107,10 @@ namespace BKConnectBE.Repository.Users
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
             return user.Role == Role.Teacher.ToString();
         }
+        public async Task UpdateAvatar(string userId, string img)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+            user.Avatar = img;
+        }
     }
 }

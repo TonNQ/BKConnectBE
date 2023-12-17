@@ -18,5 +18,6 @@ namespace BKConnectBE.Repository.Rooms
         Task<bool> IsExistBefore(long roomId, string userId);
         Task<bool> IsAdmin(long roomId, string userId);
         Task RemoveUserById(long roomId, string userId);
+        Task UpdateAvatar(long roomId, string img);
     }
 }

@@ -15,5 +15,6 @@ namespace BKConnectBE.Repository.Users
         Task<string> GetUsernameById(string userId);
         Task<bool> GetUserGenderById(string userId);
         Task<bool> IsLecturer(string userId);
+        Task UpdateAvatar(string userId, string img);
     }
 }
