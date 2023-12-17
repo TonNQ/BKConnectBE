@@ -21,7 +21,8 @@ namespace BKConnectBE.Controllers.Rooms
         private readonly IRoomService _roomService;
         private readonly IWebSocketService _webSocketService;
 
-        public RoomController(IRoomService roomService, IWebSocketService webSocketService)
+        public RoomController(IRoomService roomService,
+            IWebSocketService webSocketService)
         {
             _roomService = roomService;
             _webSocketService = webSocketService;

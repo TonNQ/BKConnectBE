@@ -17,5 +17,15 @@ namespace BKConnectBE.Repository.Files
             return await _context.ClassFiles.Where(r => r.RoomId == roomId)
                 .OrderByDescending(r => r.Id).ToListAsync();
         }
+
+        public async Task<ClassFile> GetFileByIdAsync(long fileId)
+        {
+            return await _context.ClassFiles.Include(f => f.Room).FirstOrDefaultAsync(f => f.Id == fileId);
+        }
+
+        public async Task AddFileAsync(ClassFile file)
+        {
+            await _context.ClassFiles.AddAsync(file);
+        }
     }
 }

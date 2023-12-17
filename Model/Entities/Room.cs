@@ -27,9 +27,9 @@ namespace BKConnectBE.Model.Entities
 
         public string Avatar { get; set; }
 
-        [Required]
         public DateTime UpdatedDate { get; set; }
 
+        [Required]
         public DateTime CreatedDate { get; set; }
 
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }

@@ -34,6 +34,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_REMOVE_USER_FROM_ROOM = "Xoá người dùng ra khỏi nhóm thành công";
         public static readonly string SUCCESS_CREATE_GROUP_ROOM = "Tạo nhóm thành công";
         public static readonly string SUCCESS_LEAVE_ROOM = "Rời khỏi nhóm thành công";
+        public static readonly string SUCCESS_UP_FILE = "Tải file lên thành công";
 
 
         //Error
@@ -65,6 +66,8 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_ADD_USER_TO_ROOM = "Bạn không thể thêm người dùng vào nhóm";
         public static readonly string ERROR_USER_ALREADY_IN_ROOM = "Người dùng đã ở trong nhóm này rồi";
         public static readonly string ERROR_CREATE_GROUP_ROOM = "Tạo nhóm thất bại. Hãy kiểm tra lại số người và loại nhóm";
+        public static readonly string ERROR_UP_FILE = "Bạn không thể tải file lên";
+        public static readonly string ERROR_FILE_NOT_FOUND = "File không tồn tại";
 
 
         //Error internal service

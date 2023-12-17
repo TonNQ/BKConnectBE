@@ -27,5 +27,8 @@ namespace BKConnectBE.Model.Dtos.NotificationManagement
 
         [JsonPropertyName("room_message")]
         public NotifyRoomMessage RoomMessage { get; set; }
+
+        [JsonPropertyName("post_file")]
+        public NotifyPostFile PostFile { get; set; }
     }
 }
