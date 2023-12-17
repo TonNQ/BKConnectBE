@@ -70,7 +70,7 @@ namespace BKConnectBE.Repository.Rooms
 
         public async Task<List<Room>> GetListOfRoomsByUserId(string userId)
         {
-            return await _context.Rooms
+            return await _context.Rooms.Include(r => r.UsersOfRoom)
                 .Where(r => r.UsersOfRoom.Any(u => u.UserId == userId && !u.IsDeleted)).ToListAsync();
         }
 
