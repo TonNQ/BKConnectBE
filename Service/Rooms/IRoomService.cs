@@ -19,5 +19,6 @@ namespace BKConnectBE.Service.Rooms
         Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string changeInfo, string type);
         Task<RoomDetailDto> GetRoomInformation(long roomId);
         Task<SendMessageDto> UpdateAvatar(long roomId, string img);
+        Task<SendMessageDto> UpdateName(long roomId, string name);
     }
 }

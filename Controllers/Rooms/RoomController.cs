@@ -310,6 +310,7 @@ namespace BKConnectBE.Controllers.Rooms
                 return BadRequest(this.Error(e.Message));
             }
         }
+
         [HttpPut("changeAvatar")]
         public async Task<ActionResult<Responses>> ChangeAvatar(ChangeRoomAvatarDto avatarDto)
         {
@@ -335,7 +336,43 @@ namespace BKConnectBE.Controllers.Rooms
 
                     await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
                     
-                    return this.Success(avatarDto.Avatar, MsgNo.SUCCESS_UPDATE_AVATAR);
+                    return this.Success(avatarDto, MsgNo.SUCCESS_UPDATE_AVATAR);
+                }
+
+                return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(this.Error(e.Message));
+            }
+        }
+
+        [HttpPut("changeName")]
+        public async Task<ActionResult<Responses>> ChangeName(ChangedNameDto changedNameDto)
+        {
+            try
+            {
+                if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
+                {
+                    var updateMsg = await _roomService.UpdateName(changedNameDto.RoomId, changedNameDto.RoomName);
+
+                    var websocketDataMsg = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsMessage.ToString(),
+                        Message = updateMsg
+                    };
+
+                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, null, SystemMessageType.IsUpdateRoomName.ToString());
+
+                    var websocketDataRoomInfo = new SendWebSocketData
+                    {
+                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(changedNameDto.RoomId, changedNameDto.RoomName, ChangedRoomType.NewName.ToString())
+                    };
+
+                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
+                    
+                    return this.Success(changedNameDto, MsgNo.SUCCESS_UPDATE_ROOM_NAME);
                 }
 
                 return BadRequest(this.Error(MsgNo.ERROR_TOKEN_INVALID));

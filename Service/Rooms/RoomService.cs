@@ -378,6 +378,7 @@ namespace BKConnectBE.Service.Rooms
         {
             return _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
         }
+
         public async Task<SendMessageDto> UpdateAvatar(long roomId, string img)
         {
             await _roomRepository.UpdateAvatar(roomId, img);
@@ -390,6 +391,20 @@ namespace BKConnectBE.Service.Rooms
             };
 
             return updateMsg;
-        } 
+        }
+
+        public async Task<SendMessageDto> UpdateName(long roomId, string name)
+        {
+            await _roomRepository.UpdateName(roomId, name);
+
+            var updateMsg = new SendMessageDto
+            {
+                RoomId = roomId,
+                TypeOfMessage = MessageType.System.ToString(),
+                Content = SystemMessageType.IsUpdateRoomName.ToString()
+            };
+
+            return updateMsg;
+        }
     }
 }
