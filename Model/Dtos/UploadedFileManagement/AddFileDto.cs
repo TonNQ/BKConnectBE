@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace BKConnectBE.Model.Dtos.ClassFileManagement
+namespace BKConnectBE.Model.Dtos.UploadedFileManagement
 {
     public class AddFileDto
     {
-        [JsonPropertyName("content")]
-        public string Content { get; set; }
+        [JsonPropertyName("path")]
+        public string Path { get; set; }
 
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }

@@ -1,3 +1,4 @@
+using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Entities;
 
 namespace BKConnectBE.Repository.Rooms
@@ -19,5 +20,6 @@ namespace BKConnectBE.Repository.Rooms
         Task<bool> IsAdmin(long roomId, string userId);
         Task RemoveUserById(long roomId, string userId);
         Task UpdateAvatar(long roomId, string img);
+        Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage);
     }
 }

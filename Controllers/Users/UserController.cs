@@ -1,6 +1,5 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
-using BKConnect.Migrations;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Model.Dtos.UserManagement;

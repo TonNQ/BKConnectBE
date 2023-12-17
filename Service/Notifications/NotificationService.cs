@@ -1,6 +1,5 @@
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
-using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Entities;
@@ -97,7 +96,7 @@ namespace BKConnectBE.Service.Notifications
                             RoomId = room.Id,
                             RoomName = room.Name,
                             FileId = file.Id,
-                            FileName = file.Content
+                            FileName = file.Path
                         };
                     }
                     else
@@ -174,7 +173,7 @@ namespace BKConnectBE.Service.Notifications
                 RoomId = file.Room.Id,
                 RoomName = file.Room.Name,
                 FileId = file.Id,
-                FileName = file.Content
+                FileName = file.Path
             };
 
             return notification;

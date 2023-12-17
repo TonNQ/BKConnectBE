@@ -1,6 +1,6 @@
 using AutoMapper;
 using BKConnect.BKConnectBE.Common;
-using BKConnectBE.Model.Dtos.ClassFileManagement;
+using BKConnectBE.Model.Dtos.UploadedFileManagement;
 using BKConnectBE.Model.Entities;
 using BKConnectBE.Repository;
 using BKConnectBE.Repository.Files;
@@ -14,26 +14,26 @@ namespace BKConnectBE.Service.Files
         private readonly IFileRepository _fileRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRoomRepository _roomRepository;
-        private readonly IGenericRepository<ClassFile> _genericRepositoryForClassFile;
+        private readonly IGenericRepository<UploadedFile> _genericRepositoryForUploadedFile;
         private readonly IMapper _mapper;
 
         public FileService(IFileRepository fileRepository,
             IUserRepository userRepository,
             IRoomRepository roomRepository,
-            IGenericRepository<ClassFile> genericRepositoryForClassFile,
+            IGenericRepository<UploadedFile> genericRepositoryForUploadedFile,
             IMapper mapper)
         {
             _fileRepository = fileRepository;
             _userRepository = userRepository;
             _roomRepository = roomRepository;
-            _genericRepositoryForClassFile = genericRepositoryForClassFile;
+            _genericRepositoryForUploadedFile = genericRepositoryForUploadedFile;
             _mapper = mapper;
         }
 
-        public async Task<List<ClassFileDto>> GetListFilesOfClassRoomAsync(long roomId)
+        public async Task<List<UploadedFileDto>> GetListFilesOfClassRoomAsync(long roomId)
         {
             var list = await _fileRepository.GetListFilesOfClassRoomAsync(roomId);
-            return _mapper.Map<List<ClassFileDto>>(list);
+            return _mapper.Map<List<UploadedFileDto>>(list);
         }
 
         public async Task<long> AddFileAsync(string userId, AddFileDto file)
@@ -42,17 +42,17 @@ namespace BKConnectBE.Service.Files
             {
                 throw new Exception(MsgNo.ERROR_UP_FILE);
             }
-            var classFile = new ClassFile
+            var uploadedFile = new UploadedFile
             {
-                Content = file.Content,
+                Path = file.Path,
                 RoomId = file.RoomId,
                 UserId = userId,
-                CreatedAt = DateTime.UtcNow.AddHours(7)
+                UploadTime = DateTime.UtcNow.AddHours(7)
             };
-            await _fileRepository.AddFileAsync(classFile);
+            await _fileRepository.AddFileAsync(uploadedFile);
 
-            await _genericRepositoryForClassFile.SaveChangeAsync();
-            return classFile.Id;
+            await _genericRepositoryForUploadedFile.SaveChangeAsync();
+            return uploadedFile.Id;
         }
     }
 }

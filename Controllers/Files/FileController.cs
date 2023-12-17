@@ -3,7 +3,7 @@ using BKConnect.Controllers;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
-using BKConnectBE.Model.Dtos.ClassFileManagement;
+using BKConnectBE.Model.Dtos.UploadedFileManagement;
 using BKConnectBE.Model.Dtos.NotificationManagement;
 using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Service.Files;

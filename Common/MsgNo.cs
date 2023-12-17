@@ -36,6 +36,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string SUCCESS_LEAVE_ROOM = "Rời khỏi nhóm thành công";
         public static readonly string SUCCESS_UP_FILE = "Tải file lên thành công";
         public static readonly string SUCCESS_UPDATE_AVATAR = "Thay đổi avatar thành công";
+        public static readonly string SUCCESS_SET_READ_MESSAGE = "Đánh dấu đã đọc tin nhắn thành công";
 
 
         //Error
@@ -70,6 +71,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_UP_FILE = "Bạn không thể tải file lên";
         public static readonly string ERROR_FILE_NOT_FOUND = "File không tồn tại";
 
+        public static readonly string ERROR_MESSAGE_NOT_IN_ROOM = "Tin nhắn không thuộc phòng này";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

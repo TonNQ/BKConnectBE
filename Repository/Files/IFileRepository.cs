@@ -4,8 +4,8 @@ namespace BKConnectBE.Repository.Files
 {
     public interface IFileRepository
     {
-        Task<List<ClassFile>> GetListFilesOfClassRoomAsync(long roomId);
-        Task<ClassFile> GetFileByIdAsync(long fileId);
-        Task AddFileAsync(ClassFile file);
+        Task<List<UploadedFile>> GetListFilesOfClassRoomAsync(long roomId);
+        Task<UploadedFile> GetFileByIdAsync(long fileId);
+        Task AddFileAsync(UploadedFile file);
     }
 }

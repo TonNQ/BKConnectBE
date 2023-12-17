@@ -1,6 +1,4 @@
-using AutoMapper;
 using BKConnectBE.Model;
-using BKConnectBE.Model.Dtos.ClassManagement;
 using BKConnectBE.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 

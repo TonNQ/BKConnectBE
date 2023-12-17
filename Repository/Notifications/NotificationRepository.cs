@@ -1,4 +1,3 @@
-using BKConnect.BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model;
 using BKConnectBE.Model.Entities;
