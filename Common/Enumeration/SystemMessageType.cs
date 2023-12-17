@@ -21,6 +21,9 @@ namespace BKConnectBE.Common.Enumeration
         [Description("thay đổi ảnh nhóm")]
         IsUpdateRoomImg,
 
+        [Description("thay đổi tên nhóm")]
+        IsUpdateRoomName,
+
         IsStartCall,
 
         IsJoinCall,

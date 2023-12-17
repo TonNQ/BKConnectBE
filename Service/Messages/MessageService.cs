@@ -248,6 +248,11 @@ namespace BKConnectBE.Service.Messages
                 return msgSenderName + " đã thay đổi ảnh nhóm";
             }
 
+            if (type == SystemMessageType.IsUpdateRoomName.ToString())
+            {
+                return msgSenderName + " đã thay đổi tên nhóm";
+            }
+
             if (receiverId == null)
             {
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);

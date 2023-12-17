@@ -154,6 +154,14 @@ namespace BKConnectBE.Repository.Rooms
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateName(long roomId, string name)
+        {
+            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == roomId)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+            room.Name = name;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage)
         {
             var userOfRoom = await _context.UsersOfRoom
