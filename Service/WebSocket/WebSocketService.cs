@@ -400,7 +400,7 @@ namespace BKConnectBE.Service.WebSocket
                     UserIds = new List<string> { userId }
                 };
                 StaticParams.VideoCallList.Add(videoCall);
-                websocketData.VideoCall.VideoCallType = SystemMessageType.IsStartCall.ToString();
+                websocketData.VideoCall.VideoCallType = MessageType.IsStartCall.ToString();
 
                 await VideoCallSocket(websocketData, videoCall.RoomId, userId);
             }
@@ -445,10 +445,10 @@ namespace BKConnectBE.Service.WebSocket
                 }
             };
             var tasks = new List<Task>();
+            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
             foreach (WebSocketConnection webSocket in listOfWebSocket)
             {
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-
                 tasks.Add(webSocket.WebSocket.SendAsync(
                     new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
                     WebSocketMessageType.Text,
@@ -457,17 +457,49 @@ namespace BKConnectBE.Service.WebSocket
             }
 
             await Task.WhenAll(tasks);
-            var webSocketMessage = new SendWebSocketData
+
+            if (websocketData.VideoCall.VideoCallType == MessageType.IsStartCall.ToString())
             {
-                DataType = WebSocketDataType.IsMessage.ToString(),
-                Message = new SendMessageDto
+                // Gửi message thông báo cuộc gọi bắt đầu
+                var webSocketMessage = new SendWebSocketData
                 {
-                    RoomId = roomId,
-                    Content = websocketData.VideoCall.VideoCallType,
-                    TypeOfMessage = MessageType.System.ToString()
-                }
-            };
-            await SendSystemMessage(webSocketMessage, userId, "", websocketData.VideoCall.VideoCallType);
+                    DataType = WebSocketDataType.IsMessage.ToString(),
+                    Message = new SendMessageDto
+                    {
+                        RoomId = roomId,
+                        Content = Constants.START_VIDEO_CALL,
+                        TypeOfMessage = MessageType.IsStartCall.ToString()
+                    }
+                };
+                await SendMessage(webSocketMessage, userId);
+
+                // Gửi message thông báo người gọi đã join cuộc gọi
+                webSocketMessage = new SendWebSocketData
+                {
+                    DataType = WebSocketDataType.IsMessage.ToString(),
+                    Message = new SendMessageDto
+                    {
+                        RoomId = roomId,
+                        Content = SystemMessageType.IsJoinCall.ToString(),
+                        TypeOfMessage = MessageType.System.ToString()
+                    }
+                };
+                await SendSystemMessage(webSocketMessage, userId, "", SystemMessageType.IsJoinCall.ToString());
+            }
+            else
+            {
+                var webSocketMessage = new SendWebSocketData
+                {
+                    DataType = WebSocketDataType.IsMessage.ToString(),
+                    Message = new SendMessageDto
+                    {
+                        RoomId = roomId,
+                        Content = websocketData.VideoCall.VideoCallType,
+                        TypeOfMessage = MessageType.System.ToString()
+                    }
+                };
+                await SendSystemMessage(webSocketMessage, userId, "", websocketData.VideoCall.VideoCallType);
+            }
         }
 
         private async Task SendFriendRequest(SendWebSocketData websocketData, string userId)
