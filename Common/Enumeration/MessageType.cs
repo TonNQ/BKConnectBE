@@ -17,6 +17,9 @@ namespace BKConnectBE.Common.Enumeration
         File,
 
         [Description("hệ thống")]
-        System
+        System,
+        
+        [Description("bắt đầu cuộc gọi")]
+        IsStartCall
     }
 }

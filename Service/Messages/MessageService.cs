@@ -92,6 +92,12 @@ namespace BKConnectBE.Service.Messages
                 receiveMsg.SenderName = await _userRepository.GetUsernameById(receiveMsg.SenderId);
             }
 
+            if (receiveMsg.TypeOfMessage == MessageType.IsStartCall.ToString())
+            {
+                receiveMsg.LastMessage = receiveMsg.SenderName + " đã bắt đầu cuộc gọi";
+                return receiveMsg;
+            }
+
             if (rootSenderId != null)
             {
                 if (rootSenderId == userId && receiveMsg.SenderId == userId)
@@ -221,11 +227,6 @@ namespace BKConnectBE.Service.Messages
             if (type == SystemMessageType.IsLeaveRoom.ToString())
             {
                 return msgSenderName + " đã rời khỏi nhóm";
-            }
-
-            if (type == SystemMessageType.IsStartCall.ToString())
-            {
-                return msgSenderName + " đã bắt đầu cuộc gọi";
             }
 
             if (type == SystemMessageType.IsJoinCall.ToString())

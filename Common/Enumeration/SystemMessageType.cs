@@ -24,8 +24,6 @@ namespace BKConnectBE.Common.Enumeration
         [Description("thay đổi tên nhóm")]
         IsUpdateRoomName,
 
-        IsStartCall,
-
         IsJoinCall,
 
         IsLeaveCall,

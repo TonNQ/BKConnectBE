@@ -13,8 +13,6 @@ namespace BKConnectBE.Model.Entities
 
         public string Type { get; set; }
 
-        public string Avatar { get; set; }
-
         public string SenderId { get; set; }
 
         public string ReceiverId { get; set; }
