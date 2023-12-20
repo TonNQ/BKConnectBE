@@ -60,6 +60,7 @@ namespace BKConnectBE.Controllers.Files
                         {
                             NotificationType = NotificationType.IsPostFile.ToString(),
                             FileId = fileId,
+                            RoomId = addFileDto.RoomId
                         }
                     };
 

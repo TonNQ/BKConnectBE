@@ -13,5 +13,8 @@ namespace BKConnectBE.Model.Dtos.NotificationManagement
 
         [JsonPropertyName("file_id")]
         public long FileId { get; set; }
+
+        [JsonPropertyName("room_id")]
+        public long RoomId { get; set; }
     }
 }

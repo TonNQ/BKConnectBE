@@ -94,6 +94,13 @@ namespace BKConnectBE.Repository.Users
             return user.Name;
         }
 
+        public async Task<string> GetAvatarById(string userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId)
+                ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+            return user.Avatar;
+        }
+
         public async Task<bool> GetUserGenderById(string userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId)

@@ -54,6 +54,7 @@ namespace BKConnectBE.Service.Notifications
             {
                 var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
                 notificationDto.SenderName = await _userRepository.GetUsernameById(notificationDto.SenderId);
+                notificationDto.Avatar = await _userRepository.GetAvatarById(notificationDto.SenderId);
 
                 if (notification.Type == NotificationType.IsOutRoom.ToString())
                 {
@@ -72,37 +73,21 @@ namespace BKConnectBE.Service.Notifications
                 }
                 else if (notification.Type == NotificationType.IsPostFile.ToString())
                 {
-                    if (notification.RoomId == null)
-                    {
-                        throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
-                    }
+                    var room = await _roomRepository.GetInformationOfRoom(notification.RoomId ?? 0);
 
-                    var room = await _roomRepository.GetInformationOfRoom((long)notification.RoomId);
-                    if (room.RoomType != RoomType.ClassRoom.ToString())
-                    {
-                        throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
-                    }
-
-                    if (room.UsersOfRoom.Any(u => u.UserId == userId))
-                    {
-                        var file = await _fileRepository.GetFileByIdAsync(notification.FileId ?? 0)
+                    var file = await _fileRepository.GetFileByIdAsync(notification.FileId ?? 0)
                             ?? throw new Exception(MsgNo.ERROR_FILE_NOT_FOUND);
-                        if (file.UserId == userId)
-                        {
-                            continue;
-                        }
-                        notificationDto.PostFile = new()
-                        {
-                            RoomId = room.Id,
-                            RoomName = room.Name,
-                            FileId = file.Id,
-                            FileName = file.Path
-                        };
-                    }
-                    else
+                    if (file.UserId == userId)
                     {
                         continue;
                     }
+                    notificationDto.PostFile = new()
+                    {
+                        RoomId = room.Id,
+                        RoomName = room.Name,
+                        FileId = file.Id,
+                        FileName = file.Path
+                    };
                 }
 
                 notificationDtos.Add(notificationDto);
@@ -162,11 +147,11 @@ namespace BKConnectBE.Service.Notifications
 
         }
 
-        public async Task<ReceiveNotificationDto> AddPostFileNotification(long fileId)
+        public async Task<ReceiveNotificationDto> AddPostFileNotification(long fileId, string receiverId)
         {
             var file = await _fileRepository.GetFileByIdAsync(fileId)
                 ?? throw new Exception(MsgNo.ERROR_FILE_NOT_FOUND);
-            var notification = await AddNotification(file.UserId, null, NotificationType.IsPostFile.ToString(), file.RoomId, fileId);
+            var notification = await AddNotification(file.UserId, receiverId, NotificationType.IsPostFile.ToString(), file.RoomId, fileId);
 
             notification.PostFile = new NotifyPostFile
             {
@@ -186,7 +171,6 @@ namespace BKConnectBE.Service.Notifications
 
             var notification = new Notification()
             {
-                Avatar = sender.Avatar,
                 ReceiverId = receiverId,
                 Type = type,
                 SendTime = DateTime.UtcNow.AddHours(7),
