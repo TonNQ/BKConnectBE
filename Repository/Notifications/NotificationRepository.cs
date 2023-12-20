@@ -17,8 +17,7 @@ namespace BKConnectBE.Repository.Notifications
         public async Task<List<Notification>> GetListOfNotificationsByUserIdAsync(string userId)
         {
             return await _context.Notifications
-                .Where(n => n.ReceiverId == userId
-                    || (n.Type == NotificationType.IsPostFile.ToString()))
+                .Where(n => n.ReceiverId == userId)
                 .OrderByDescending(n => n.SendTime)
                 .ToListAsync();
         }
