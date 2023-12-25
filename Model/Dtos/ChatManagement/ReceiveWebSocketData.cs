@@ -31,5 +31,8 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("room_info")]
         public RoomDetailDto RoomInfo { get; set; }
+
+        [JsonPropertyName("error_message")]
+        public string ErrorMessage { get; set; } = null;
     }
 }

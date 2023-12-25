@@ -34,6 +34,7 @@ using Hangfire;
 using BKConnectBE.Service.BackgroundJobs;
 using BKConnectBE.Filter;
 using Hangfire.Dashboard;
+using BKConnectBE.Service.VideoCalls;
 
 var builder = WebApplication.CreateBuilder(args);
 Settings settings = builder.Configuration.GetSection("Settings").Get<Settings>();
@@ -96,6 +97,7 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IVideoCallService, VideoCallService>();
 builder.Services.AddScoped<IWebSocketService, WebSocketService>();
 builder.Services.AddScoped<IBackgroundJobService, BackgroundJobService>();
 
