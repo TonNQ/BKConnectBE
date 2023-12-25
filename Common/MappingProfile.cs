@@ -10,6 +10,7 @@ using BKConnectBE.Model.Dtos.RefreshTokenManagement;
 using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.UserManagement;
 using BKConnectBE.Model.Entities;
+using BKConnectBE.Model.Dtos.VideoCallManagement;
 
 namespace BKConnectBE.Common
 {
@@ -51,7 +52,7 @@ namespace BKConnectBE.Common
             CreateMap<Message, ReceiveMessageDto>()
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.Name))
                 .ForMember(dest => dest.RootMessageContent, opt => opt.MapFrom(src => src.RootMessage.Content));
-            
+
             CreateMap<Message, MessageDto>()
                 .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.Name))
                 .ForMember(dest => dest.RootMessageContent, opt => opt.MapFrom(src => src.RootMessage.Content));
@@ -89,6 +90,8 @@ namespace BKConnectBE.Common
 
             CreateMap<Notification, ReceiveNotificationDto>()
                 .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
+
+            CreateMap<User, ParticipantInfo>();
         }
     }
 }

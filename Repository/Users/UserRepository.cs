@@ -18,6 +18,11 @@ namespace BKConnectBE.Repository.Users
             _context = context;
         }
 
+        public async Task<List<User>> GetListUsersByListIdAsync(List<string> ids)
+        {
+            return await _context.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
+        }
+
         public async Task ChangePasswordAsync(string userId, string password)
         {
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId)

@@ -9,5 +9,6 @@ namespace BKConnectBE.Common.Enumeration
         IsChangedRoomInfo,
         IsVideoCall,
         IsCreateGroupRoom,
+        IsError,
     }
 }
