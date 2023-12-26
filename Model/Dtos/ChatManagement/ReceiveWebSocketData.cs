@@ -34,5 +34,8 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("error_message")]
         public string ErrorMessage { get; set; } = null;
+
+        [JsonPropertyName("signal_info")]
+        public SignalInfo SignalInfo { get; set; }
     }
 }

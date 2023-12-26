@@ -28,5 +28,8 @@ namespace BKConnectBE.Model.Dtos.ChatManagement
 
         [JsonPropertyName("room_info")]
         public RoomDetailDto RoomInfo { get; set; }
+
+        [JsonPropertyName("signal_info")]
+        public SignalInfo SignalInfo { get; set; }
     }
 }

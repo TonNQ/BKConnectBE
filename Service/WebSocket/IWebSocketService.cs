@@ -17,5 +17,6 @@ namespace BKConnectBE.Service.WebSocket
         Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId);
         Task SendChangedRoomInfo(SendWebSocketData websocketData, string userId);
         Task CallVideo(SendWebSocketData websocketData, string userId);
+        Task SendSignalForVideoCall(SendWebSocketData websocketData, string userId);
     }
 }
