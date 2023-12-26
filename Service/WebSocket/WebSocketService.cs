@@ -114,6 +114,8 @@ namespace BKConnectBE.Service.WebSocket
                 DataType = websocketData.DataType,
                 Message = newMsg
             };
+            receiveWebSocketData.Message.TempId = websocketData.Message.TempId;
+
             string rootMessageSenderId = await _messageService.GetRootMessageSenderId(websocketData.Message.RootMessageId);
 
             var options = new JsonSerializerOptions
