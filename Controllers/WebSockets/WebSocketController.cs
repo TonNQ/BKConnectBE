@@ -80,6 +80,10 @@ public class WebSocketController : ControllerBase
                 {
                     await _webSocketService.CallVideo(receivedObject, cnn.UserId);
                 }
+                else if (receivedObject.DataType == WebSocketDataType.IsConnectSignal.ToString())
+                {
+                    await _webSocketService.SendSignalForVideoCall(receivedObject, cnn.UserId);
+                }
 
                 buffer = new byte[1024 * 4];
                 receiveResult = await cnn.WebSocket.ReceiveAsync(

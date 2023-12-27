@@ -401,6 +401,39 @@ namespace BKConnectBE.Service.WebSocket
             await Task.WhenAll(tasks);
         }
 
+        public async Task SendSignalForVideoCall(SendWebSocketData websocketData, string userId)
+        {
+            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.SignalInfo.ToUser);
+
+            if (webSocket is not null)
+            {
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = WebSocketDataType.IsConnectSignal.ToString(),
+                    SignalInfo = new SignalInfo
+                    {
+                        SignalType = websocketData.SignalInfo.SignalType,
+                        SignalObject = websocketData.SignalInfo.SignalObject
+                    }
+                };
+
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var tasks = new List<Task>();
+
+                await webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
+        }
+
         private async Task JoinVideoCall(SendWebSocketData websocketData, string userId)
         {
             if (IsInVideoCall(userId))
