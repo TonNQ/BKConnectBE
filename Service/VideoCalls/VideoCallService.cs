@@ -17,7 +17,7 @@ namespace BKConnectBE.Service.VideoCalls
             _userRepository = userRepository;
         }
 
-        public async Task<List<ParticipantInfo>> GetParticipantInfosWithoutUser(long roomId, string userId)
+        public async Task<List<ParticipantInfo>> GetParticipantInfosInCall(long roomId)
         {
             var videoCall = StaticParams.VideoCallList.FirstOrDefault(x => x.RoomId == roomId);
 
@@ -26,8 +26,7 @@ namespace BKConnectBE.Service.VideoCalls
                 return new();
             }
 
-            var listParticipant = videoCall.Participants.Where(k => k.Key != userId)
-                .ToDictionary(x => x.Key, x => x.Value);
+            var listParticipant = videoCall.Participants.ToDictionary(x => x.Key, x => x.Value);
             var users = await _userRepository
                 .GetListUsersByListIdAsync(listParticipant.Select(x => x.Key).ToList());
             var listParticipantInfo = _mapper.Map<List<ParticipantInfo>>(users);
