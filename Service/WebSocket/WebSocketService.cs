@@ -515,7 +515,7 @@ namespace BKConnectBE.Service.WebSocket
             {
                 if (webSocket.UserId == userId)
                 {
-                    receiveWebSocketData.VideoCall.Participants = await _videoCallService.GetParticipantInfosWithoutUser(roomId, userId);
+                    receiveWebSocketData.VideoCall.Participants = await _videoCallService.GetParticipantInfosInCall(roomId);
                 }
                 else
                 {
