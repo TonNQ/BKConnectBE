@@ -12,6 +12,7 @@ namespace BKConnectBE.Model.Entities
             SentMessages = new HashSet<Message>();
             RefreshTokens = new HashSet<RefreshToken>();
             UploadedFiles = new HashSet<UploadedFile>();
+            Notifications = new HashSet<Notification>();
         }
 
         [Key]
@@ -55,5 +56,6 @@ namespace BKConnectBE.Model.Entities
         public virtual ICollection<Message> SentMessages { set; get; }
         public virtual ICollection<RefreshToken> RefreshTokens { set; get; }
         public virtual ICollection<UploadedFile> UploadedFiles { set; get; }
+        public virtual ICollection<Notification> Notifications { set; get; }
     }
 }

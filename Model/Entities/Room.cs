@@ -11,7 +11,6 @@ namespace BKConnectBE.Model.Entities
         {
             UsersOfRoom = new HashSet<UserOfRoom>();
             UploadedFiles = new HashSet<UploadedFile>();
-            RoomInvitations = new HashSet<RoomInvitation>();
             Messages = new HashSet<Message>();
         }
 
@@ -33,7 +32,6 @@ namespace BKConnectBE.Model.Entities
 
         public virtual ICollection<UserOfRoom> UsersOfRoom { set; get; }
         public virtual ICollection<UploadedFile> UploadedFiles { set; get; }
-        public virtual ICollection<RoomInvitation> RoomInvitations { set; get; }
         public virtual ICollection<Message> Messages { set; get; }
     }
 }
