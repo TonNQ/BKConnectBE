@@ -69,6 +69,12 @@ namespace BKConnectBE.Repository.Users
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
         }
 
+        public async Task<User> GetUserByIdAsync(string id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id)
+                ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+        }
+
         public async Task UpdateUserAsync(User user)
         {
             User updatedUser = await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty)

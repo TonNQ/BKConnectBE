@@ -10,6 +10,9 @@ namespace BKConnectBE.Model.Dtos.VideoCallManagement
         [JsonPropertyName("video_call_type")]
         public string VideoCallType { get; set; }
 
+        [JsonPropertyName("peer_id")]
+        public string PeerId { get; set; }
+
         [JsonPropertyName("participants")]
         public List<ParticipantInfo> Participants { get; set; }
 

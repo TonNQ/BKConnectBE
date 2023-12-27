@@ -12,5 +12,8 @@ namespace BKConnectBE.Model.Dtos.VideoCallManagement
 
         [JsonPropertyName("avatar")]
         public string Avatar { get; set; }
+
+        [JsonPropertyName("peer_id")]
+        public string PeerId { get; set; }
     }
 }
