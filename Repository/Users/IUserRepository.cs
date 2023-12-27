@@ -8,6 +8,7 @@ namespace BKConnectBE.Repository.Users
     {
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByIdAsync(string id);
+        Task<User> GetUserByIdAsync(string id);
         Task<List<User>> GetListUsersByListIdAsync(List<string> ids);
         Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition);
         Task UpdateUserAsync(User user);

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 
 namespace BKConnectBE.Model.Dtos.VideoCallManagement
@@ -7,7 +8,13 @@ namespace BKConnectBE.Model.Dtos.VideoCallManagement
         [JsonPropertyName("room_id")]
         public long RoomId { get; set; }
 
-        [JsonPropertyName("user_ids")]
-        public List<string> UserIds { get; set; } = new();
+        //Key is user id, value is peer id
+        [JsonPropertyName("participants")]
+        public ConcurrentDictionary<string, string> Participants { get; set; }
+
+        public VideoCallWebsocket()
+        {
+            Participants = new();
+        }
     }
 }
