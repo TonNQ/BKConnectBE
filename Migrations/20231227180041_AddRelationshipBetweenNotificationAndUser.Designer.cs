@@ -4,6 +4,7 @@ using BKConnectBE.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BKConnect.Migrations
 {
     [DbContext(typeof(BKConnectContext))]
-    partial class BKConnectContextModelSnapshot : ModelSnapshot
+    [Migration("20231227180041_AddRelationshipBetweenNotificationAndUser")]
+    partial class AddRelationshipBetweenNotificationAndUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,6 +246,37 @@ namespace BKConnect.Migrations
                     b.ToTable("Rooms");
                 });
 
+            modelBuilder.Entity("BKConnectBE.Model.Entities.RoomInvitation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ReceiverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<long>("RoomId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("SendTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("RoomInvitations");
+                });
+
             modelBuilder.Entity("BKConnectBE.Model.Entities.UploadedFile", b =>
                 {
                     b.Property<long>("Id")
@@ -457,6 +491,31 @@ namespace BKConnect.Migrations
                     b.Navigation("User2");
                 });
 
+            modelBuilder.Entity("BKConnectBE.Model.Entities.RoomInvitation", b =>
+                {
+                    b.HasOne("BKConnectBE.Model.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("BKConnectBE.Model.Entities.Room", "Room")
+                        .WithMany("RoomInvitations")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BKConnectBE.Model.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("BKConnectBE.Model.Entities.UploadedFile", b =>
                 {
                     b.HasOne("BKConnectBE.Model.Entities.Room", "Room")
@@ -533,6 +592,8 @@ namespace BKConnect.Migrations
             modelBuilder.Entity("BKConnectBE.Model.Entities.Room", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("RoomInvitations");
 
                     b.Navigation("UploadedFiles");
 

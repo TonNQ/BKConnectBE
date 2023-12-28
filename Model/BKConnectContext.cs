@@ -13,7 +13,6 @@ namespace BKConnectBE.Model
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
-        public virtual DbSet<RoomInvitation> RoomInvitations { get; set; }
         public virtual DbSet<UploadedFile> UploadedFiles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserOfRoom> UsersOfRoom { get; set; }
@@ -98,28 +97,10 @@ namespace BKConnectBE.Model
                     .HasForeignKey(r => r.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(r => r.RoomInvitations)
-                    .WithOne(r => r.Room)
-                    .HasForeignKey(r => r.RoomId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
                 entity.HasMany(r => r.UploadedFiles)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            modelBuilder.Entity<RoomInvitation>(entity =>
-            {
-                entity.HasOne(r => r.Sender)
-                    .WithMany()
-                    .HasForeignKey(r => r.SenderId)
-                    .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(r => r.Receiver)
-                    .WithMany()
-                    .HasForeignKey(r => r.ReceiverId)
-                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -133,6 +114,11 @@ namespace BKConnectBE.Model
                     .WithOne(r => r.User)
                     .HasForeignKey(r => r.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasMany(r => r.Notifications)
+                    .WithOne(r => r.Receiver)
+                    .HasForeignKey(r => r.ReceiverId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
