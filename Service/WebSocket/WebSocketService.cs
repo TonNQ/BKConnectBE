@@ -56,51 +56,69 @@ namespace BKConnectBE.Service.WebSocket
 
         public async Task CloseConnection(WebSocketConnection cnn)
         {
-            if (IsInVideoCall(cnn.UserId))
+            try
             {
-                var websocketOfVideoCall = new SendWebSocketData
+                StaticParams.WebsocketList.Remove(cnn);
+                if (IsInVideoCall(cnn.UserId))
                 {
-                    DataType = WebSocketDataType.IsVideoCall.ToString(),
-                    VideoCall = new VideoCallData
+                    var websocketOfVideoCall = new SendWebSocketData
                     {
-                        RoomId = StaticParams.VideoCallList
-                            .FirstOrDefault(cr => cr.Participants.ContainsKey(cnn.UserId))?.RoomId ?? 0,
-                        VideoCallType = SystemMessageType.IsLeaveCall.ToString()
-                    }
+                        DataType = WebSocketDataType.IsVideoCall.ToString(),
+                        VideoCall = new VideoCallData
+                        {
+                            RoomId = StaticParams.VideoCallList
+                                .FirstOrDefault(cr => cr.Participants.ContainsKey(cnn.UserId))?.RoomId ?? 0,
+                            VideoCallType = SystemMessageType.IsLeaveCall.ToString()
+                        }
+                    };
+                    await LeaveVideoCall(websocketOfVideoCall, cnn.UserId);
+                }
+
+                var websocketData = new ReceiveWebSocketData
+                {
+                    UserId = cnn.UserId,
+                    DataType = WebSocketDataType.IsOffline.ToString()
                 };
-                await LeaveVideoCall(websocketOfVideoCall, cnn.UserId);
+
+                await _userService.UpdateLastOnlineAsync(cnn.UserId);
+                await SendStatusMessage(websocketData);
+
+                await cnn.WebSocket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
             }
-
-            var websocketData = new ReceiveWebSocketData
+            catch (Exception)
             {
-                UserId = cnn.UserId,
-                DataType = WebSocketDataType.IsOffline.ToString()
-            };
-
-            await _userService.UpdateLastOnlineAsync(cnn.UserId);
-            await SendStatusMessage(websocketData);
-
-            await cnn.WebSocket.CloseAsync(
-                WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
-            StaticParams.WebsocketList.Remove(cnn);
+                StaticParams.WebsocketList.Remove(cnn);
+            }
         }
 
         public async Task SendStatusMessage(ReceiveWebSocketData websocketData)
         {
-            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(websocketData));
-
-            var tasks = new List<Task>();
-
-            foreach (WebSocketConnection webSocket in StaticParams.WebsocketList)
+            try
             {
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
-            }
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(websocketData));
 
-            await Task.WhenAll(tasks);
+                var tasks = new List<Task>();
+
+                foreach (WebSocketConnection webSocket in StaticParams.WebsocketList)
+                {
+                    if (webSocket.WebSocket.State == WebSocketState.Closed)
+                    {
+                        StaticParams.WebsocketList.Remove(webSocket);
+                        continue;
+                    }
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public async Task SendMessage(SendWebSocketData websocketData, string userId)
@@ -435,6 +453,35 @@ namespace BKConnectBE.Service.WebSocket
             }
         }
 
+        public async Task SendErrorNotification(string userId, string errorMessage)
+        {
+            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+
+            if (webSocket is not null)
+            {
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = WebSocketDataType.IsError.ToString(),
+                    ErrorMessage = errorMessage
+                };
+
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var tasks = new List<Task>();
+
+                await webSocket.WebSocket.SendAsync(
+                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
+        }
+
         private async Task JoinVideoCall(SendWebSocketData websocketData, string userId)
         {
             if (IsInVideoCall(userId))
@@ -672,35 +719,6 @@ namespace BKConnectBE.Service.WebSocket
                 }
             }
             await Task.WhenAll(tasks);
-        }
-
-        private async Task SendErrorNotification(string userId, string errorMessage)
-        {
-            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
-
-            if (webSocket is not null)
-            {
-                var receiveWebSocketData = new ReceiveWebSocketData
-                {
-                    UserId = userId,
-                    DataType = WebSocketDataType.IsError.ToString(),
-                    ErrorMessage = errorMessage
-                };
-
-                var options = new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true
-                };
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-                var tasks = new List<Task>();
-
-                await webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None);
-            }
         }
 
         private static bool IsInVideoCall(string userId)
