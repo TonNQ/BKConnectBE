@@ -118,323 +118,381 @@ namespace BKConnectBE.Service.WebSocket
             }
             catch (Exception)
             {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.UserId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
         public async Task SendMessage(SendWebSocketData websocketData, string userId)
         {
-            var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
-            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
+            try
             {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                Message = newMsg
-            };
-            receiveWebSocketData.Message.TempId = websocketData.Message.TempId;
+                var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId);
+                var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-            string rootMessageSenderId = await _messageService.GetRootMessageSenderId(websocketData.Message.RootMessageId);
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    Message = newMsg
+                };
+                receiveWebSocketData.Message.TempId = websocketData.Message.TempId;
 
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
+                string rootMessageSenderId = await _messageService.GetRootMessageSenderId(websocketData.Message.RootMessageId);
 
-            var tasks = new List<Task>();
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
 
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                receiveWebSocketData.Message = await _messageService.ChangeMessage(receiveWebSocketData.Message, webSocket.UserId, rootMessageSenderId);
+                var tasks = new List<Task>();
 
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    receiveWebSocketData.Message = await _messageService.ChangeMessage(receiveWebSocketData.Message, webSocket.UserId, rootMessageSenderId);
 
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
             }
-
-            await Task.WhenAll(tasks);
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
         }
 
         public async Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type)
         {
-            var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId, receiverId);
-            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
+            try
             {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                Message = newMsg
-            };
+                var newMsg = await _messageService.AddMessageAsync(websocketData.Message, userId, receiverId);
+                var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    Message = newMsg
+                };
 
-            var tasks = new List<Task>();
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
 
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, type);
+                var tasks = new List<Task>();
 
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, type);
 
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
             }
-
-            await Task.WhenAll(tasks);
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
         }
         public async Task SendSystemMessageForAddMember(SendWebSocketData websocketData, string userId, string receiverId, long newMsgId)
         {
-            var newMsg = await _genericRepositoryForMsg.GetByIdAsync(newMsgId);
-            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
-
-            var receiveMsg = _mapper.Map<ReceiveMessageDto>(newMsg);
-            receiveMsg.SendTime = receiveMsg.SendTime.AddHours(-7);
-
-            var receiveWebSocketData = new ReceiveWebSocketData
+            try
             {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                Message = receiveMsg
-            };
+                var newMsg = await _genericRepositoryForMsg.GetByIdAsync(newMsgId);
+                var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.Message.RoomId);
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
+                var receiveMsg = _mapper.Map<ReceiveMessageDto>(newMsg);
+                receiveMsg.SendTime = receiveMsg.SendTime.AddHours(-7);
 
-            var tasks = new List<Task>();
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    Message = receiveMsg
+                };
 
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, SystemMessageType.IsInRoom.ToString());
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
 
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var tasks = new List<Task>();
 
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    receiveWebSocketData.Message = await _messageService.ChangeSystemMessage(receiveWebSocketData.Message, webSocket.UserId, receiverId, SystemMessageType.IsInRoom.ToString());
+
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
             }
-
-            await Task.WhenAll(tasks);
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
         }
         public async Task SendNotification(SendWebSocketData websocketData, string userId)
         {
-            if (websocketData.Notification.NotificationType == NotificationType.IsSendFriendRequest.ToString())
+            try
             {
-                await SendFriendRequest(websocketData, userId);
+                if (websocketData.Notification.NotificationType == NotificationType.IsSendFriendRequest.ToString())
+                {
+                    await SendFriendRequest(websocketData, userId);
+                }
+                else if (websocketData.Notification.NotificationType == NotificationType.IsAcceptFriendRequest.ToString())
+                {
+                    await SendFriendRequestAcception(websocketData, userId);
+                }
+                else if (websocketData.Notification.NotificationType == NotificationType.IsPostFile.ToString())
+                {
+                    await SendPostFileInClassRoom(websocketData, userId);
+                }
             }
-            else if (websocketData.Notification.NotificationType == NotificationType.IsAcceptFriendRequest.ToString())
+            catch (Exception)
             {
-                await SendFriendRequestAcception(websocketData, userId);
-            }
-            else if (websocketData.Notification.NotificationType == NotificationType.IsPostFile.ToString())
-            {
-                await SendPostFileInClassRoom(websocketData, userId);
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
         public async Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId)
         {
-            var notification = await _notificationService.AddRoomNotification(userId, websocketData.Notification.ReceiverId, websocketData.Notification.NotificationType, roomId);
-            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.Notification.ReceiverId);
-
-            if (webSocket is not null)
+            try
             {
-                var receiveWebSocketData = new ReceiveWebSocketData
-                {
-                    UserId = userId,
-                    DataType = websocketData.DataType,
-                    Notification = notification
-                };
+                var notification = await _notificationService.AddRoomNotification(userId, websocketData.Notification.ReceiverId, websocketData.Notification.NotificationType, roomId);
+                var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.Notification.ReceiverId);
 
-                var options = new JsonSerializerOptions
+                if (webSocket is not null)
                 {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true
-                };
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-                var tasks = new List<Task>();
+                    var receiveWebSocketData = new ReceiveWebSocketData
+                    {
+                        UserId = userId,
+                        DataType = websocketData.DataType,
+                        Notification = notification
+                    };
 
-                await webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None);
+                    var options = new JsonSerializerOptions
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true
+                    };
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                    var tasks = new List<Task>();
+
+                    await webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None);
+                }
+            }
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
         public async Task SendRoomInfo(SendWebSocketData websocketData, string userId)
         {
-            var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.RoomInfo.Id);
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
+            try
             {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                RoomInfo = websocketData.RoomInfo
-            };
+                var listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.RoomInfo.Id);
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    RoomInfo = websocketData.RoomInfo
+                };
 
-            var tasks = new List<Task>();
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
 
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var tasks = new List<Task>();
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
 
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
             }
-
-            await Task.WhenAll(tasks);
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
         }
 
         public async Task SendRoomInfoForNewMember(SendWebSocketData websocketData, string newUserId, string userId)
         {
-            List<string> newUserIdList = newUserId.Split(", ").ToList();
-
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => newUserIdList.Contains(ws.UserId)).ToList();
-
-            var receiveWebSocketData = new ReceiveWebSocketData
+            try
             {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                RoomInfo = websocketData.RoomInfo
-            };
+                List<string> newUserIdList = newUserId.Split(", ").ToList();
 
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => newUserIdList.Contains(ws.UserId)).ToList();
 
-            var tasks = new List<Task>();
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
+                var receiveWebSocketData = new ReceiveWebSocketData
+                {
+                    UserId = userId,
+                    DataType = websocketData.DataType,
+                    RoomInfo = websocketData.RoomInfo
+                };
 
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
 
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
+                var tasks = new List<Task>();
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    receiveWebSocketData.RoomInfo.LastMessage = await _messageService.ChangeContentSystemMessage(receiveWebSocketData.RoomInfo.LastMessageId ?? 0, webSocket.UserId);
+
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
             }
-
-            await Task.WhenAll(tasks);
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
         }
 
         public async Task CallVideo(SendWebSocketData websocketData, string userId)
         {
-            if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsLeaveCall.ToString())
+            try
             {
-                await LeaveVideoCall(websocketData, userId);
+                if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsLeaveCall.ToString())
+                {
+                    await LeaveVideoCall(websocketData, userId);
+                }
+                else if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsJoinCall.ToString())
+                {
+                    await JoinVideoCall(websocketData, userId);
+                }
             }
-            else if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsJoinCall.ToString())
+            catch (Exception)
             {
-                await JoinVideoCall(websocketData, userId);
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
         public async Task SendChangedRoomInfo(SendWebSocketData websocketData, string userId)
         {
-            List<string> listOfUserId = new List<string>();
-            if (websocketData.ChangedRoomInfo.NewMemberList != null)
+            try
             {
-                List<string> changedUserIdList = new List<string>();
-                foreach (var newUser in websocketData.ChangedRoomInfo.NewMemberList)
+                List<string> listOfUserId = new List<string>();
+                if (websocketData.ChangedRoomInfo.NewMemberList != null)
                 {
-                    changedUserIdList.Add(newUser.Id);
-                }
-                listOfUserId = await _roomService.GetListOfOldUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId, changedUserIdList);
+                    List<string> changedUserIdList = new List<string>();
+                    foreach (var newUser in websocketData.ChangedRoomInfo.NewMemberList)
+                    {
+                        changedUserIdList.Add(newUser.Id);
+                    }
+                    listOfUserId = await _roomService.GetListOfOldUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId, changedUserIdList);
 
-            }
-            else if (websocketData.ChangedRoomInfo.LeftMemberId != null)
-            {
-                List<string> changedUserIdList = new List<string>
+                }
+                else if (websocketData.ChangedRoomInfo.LeftMemberId != null)
+                {
+                    List<string> changedUserIdList = new List<string>
                 {
                     websocketData.ChangedRoomInfo.LeftMemberId
                 };
-                listOfUserId = await _roomService.GetListOfOldUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId, changedUserIdList);
-            }
-            else if (websocketData.ChangedRoomInfo.NewAvatar != null || websocketData.ChangedRoomInfo.NewName != null)
-            {
-                listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId);
-            }
+                    listOfUserId = await _roomService.GetListOfOldUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId, changedUserIdList);
+                }
+                else if (websocketData.ChangedRoomInfo.NewAvatar != null || websocketData.ChangedRoomInfo.NewName != null)
+                {
+                    listOfUserId = await _roomService.GetListOfUserIdInRoomAsync(websocketData.ChangedRoomInfo.RoomId);
+                }
 
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
+                var listOfWebSocket = StaticParams.WebsocketList.Where(ws => listOfUserId.Contains(ws.UserId)).ToList();
 
-            var receiveWebSocketData = new ReceiveWebSocketData
-            {
-                UserId = userId,
-                DataType = websocketData.DataType,
-                ChangedRoomInfo = websocketData.ChangedRoomInfo
-            };
-
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true
-            };
-
-            var tasks = new List<Task>();
-            var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-            foreach (WebSocketConnection webSocket in listOfWebSocket)
-            {
-                tasks.Add(webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None));
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
-        public async Task SendSignalForVideoCall(SendWebSocketData websocketData, string userId)
-        {
-            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.SignalInfo.ToUser);
-
-            if (webSocket is not null)
-            {
                 var receiveWebSocketData = new ReceiveWebSocketData
                 {
                     UserId = userId,
-                    DataType = WebSocketDataType.IsConnectSignal.ToString(),
-                    SignalInfo = new SignalInfo
-                    {
-                        SignalType = websocketData.SignalInfo.SignalType,
-                        SignalObject = websocketData.SignalInfo.SignalObject
-                    }
+                    DataType = websocketData.DataType,
+                    ChangedRoomInfo = websocketData.ChangedRoomInfo
                 };
 
                 var options = new JsonSerializerOptions
@@ -442,43 +500,111 @@ namespace BKConnectBE.Service.WebSocket
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                     WriteIndented = true
                 };
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-                var tasks = new List<Task>();
 
-                await webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None);
+                var tasks = new List<Task>();
+                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
+            }
+        }
+
+        public async Task SendSignalForVideoCall(SendWebSocketData websocketData, string userId)
+        {
+            try
+            {
+                var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == websocketData.SignalInfo.ToUser);
+
+                if (webSocket is not null)
+                {
+                    var receiveWebSocketData = new ReceiveWebSocketData
+                    {
+                        UserId = userId,
+                        DataType = WebSocketDataType.IsConnectSignal.ToString(),
+                        SignalInfo = new SignalInfo
+                        {
+                            SignalType = websocketData.SignalInfo.SignalType,
+                            SignalObject = websocketData.SignalInfo.SignalObject
+                        }
+                    };
+
+                    var options = new JsonSerializerOptions
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true
+                    };
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                    var tasks = new List<Task>();
+
+                    await webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None);
+                }
+            }
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
         public async Task SendErrorNotification(string userId, string errorMessage)
         {
-            var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
-
-            if (webSocket is not null)
+            try
             {
-                var receiveWebSocketData = new ReceiveWebSocketData
-                {
-                    UserId = userId,
-                    DataType = WebSocketDataType.IsError.ToString(),
-                    ErrorMessage = errorMessage
-                };
+                var webSocket = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
 
-                var options = new JsonSerializerOptions
+                if (webSocket is not null)
                 {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true
-                };
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-                var tasks = new List<Task>();
+                    var receiveWebSocketData = new ReceiveWebSocketData
+                    {
+                        UserId = userId,
+                        DataType = WebSocketDataType.IsError.ToString(),
+                        ErrorMessage = errorMessage
+                    };
 
-                await webSocket.WebSocket.SendAsync(
-                    new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None);
+                    var options = new JsonSerializerOptions
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true
+                    };
+                    var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
+                    var tasks = new List<Task>();
+
+                    await webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None);
+                }
+            }
+            catch (Exception)
+            {
+                var cnn = StaticParams.WebsocketList.FirstOrDefault(ws => ws.UserId == userId);
+                if (cnn is not null)
+                {
+                    await CloseConnection(cnn);
+                }
             }
         }
 
