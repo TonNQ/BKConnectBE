@@ -75,6 +75,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_USER_ALREADY_IN_CALL = "Bạn đã đang tham gia một cuộc gọi";
         public static readonly string ERROR_USER_NOT_IN_CALL = "Bạn không tham gia cuộc gọi này";
         public static readonly string ERROR_VIDEO_CALL_NOT_FOUND = "Cuộc gọi video không tồn tại";
+        public static readonly string ERROR_WEBSOCKET_DATA = "Dữ liệu websocket không hợp lệ";
 
         //Error internal service
         public static readonly string ERROR_INTERNAL_SERVICE = "Một lỗi đã xảy ra trên hệ thống, thử lại sau";

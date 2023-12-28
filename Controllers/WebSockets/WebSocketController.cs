@@ -1,3 +1,4 @@
+using BKConnect.BKConnectBE.Common;
 using BKConnect.Service.Jwt;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
@@ -83,6 +84,10 @@ public class WebSocketController : ControllerBase
                 else if (receivedObject.DataType == WebSocketDataType.IsConnectSignal.ToString())
                 {
                     await _webSocketService.SendSignalForVideoCall(receivedObject, cnn.UserId);
+                }
+                else
+                {
+                    await _webSocketService.SendErrorNotification(cnn.UserId, MsgNo.ERROR_WEBSOCKET_DATA);
                 }
 
                 buffer = new byte[1024 * 4];
