@@ -1,5 +1,6 @@
 using BKConnect.BKConnectBE.Common;
 using BKConnect.Controllers;
+using BKConnectBE.Common;
 using BKConnectBE.Common.Attributes;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
@@ -152,40 +153,43 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var addMsgDto = await _roomService.AddUserToRoomAsync(addMemberDto.RoomId, addMemberDto.UserId, userId);
 
-                    var websocketDataRoomInfo1 = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId, ChangedRoomType.NewMember.ToString())
-                    };
+                        var websocketDataRoomInfo1 = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                            ChangedRoomInfo = await _roomService.GetChangedRoomInfo(addMemberDto.RoomId, addMemberDto.UserId, ChangedRoomType.NewMember.ToString())
+                        };
 
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo1, userId);
+                        await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo1, cnn);
 
-                    var roomInfo = await _roomService.GetRoomInformation(addMemberDto.RoomId);
-                    roomInfo.LastMessageId = addMsgDto.Id;
-                    roomInfo.LastMessageTime = addMsgDto.SendTime;
+                        var roomInfo = await _roomService.GetRoomInformation(addMemberDto.RoomId);
+                        roomInfo.LastMessageId = addMsgDto.Id;
+                        roomInfo.LastMessageTime = addMsgDto.SendTime;
 
-                    var websocketDataRoomInfo2 = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
-                        RoomInfo = roomInfo
-                    };
+                        var websocketDataRoomInfo2 = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                            RoomInfo = roomInfo
+                        };
 
-                    await _webSocketService.SendRoomInfoForNewMember(websocketDataRoomInfo2, addMemberDto.UserId, userId);
+                        await _webSocketService.SendRoomInfoForNewMember(websocketDataRoomInfo2, addMemberDto.UserId, cnn);
 
-                    var sendAddMsg = new SendMessageDto
-                    {
-                        RoomId = addMsgDto.RoomId,
-                        TypeOfMessage = MessageType.System.ToString(),
-                        Content = SystemMessageType.IsInRoom.ToString()
-                    };
-                    var websocketDataMsg = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = sendAddMsg
-                    };
+                        var sendAddMsg = new SendMessageDto
+                        {
+                            RoomId = addMsgDto.RoomId,
+                            TypeOfMessage = MessageType.System.ToString(),
+                            Content = SystemMessageType.IsInRoom.ToString()
+                        };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsMessage.ToString(),
+                            Message = sendAddMsg
+                        };
 
-                    await _webSocketService.SendSystemMessageForAddMember(websocketDataMsg, userId, addMemberDto.UserId, addMsgDto.Id);
-
+                        await _webSocketService.SendSystemMessageForAddMember(websocketDataMsg, cnn, addMemberDto.UserId, addMsgDto.Id);
+                    }
                     return this.Success(addMemberDto.UserId, MsgNo.SUCCESS_ADD_USER_TO_ROOM);
                 }
 
@@ -206,36 +210,39 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var removeMsg = await _roomService.RemoveUserFromRoom(removeMemberDto.RoomId, removeMemberDto.UserId, userId);
 
-                    var websocketDataMsg = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = removeMsg
-                    };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsMessage.ToString(),
+                            Message = removeMsg
+                        };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, removeMemberDto.UserId, SystemMessageType.IsOutRoom.ToString());
+                        await _webSocketService.SendSystemMessage(websocketDataMsg, cnn, removeMemberDto.UserId, SystemMessageType.IsOutRoom.ToString());
 
-                    var notification = new SendNotificationDto
-                    {
-                        NotificationType = NotificationType.IsOutRoom.ToString(),
-                        ReceiverId = removeMemberDto.UserId
-                    };
+                        var notification = new SendNotificationDto
+                        {
+                            NotificationType = NotificationType.IsOutRoom.ToString(),
+                            ReceiverId = removeMemberDto.UserId
+                        };
 
-                    var websocketDataNotify = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsNotification.ToString(),
-                        Notification = notification
-                    };
+                        var websocketDataNotify = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsNotification.ToString(),
+                            Notification = notification
+                        };
 
-                    await _webSocketService.SendRoomNotification(websocketDataNotify, userId, removeMemberDto.RoomId);
+                        await _webSocketService.SendRoomNotification(websocketDataNotify, cnn, removeMemberDto.RoomId);
 
-                    var websocketDataRoomInfo = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(removeMemberDto.RoomId, removeMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
-                    };
+                        var websocketDataRoomInfo = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                            ChangedRoomInfo = await _roomService.GetChangedRoomInfo(removeMemberDto.RoomId, removeMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
+                        };
 
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
-
+                        await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, cnn);
+                    }
                     return this.Success(removeMemberDto.UserId, MsgNo.SUCCESS_REMOVE_USER_FROM_ROOM);
                 }
 
@@ -255,22 +262,25 @@ namespace BKConnectBE.Controllers.Rooms
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
                     var leaveMsg = await _roomService.LeaveRoom(leaveMemberDto.RoomId, leaveMemberDto.UserId);
-
-                    var websocketDataMsg = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = leaveMsg
-                    };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsMessage.ToString(),
+                            Message = leaveMsg
+                        };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, leaveMemberDto.UserId, SystemMessageType.IsLeaveRoom.ToString());
+                        await _webSocketService.SendSystemMessage(websocketDataMsg, cnn, leaveMemberDto.UserId, SystemMessageType.IsLeaveRoom.ToString());
 
-                    var websocketDataRoomInfo = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(leaveMemberDto.RoomId, leaveMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
-                    };
+                        var websocketDataRoomInfo = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                            ChangedRoomInfo = await _roomService.GetChangedRoomInfo(leaveMemberDto.RoomId, leaveMemberDto.UserId, ChangedRoomType.LeftMember.ToString())
+                        };
 
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
+                        await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, cnn);
+                    }
 
                     return this.Success(leaveMemberDto.UserId, MsgNo.SUCCESS_LEAVE_ROOM);
                 }
@@ -291,15 +301,17 @@ namespace BKConnectBE.Controllers.Rooms
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
                     var roomInfo = await _roomService.CreateGroupRoomAsync(addGroupRoomDto, userId);
-
-                    var websocketDataMsg = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
-                        RoomInfo = roomInfo
-                    };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                            RoomInfo = roomInfo
+                        };
 
-                    await _webSocketService.SendRoomInfo(websocketDataMsg, userId);
-
+                        await _webSocketService.SendRoomInfo(websocketDataMsg, cnn);
+                    }
                     return this.Success(roomInfo.Id, MsgNo.SUCCESS_CREATE_GROUP_ROOM);
                 }
 
@@ -320,22 +332,25 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var updateMsg = await _roomService.UpdateAvatar(avatarDto.RoomId, avatarDto.Avatar);
 
-                    var websocketDataMsg = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = updateMsg
-                    };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsMessage.ToString(),
+                            Message = updateMsg
+                        };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, null, SystemMessageType.IsUpdateRoomImg.ToString());
+                        await _webSocketService.SendSystemMessage(websocketDataMsg, cnn, null, SystemMessageType.IsUpdateRoomImg.ToString());
 
-                    var websocketDataRoomInfo = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(avatarDto.RoomId, avatarDto.Avatar, ChangedRoomType.NewAvatar.ToString())
-                    };
+                        var websocketDataRoomInfo = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                            ChangedRoomInfo = await _roomService.GetChangedRoomInfo(avatarDto.RoomId, avatarDto.Avatar, ChangedRoomType.NewAvatar.ToString())
+                        };
 
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
-                    
+                        await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, cnn);
+                    }
                     return this.Success(avatarDto, MsgNo.SUCCESS_UPDATE_AVATAR);
                 }
 
@@ -356,22 +371,25 @@ namespace BKConnectBE.Controllers.Rooms
                 {
                     var updateMsg = await _roomService.UpdateName(changedNameDto.RoomId, changedNameDto.RoomName);
 
-                    var websocketDataMsg = new SendWebSocketData
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
                     {
-                        DataType = WebSocketDataType.IsMessage.ToString(),
-                        Message = updateMsg
-                    };
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsMessage.ToString(),
+                            Message = updateMsg
+                        };
 
-                    await _webSocketService.SendSystemMessage(websocketDataMsg, userId, null, SystemMessageType.IsUpdateRoomName.ToString());
+                        await _webSocketService.SendSystemMessage(websocketDataMsg, cnn, null, SystemMessageType.IsUpdateRoomName.ToString());
 
-                    var websocketDataRoomInfo = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
-                        ChangedRoomInfo = await _roomService.GetChangedRoomInfo(changedNameDto.RoomId, changedNameDto.RoomName, ChangedRoomType.NewName.ToString())
-                    };
+                        var websocketDataRoomInfo = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsChangedRoomInfo.ToString(),
+                            ChangedRoomInfo = await _roomService.GetChangedRoomInfo(changedNameDto.RoomId, changedNameDto.RoomName, ChangedRoomType.NewName.ToString())
+                        };
 
-                    await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, userId);
-                    
+                        await _webSocketService.SendChangedRoomInfo(websocketDataRoomInfo, cnn);
+                    }
                     return this.Success(changedNameDto, MsgNo.SUCCESS_UPDATE_ROOM_NAME);
                 }
 

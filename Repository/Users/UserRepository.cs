@@ -33,8 +33,7 @@ namespace BKConnectBE.Repository.Users
         public async Task<User> GetByEmailAsync(string email)
         {
             return await _context.Users.Include(u => u.Class).ThenInclude(f => f.Faculty).
-                FirstOrDefaultAsync(u => u.Email == email)
-                ?? throw new Exception(MsgNo.ERROR_USER_NOT_FOUND);
+                FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<List<UserSearchDto>> SearchListOfUsers(string userId, SearchKeyConditionWithPage searchCondition)

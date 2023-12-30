@@ -116,7 +116,7 @@ namespace BKConnectBE.Service.Notifications
         public async Task<ReceiveNotificationDto> AddAcceptedFriendRequestNotification(string senderId, string receiverId)
         {
             var friendRequest = await _friendRequestRepository.GetFriendRequestByUser(receiverId, senderId)
-                ?? throw new Exception(MsgNo.ERROR_INTERNAL_SERVICE);
+                ?? throw new Exception(MsgNo.ERROR_FRIEND_REQUEST_NOT_FOUND);
 
             if (friendRequest.ReceiverId != senderId)
             {

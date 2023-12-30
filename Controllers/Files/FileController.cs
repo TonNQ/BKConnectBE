@@ -9,6 +9,7 @@ using BKConnectBE.Model.Dtos.Parameters;
 using BKConnectBE.Service.Files;
 using BKConnectBE.Service.WebSocket;
 using Microsoft.AspNetCore.Mvc;
+using BKConnectBE.Common;
 
 namespace BKConnectBE.Controllers.Files
 {
@@ -53,18 +54,23 @@ namespace BKConnectBE.Controllers.Files
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
                     var fileId = await _fileService.AddFileAsync(userId, addFileDto);
-                    var websocketDataMsg = new SendWebSocketData
-                    {
-                        DataType = WebSocketDataType.IsNotification.ToString(),
-                        Notification = new SendNotificationDto
-                        {
-                            NotificationType = NotificationType.IsPostFile.ToString(),
-                            FileId = fileId,
-                            RoomId = addFileDto.RoomId
-                        }
-                    };
 
-                    await _webSocketService.SendNotification(websocketDataMsg, userId);
+                    var cnn = StaticParams.WebsocketList.FirstOrDefault(x => x.UserId == userId);
+                    if (cnn is not null)
+                    {
+                        var websocketDataMsg = new SendWebSocketData
+                        {
+                            DataType = WebSocketDataType.IsNotification.ToString(),
+                            Notification = new SendNotificationDto
+                            {
+                                NotificationType = NotificationType.IsPostFile.ToString(),
+                                FileId = fileId,
+                                RoomId = addFileDto.RoomId
+                            }
+                        };
+
+                        await _webSocketService.SendNotification(websocketDataMsg, cnn);
+                    }
                     return this.Success(fileId, MsgNo.SUCCESS_UP_FILE);
                 }
 
