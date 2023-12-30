@@ -11,5 +11,6 @@ namespace BKConnectBE.Common.Enumeration
         IsCreateGroupRoom,
         IsError,
         IsConnectSignal,
+        IsReloadChats,
     }
 }

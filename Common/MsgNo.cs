@@ -61,6 +61,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_UNAUTHORIZED = "Bạn không có quyền truy cập";
         public static readonly string ERROR_UNHADLED_ACTION = "Bạn không thể thực hiện hành động này";
         public static readonly string ERROR_CREATE_FRIEND_REQUEST = "Gửi lời mời kết bạn thất bại";
+        public static readonly string ERROR_FRIEND_REQUEST_NOT_FOUND = "Lời mời kết bạn không tồn tại";
         public static readonly string ERROR_RESPONSE_FRIEND_REQUEST = "Trả lời lời mời kết bạn thất bại";
         public static readonly string ERROR_REMOVE_FRIEND_REQUEST = "Xóa lời mời kết bạn thất bại";
         public static readonly string ERROR_UPDATE_FRIEND_REQUEST = "Cập nhật lời mời kết bạn thất bại";

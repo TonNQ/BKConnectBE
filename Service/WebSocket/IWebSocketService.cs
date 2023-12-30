@@ -7,17 +7,17 @@ namespace BKConnectBE.Service.WebSocket
     {
         void AddWebSocketConnection(WebSocketConnection connection);
         Task CloseConnection(WebSocketConnection cnn);
-        Task SendStatusMessage(ReceiveWebSocketData websocketData);
-        Task SendMessage(SendWebSocketData websocketData, string userId);
-        Task SendNotification(SendWebSocketData websocketData, string userId);
-        Task SendSystemMessage(SendWebSocketData websocketData, string userId, string receiverId, string type);
-        Task SendSystemMessageForAddMember(SendWebSocketData websocketData, string userId, string receiverId, long newMsgId);
-        Task SendRoomInfo(SendWebSocketData websocketData, string userId);
-        Task SendRoomInfoForNewMember(SendWebSocketData websocketData, string newUserId, string userId);
-        Task SendRoomNotification(SendWebSocketData websocketData, string userId, long roomId);
-        Task SendChangedRoomInfo(SendWebSocketData websocketData, string userId);
-        Task CallVideo(SendWebSocketData websocketData, string userId);
-        Task SendSignalForVideoCall(SendWebSocketData websocketData, string userId);
-        Task SendErrorNotification(string userId, string errorMessage);
+        Task SendStatusMessage(ReceiveWebSocketData websocketData, string wsId);
+        Task SendMessage(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task SendNotification(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task SendSystemMessage(SendWebSocketData websocketData, WebSocketConnection cnn, string receiverId, string type);
+        Task SendSystemMessageForAddMember(SendWebSocketData websocketData, WebSocketConnection cnn, string receiverId, long newMsgId);
+        Task SendRoomInfo(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task SendRoomInfoForNewMember(SendWebSocketData websocketData, string newUserId, WebSocketConnection cnn);
+        Task SendRoomNotification(SendWebSocketData websocketData, WebSocketConnection cnn, long roomId);
+        Task SendChangedRoomInfo(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task CallVideo(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task SendSignalForVideoCall(SendWebSocketData websocketData, WebSocketConnection cnn);
+        Task SendErrorNotification(WebSocketConnection cnn, string errorMessage);
     }
 }

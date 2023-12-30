@@ -34,6 +34,7 @@ public class WebSocketController : ControllerBase
                 var tokenInfo = _jwtService.DecodeToken(accessToken);
                 var webSocketConnection = new WebSocketConnection
                 {
+                    Id = Guid.NewGuid().ToString(),
                     UserId = tokenInfo["UserId"],
                     WebSocket = webSocket
                 };
@@ -45,7 +46,7 @@ public class WebSocketController : ControllerBase
                     DataType = WebSocketDataType.IsOnline.ToString()
                 };
 
-                await _webSocketService.SendStatusMessage(receiveWebSocketData);
+                await _webSocketService.SendStatusMessage(receiveWebSocketData, webSocketConnection.Id);
 
                 await Echo(webSocketConnection);
             }
@@ -71,23 +72,23 @@ public class WebSocketController : ControllerBase
 
                 if (receivedObject.DataType == WebSocketDataType.IsMessage.ToString())
                 {
-                    await _webSocketService.SendMessage(receivedObject, cnn.UserId);
+                    await _webSocketService.SendMessage(receivedObject, cnn);
                 }
                 else if (receivedObject.DataType == WebSocketDataType.IsNotification.ToString())
                 {
-                    await _webSocketService.SendNotification(receivedObject, cnn.UserId);
+                    await _webSocketService.SendNotification(receivedObject, cnn);
                 }
                 else if (receivedObject.DataType == WebSocketDataType.IsVideoCall.ToString())
                 {
-                    await _webSocketService.CallVideo(receivedObject, cnn.UserId);
+                    await _webSocketService.CallVideo(receivedObject, cnn);
                 }
                 else if (receivedObject.DataType == WebSocketDataType.IsConnectSignal.ToString())
                 {
-                    await _webSocketService.SendSignalForVideoCall(receivedObject, cnn.UserId);
+                    await _webSocketService.SendSignalForVideoCall(receivedObject, cnn);
                 }
                 else
                 {
-                    await _webSocketService.SendErrorNotification(cnn.UserId, MsgNo.ERROR_WEBSOCKET_DATA);
+                    await _webSocketService.SendErrorNotification(cnn, MsgNo.ERROR_WEBSOCKET_DATA);
                 }
 
                 buffer = new byte[1024 * 4];
