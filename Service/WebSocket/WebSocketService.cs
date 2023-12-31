@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -54,13 +53,15 @@ namespace BKConnectBE.Service.WebSocket
             _mapper = mapper;
         }
 
-        public void AddWebSocketConnection(WebSocketConnection connection)
+        public bool AddWebSocketConnection(WebSocketConnection connection)
         {
+            var isExist = StaticParams.WebsocketList.Any(ws => ws.UserId == connection.UserId);
             if (!StaticParams.WebsocketList.TryAdd(connection))
             {
                 StaticParams.WebsocketList.Remove(connection);
                 StaticParams.WebsocketList.TryAdd(connection);
             }
+            return !isExist;
         }
 
         public async Task CloseConnection(WebSocketConnection cnn)
@@ -69,7 +70,7 @@ namespace BKConnectBE.Service.WebSocket
             {
                 if (StaticParams.WebsocketList.Remove(cnn))
                 {
-                    if (IsInVideoCall(cnn.UserId))
+                    if (IsInVideoCall(cnn.UserId, cnn.Id))
                     {
                         var websocketOfVideoCall = new SendWebSocketData
                         {
@@ -77,7 +78,7 @@ namespace BKConnectBE.Service.WebSocket
                             VideoCall = new VideoCallData
                             {
                                 RoomId = StaticParams.VideoCallList
-                                    .FirstOrDefault(cr => cr.Participants.ContainsKey(cnn.UserId))?.RoomId ?? 0,
+                                    .FirstOrDefault(cr => cr.Participants.Any(p => p.UserId == cnn.UserId)).RoomId,
                                 VideoCallType = SystemMessageType.IsLeaveCall.ToString()
                             }
                         };
@@ -707,7 +708,12 @@ namespace BKConnectBE.Service.WebSocket
             var videoCall = StaticParams.VideoCallList.FirstOrDefault(cr => cr.RoomId == websocketData.VideoCall.RoomId);
             if (videoCall is not null)
             {
-                videoCall.Participants.TryAdd(cnn.UserId, websocketData.VideoCall.PeerId);
+                videoCall.Participants.Add(new ParticipantIdInRoom
+                {
+                    UserId = cnn.UserId,
+                    PeerId = websocketData.VideoCall.PeerId,
+                    WebSocketId = cnn.Id
+                });
                 await VideoCallSocket(websocketData, videoCall.RoomId, cnn);
             }
             else
@@ -715,9 +721,13 @@ namespace BKConnectBE.Service.WebSocket
                 videoCall = new VideoCallWebsocket
                 {
                     RoomId = websocketData.VideoCall.RoomId,
-                    Participants = new ConcurrentDictionary<string, string>
+                    Participants = new List<ParticipantIdInRoom>
                     {
-                        [cnn.UserId] = websocketData.VideoCall.PeerId
+                        new() {
+                            UserId = cnn.UserId,
+                            PeerId = websocketData.VideoCall.PeerId,
+                            WebSocketId = cnn.Id
+                        }
                     }
                 };
                 StaticParams.VideoCallList.Add(videoCall);
@@ -732,16 +742,16 @@ namespace BKConnectBE.Service.WebSocket
             var videoCall = StaticParams.VideoCallList.FirstOrDefault(cr => cr.RoomId == websocketData.VideoCall.RoomId);
             if (videoCall is not null)
             {
-                var peerId = videoCall.Participants[cnn.UserId];
-                videoCall.Participants.TryRemove(cnn.UserId, out _);
+                var participant = videoCall.Participants.FirstOrDefault(p => p.UserId == cnn.UserId);
+                videoCall.Participants.Remove(participant);
 
-                if (videoCall.Participants.IsEmpty)
+                if (videoCall.Participants.Count == 0)
                 {
                     StaticParams.VideoCallList.Remove(videoCall);
                     websocketData.VideoCall.VideoCallType = SystemMessageType.IsEndCall.ToString();
                 }
 
-                await VideoCallSocket(websocketData, videoCall.RoomId, cnn, peerId);
+                await VideoCallSocket(websocketData, videoCall.RoomId, cnn, participant.PeerId);
             }
             else
             {
@@ -1058,9 +1068,13 @@ namespace BKConnectBE.Service.WebSocket
             }
         }
 
-        private static bool IsInVideoCall(string userId)
+        private static bool IsInVideoCall(string userId, string wsId = null)
         {
-            return StaticParams.VideoCallList.Any(cr => cr.Participants.ContainsKey(userId));
+            if (wsId is not null)
+            {
+                return StaticParams.VideoCallList.Any(cr => cr.Participants.Any(p => p.WebSocketId == wsId));
+            }
+            return StaticParams.VideoCallList.Any(cr => cr.Participants.Any(p => p.UserId == userId));
         }
     }
 }

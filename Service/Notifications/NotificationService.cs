@@ -193,6 +193,7 @@ namespace BKConnectBE.Service.Notifications
 
             var notificationDto = _mapper.Map<ReceiveNotificationDto>(notification);
             notificationDto.Id = notification.Id;
+            notificationDto.Avatar = sender.Avatar;
             notificationDto.SenderName = sender.Name;
             notificationDto.SendTime = notificationDto.SendTime.AddHours(-7);
 

@@ -5,7 +5,7 @@ namespace BKConnectBE.Service.WebSocket
 {
     public interface IWebSocketService
     {
-        void AddWebSocketConnection(WebSocketConnection connection);
+        bool AddWebSocketConnection(WebSocketConnection connection);
         Task CloseConnection(WebSocketConnection cnn);
         Task SendStatusMessage(ReceiveWebSocketData websocketData, string wsId);
         Task SendMessage(SendWebSocketData websocketData, WebSocketConnection cnn);

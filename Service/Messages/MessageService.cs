@@ -177,12 +177,12 @@ namespace BKConnectBE.Service.Messages
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
 
-            if (msg.TypeOfMessage == SystemMessageType.IsBecomeFriend.ToString())
+            if (msg.Content == SystemMessageType.IsBecomeFriend.ToString())
             {
                 return Constants.BECOME_FRIEND_MESSAGE;
             }
 
-            if (msg.TypeOfMessage == SystemMessageType.IsEndCall.ToString())
+            if (msg.Content == SystemMessageType.IsEndCall.ToString())
             {
                 return Constants.END_VIDEO_CALL;
             }
