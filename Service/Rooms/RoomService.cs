@@ -376,7 +376,22 @@ namespace BKConnectBE.Service.Rooms
 
         public async Task<RoomDetailDto> GetRoomInformation(long roomId)
         {
-            return _mapper.Map<RoomDetailDto>(await _roomRepository.GetInformationOfRoom(roomId));
+            var room = await _roomRepository.GetInformationOfRoom(roomId)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+            return _mapper.Map<RoomDetailDto>(room);
+        }
+
+        public async Task<RoomDetailDto> GetPrivateRoomInformation(string user1Id, string user2Id)
+        {
+            var room = await _roomRepository.GetPrivateRoomInformation(user1Id, user2Id)
+                ?? throw new Exception(MsgNo.ERROR_ROOM_NOT_FOUND);
+            var roomDto = _mapper.Map<RoomDetailDto>(room);
+
+            var lastMessage = await _messageRepository.GetLastMessageInRoomAsync(room.Id);
+            roomDto.IsRead = false;
+            roomDto.LastMessageTime = lastMessage.SendTime;
+            roomDto.LastMessage = Constants.BECOME_FRIEND_MESSAGE;
+            return roomDto;
         }
 
         public async Task<SendMessageDto> UpdateAvatar(long roomId, string img)

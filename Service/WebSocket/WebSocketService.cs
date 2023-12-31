@@ -11,6 +11,7 @@ using BKConnectBE.Common;
 using BKConnectBE.Common.Enumeration;
 using BKConnectBE.Model.Dtos.ChatManagement;
 using BKConnectBE.Model.Dtos.MessageManagement;
+using BKConnectBE.Model.Dtos.RoomManagement;
 using BKConnectBE.Model.Dtos.VideoCallManagement;
 using BKConnectBE.Model.Dtos.WebSocketManagement;
 using BKConnectBE.Model.Entities;
@@ -39,7 +40,7 @@ namespace BKConnectBE.Service.WebSocket
             IRoomService roomService,
             INotificationService notificationService,
             IVideoCallService videoCallService,
-            IGenericRepository<Message> genericRepositoryForMsg,
+                        IGenericRepository<Message> genericRepositoryForMsg,
             IGenericRepository<Room> genericRepositoryForRoom,
             IMapper mapper)
         {
@@ -66,33 +67,38 @@ namespace BKConnectBE.Service.WebSocket
         {
             try
             {
-                StaticParams.WebsocketList.Remove(cnn);
-                if (IsInVideoCall(cnn.UserId))
+                if (StaticParams.WebsocketList.Remove(cnn))
                 {
-                    var websocketOfVideoCall = new SendWebSocketData
+                    if (IsInVideoCall(cnn.UserId))
                     {
-                        DataType = WebSocketDataType.IsVideoCall.ToString(),
-                        VideoCall = new VideoCallData
+                        var websocketOfVideoCall = new SendWebSocketData
                         {
-                            RoomId = StaticParams.VideoCallList
-                                .FirstOrDefault(cr => cr.Participants.ContainsKey(cnn.UserId))?.RoomId ?? 0,
-                            VideoCallType = SystemMessageType.IsLeaveCall.ToString()
-                        }
-                    };
-                    await LeaveVideoCall(websocketOfVideoCall, cnn);
+                            DataType = WebSocketDataType.IsVideoCall.ToString(),
+                            VideoCall = new VideoCallData
+                            {
+                                RoomId = StaticParams.VideoCallList
+                                    .FirstOrDefault(cr => cr.Participants.ContainsKey(cnn.UserId))?.RoomId ?? 0,
+                                VideoCallType = SystemMessageType.IsLeaveCall.ToString()
+                            }
+                        };
+                        await LeaveVideoCall(websocketOfVideoCall, cnn);
+                    }
+
+                    if (!StaticParams.WebsocketList.Any(ws => ws.UserId == cnn.UserId))
+                    {
+                        var websocketData = new ReceiveWebSocketData
+                        {
+                            UserId = cnn.UserId,
+                            DataType = WebSocketDataType.IsOffline.ToString()
+                        };
+
+                        await _userService.UpdateLastOnlineAsync(cnn.UserId);
+                        await SendStatusMessage(websocketData, cnn.Id);
+                    }
+
+                    await cnn.WebSocket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
                 }
-
-                var websocketData = new ReceiveWebSocketData
-                {
-                    UserId = cnn.UserId,
-                    DataType = WebSocketDataType.IsOffline.ToString()
-                };
-
-                await _userService.UpdateLastOnlineAsync(cnn.UserId);
-                await SendStatusMessage(websocketData, cnn.Id);
-
-                await cnn.WebSocket.CloseAsync(
-                    WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
             }
             catch (Exception)
             {
@@ -317,8 +323,6 @@ namespace BKConnectBE.Service.WebSocket
                 else if (websocketData.Notification.NotificationType == NotificationType.IsAcceptFriendRequest.ToString())
                 {
                     await SendFriendRequestAcception(websocketData, cnn.UserId);
-                    await SendFriendRequestAcception(cnn.UserId);
-                    await SendFriendRequestAcception(websocketData.Notification.ReceiverId);
                 }
                 else if (websocketData.Notification.NotificationType == NotificationType.IsPostFile.ToString())
                 {
@@ -921,44 +925,7 @@ namespace BKConnectBE.Service.WebSocket
                 }
                 await Task.WhenAll(tasks);
             }
-        }
-
-        private async Task SendFriendRequestAcception(string userId)
-        {
-            var listOfWebSocket = StaticParams.WebsocketList.Where(ws => ws.UserId == userId).ToList();
-
-            if (listOfWebSocket.Count > 0)
-            {
-                var receiveWebSocketData = new ReceiveWebSocketData
-                {
-                    UserId = userId,
-                    DataType = WebSocketDataType.IsReloadChats.ToString(),
-                };
-
-                var options = new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true
-                };
-                var serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(receiveWebSocketData, options));
-                var tasks = new List<Task>();
-
-                foreach (WebSocketConnection webSocket in listOfWebSocket)
-                {
-                    if (webSocket.WebSocket.State == WebSocketState.Closed)
-                    {
-                        StaticParams.WebsocketList.Remove(webSocket);
-                        continue;
-                    }
-
-                    tasks.Add(webSocket.WebSocket.SendAsync(
-                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
-                        WebSocketMessageType.Text,
-                        true,
-                        CancellationToken.None));
-                }
-                await Task.WhenAll(tasks);
-            }
+            await SendPrivateRoomInfo(userId, websocketData.Notification.ReceiverId);
         }
 
         private async Task SendPostFileInClassRoom(SendWebSocketData websocketData, string userId)
@@ -1005,6 +972,88 @@ namespace BKConnectBE.Service.WebSocket
                         }
                     }
                 }
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private async Task SendPrivateRoomInfo(string user1Id, string user2Id)
+        {
+            var room = await _roomService.GetPrivateRoomInformation(user1Id, user2Id);
+            var roomInfo = _mapper.Map<RoomDetailDto>(room);
+
+            var listOfWebSocket = StaticParams.WebsocketList
+                .Where(ws => ws.UserId == user1Id || ws.UserId == user2Id).ToList();
+
+            if (listOfWebSocket.Count > 0)
+            {
+                var user2 = await _userService.GetByIdAsync(user2Id);
+                roomInfo.Name = user2.Name;
+                roomInfo.Avatar = user2.Avatar;
+                if (listOfWebSocket.Any(ws => ws.UserId == user2Id))
+                {
+                    roomInfo.IsOnline = true;
+                }
+                else
+                {
+                    roomInfo.LastOnline = user2.LastOnline;
+                }
+                var webSocketDataForUser1 = new ReceiveWebSocketData
+                {
+                    UserId = user2Id,
+                    DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                    RoomInfo = roomInfo
+                };
+
+                var user1 = await _userService.GetByIdAsync(user1Id);
+                roomInfo.Name = user1.Name;
+                roomInfo.Avatar = user1.Avatar;
+                if (listOfWebSocket.Any(ws => ws.UserId == user1Id))
+                {
+                    roomInfo.IsOnline = true;
+                }
+                else
+                {
+                    roomInfo.LastOnline = user1.LastOnline;
+                }
+                var webSocketDataForUser2 = new ReceiveWebSocketData
+                {
+                    UserId = user1Id,
+                    DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
+                    RoomInfo = roomInfo
+                };
+
+                var options = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true
+                };
+
+                var tasks = new List<Task>();
+                var serverMsg = Array.Empty<byte>();
+                foreach (WebSocketConnection webSocket in listOfWebSocket)
+                {
+                    if (webSocket.WebSocket.State == WebSocketState.Closed)
+                    {
+                        StaticParams.WebsocketList.Remove(webSocket);
+                        continue;
+                    }
+
+                    if (webSocket.UserId == user1Id)
+                    {
+                        serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(webSocketDataForUser1, options));
+                    }
+                    else
+                    {
+                        serverMsg = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(webSocketDataForUser2, options));
+                    }
+
+                    tasks.Add(webSocket.WebSocket.SendAsync(
+                        new ArraySegment<byte>(serverMsg, 0, serverMsg.Length),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None));
+                }
+
                 await Task.WhenAll(tasks);
             }
         }
