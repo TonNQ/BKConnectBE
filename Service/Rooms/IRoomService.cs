@@ -18,6 +18,7 @@ namespace BKConnectBE.Service.Rooms
         Task<RoomDetailDto> CreateGroupRoomAsync(AddGroupRoomDto addGroupRoomDto, string userId);
         Task<ChangedRoomDto> GetChangedRoomInfo(long roomId, string changeInfo, string type);
         Task<RoomDetailDto> GetRoomInformation(long roomId);
+        Task<RoomDetailDto> GetPrivateRoomInformation(string user1Id, string user2Id);
         Task<SendMessageDto> UpdateAvatar(long roomId, string img);
         Task<SendMessageDto> UpdateName(long roomId, string name);
     }

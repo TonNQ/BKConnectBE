@@ -39,5 +39,8 @@ namespace BKConnectBE.Model.Dtos.UserManagement
 
         [JsonPropertyName("avatar")]
         public string Avatar { get; set; }
+
+        [JsonPropertyName("last_online")]
+        public DateTime? LastOnline { get; set; }
     }
 }

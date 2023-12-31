@@ -23,7 +23,7 @@ namespace BKConnectBE.Service.Notifications
         private readonly IFileRepository _fileRepository;
         private readonly IGenericRepository<FriendRequest> _genericRepositoryForFriendRequest;
         private readonly IGenericRepository<Notification> _genericRepositoryForNotification;
-        private readonly IMapper _mapper;
+                private readonly IMapper _mapper;
 
         public NotificationService(INotificationRepository notificationRepository,
             IUserRepository userRepository,
@@ -32,7 +32,7 @@ namespace BKConnectBE.Service.Notifications
             IFileRepository fileRepository,
             IGenericRepository<FriendRequest> genericRepositoryForFriendRequest,
             IGenericRepository<Notification> genericRepositoryForNotification,
-            IRoomRepository roomRepository,
+                        IRoomRepository roomRepository,
             IMapper mapper)
         {
             _notificationRepository = notificationRepository;
@@ -43,7 +43,7 @@ namespace BKConnectBE.Service.Notifications
             _fileRepository = fileRepository;
             _genericRepositoryForFriendRequest = genericRepositoryForFriendRequest;
             _genericRepositoryForNotification = genericRepositoryForNotification;
-            _mapper = mapper;
+                        _mapper = mapper;
         }
 
         public async Task<List<ReceiveNotificationDto>> GetListOfNotificationsByUserIdAsync(string userId)

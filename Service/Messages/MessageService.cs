@@ -177,10 +177,20 @@ namespace BKConnectBE.Service.Messages
                 throw new Exception(MsgNo.ERROR_UNHADLED_ACTION);
             }
 
+            if (msg.TypeOfMessage == SystemMessageType.IsBecomeFriend.ToString())
+            {
+                return Constants.BECOME_FRIEND_MESSAGE;
+            }
+
+            if (msg.TypeOfMessage == SystemMessageType.IsEndCall.ToString())
+            {
+                return Constants.END_VIDEO_CALL;
+            }
+
             var msgSenderName = (msg.SenderId == null || msg.SenderId == userId)
                 ? "Bạn" : await _userRepository.GetUsernameById(msg.SenderId);
 
-            return await ChangeContentSystemMessage(userId, msgSenderName, msg.AffectedId, msg.Content);
+            return await ChangeContentSystemMessage(userId, msgSenderName, msg.AffectedId, msg.Content, true);
         }
 
         private async Task<string[]> GetAllReceiverName(string[] ids, string userId)
@@ -211,17 +221,20 @@ namespace BKConnectBE.Service.Messages
 
             return names;
         }
-        private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type)
+        private async Task<string> ChangeContentSystemMessage(string userId, string? msgSenderName, string? receiverId, string type, bool isSenderNotNull = false)
         {
 
-            if (type == SystemMessageType.IsBecomeFriend.ToString())
+            if (!isSenderNotNull)
             {
-                return Constants.FRIEND_ACCEPTED_NOTIFICATION;
-            }
+                if (type == SystemMessageType.IsBecomeFriend.ToString())
+                {
+                    return Constants.BECOME_FRIEND_MESSAGE;
+                }
 
-            if (type == SystemMessageType.IsEndCall.ToString())
-            {
-                return Constants.END_VIDEO_CALL;
+                if (type == SystemMessageType.IsEndCall.ToString())
+                {
+                    return Constants.END_VIDEO_CALL;
+                }
             }
 
             if (type == SystemMessageType.IsLeaveRoom.ToString())

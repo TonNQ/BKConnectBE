@@ -68,6 +68,14 @@ namespace BKConnectBE.Repository.Rooms
                 .FirstOrDefaultAsync(r => r.Id == roomId);
         }
 
+        public async Task<Room> GetPrivateRoomInformation(string user1Id, string user2Id)
+        {
+            return await _context.Rooms
+                .FirstOrDefaultAsync(r => r.RoomType == RoomType.PrivateRoom.ToString() &&
+                    r.UsersOfRoom.Any(u => u.UserId == user1Id) &&
+                    r.UsersOfRoom.Any(u => u.UserId == user2Id));
+        }
+
         public async Task<List<Room>> GetListOfRoomsByUserId(string userId)
         {
             return await _context.Rooms.Include(r => r.UsersOfRoom)
