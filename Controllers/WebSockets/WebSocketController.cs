@@ -38,15 +38,17 @@ public class WebSocketController : ControllerBase
                     UserId = tokenInfo["UserId"],
                     WebSocket = webSocket
                 };
-                _webSocketService.AddWebSocketConnection(webSocketConnection);
 
-                var receiveWebSocketData = new ReceiveWebSocketData
+                if (_webSocketService.AddWebSocketConnection(webSocketConnection))
                 {
-                    UserId = tokenInfo["UserId"],
-                    DataType = WebSocketDataType.IsOnline.ToString()
-                };
+                    var receiveWebSocketData = new ReceiveWebSocketData
+                    {
+                        UserId = tokenInfo["UserId"],
+                        DataType = WebSocketDataType.IsOnline.ToString()
+                    };
 
-                await _webSocketService.SendStatusMessage(receiveWebSocketData, webSocketConnection.Id);
+                    await _webSocketService.SendStatusMessage(receiveWebSocketData, webSocketConnection.Id);
+                }
 
                 await Echo(webSocketConnection);
             }

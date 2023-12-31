@@ -26,7 +26,7 @@ namespace BKConnectBE.Service.VideoCalls
                 return new();
             }
 
-            var listParticipant = videoCall.Participants.ToDictionary(x => x.Key, x => x.Value);
+            var listParticipant = videoCall.Participants.ToDictionary(x => x.UserId, x => x.PeerId);
             var users = await _userRepository
                 .GetListUsersByListIdAsync(listParticipant.Select(x => x.Key).ToList());
             var listParticipantInfo = _mapper.Map<List<ParticipantInfo>>(users);
@@ -41,18 +41,18 @@ namespace BKConnectBE.Service.VideoCalls
         public async Task<List<ParticipantInfo>> GetUserInfoWhenJoinCall(long roomId, string userId)
         {
             var videoCall = StaticParams.VideoCallList
-                .FirstOrDefault(x => x.RoomId == roomId && x.Participants.Any(k => k.Key == userId));
+                .FirstOrDefault(x => x.RoomId == roomId && x.Participants.Any(p => p.UserId == userId));
 
             if (videoCall == null)
             {
                 return new();
             }
 
-            var participant = videoCall.Participants.FirstOrDefault(k => k.Key == userId);
-            var user = await _userRepository.GetUserByIdAsync(participant.Key);
+            var participant = videoCall.Participants.FirstOrDefault(p => p.UserId == userId);
+            var user = await _userRepository.GetUserByIdAsync(participant.UserId);
 
             var participantInfo = _mapper.Map<ParticipantInfo>(user);
-            participantInfo.PeerId = participant.Value;
+            participantInfo.PeerId = participant.PeerId;
             return new List<ParticipantInfo>() { participantInfo };
         }
     }
