@@ -86,7 +86,8 @@ namespace BKConnectBE.Common
             CreateMap<AddGroupRoomDto, Room>()
                 .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow.AddHours(7)))
                 .ForMember(dest => dest.UsersOfRoom, opt => opt.MapFrom(src => new List<UserOfRoom>()))
-                .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => new List<Message>()));
+                .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => new List<Message>()))
+                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => Constants.DEFAULT_AVATAR));
 
             CreateMap<Notification, ReceiveNotificationDto>()
                 .ForMember(dest => dest.NotificationType, opt => opt.MapFrom(src => src.Type));
