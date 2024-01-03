@@ -25,6 +25,7 @@ namespace BKConnectBE.Common
                 .ForMember(d => d.Role, opt => opt.MapFrom(x => x.Email.Contains("sv") ? Role.Student : Role.Teacher))
                 .ForMember(d => d.IsActive, opt => opt.MapFrom(x => false))
                 .ForMember(d => d.Gender, opt => opt.MapFrom(x => true))
+                .ForMember(d => d.Avatar, opt => opt.MapFrom(x => Constants.DEFAULT_AVATAR))
                 .ForMember(d => d.DateOfBirth, opt => opt.MapFrom(x => DateTime.UtcNow.AddHours(7)))
                 .ForMember(d => d.CreatedDate, opt => opt.MapFrom(x => DateTime.UtcNow.AddHours(7)));
 
