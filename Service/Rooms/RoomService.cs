@@ -64,6 +64,7 @@ namespace BKConnectBE.Service.Rooms
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > userOfRoom.ReadMessageId);
                     roomDto.LastMessageTime = lastMessage.SendTime;
+                    roomDto.LastMessageId = lastMessage.Id;
 
                     roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
                         ? await _messageService.ChangeContentSystemMessage(lastMessage.Id, userId)
@@ -100,6 +101,8 @@ namespace BKConnectBE.Service.Rooms
                             && !room.Messages.Any(m => m.SenderId != userId
                                 && m.Id > userOfRoom.ReadMessageId);
                         roomDto.LastMessageTime = lastMessage.SendTime;
+                        roomDto.LastMessageId = lastMessage.Id;
+
                         roomDto.LastMessage = lastMessage.TypeOfMessage == nameof(MessageType.System)
                             ? await _messageService.ChangeContentSystemMessage(lastMessage.Id, userId)
                             : ((lastMessage.SenderId == userId ? "Bạn: " : $"{lastMessage.Sender.Name}: ")
@@ -389,6 +392,7 @@ namespace BKConnectBE.Service.Rooms
 
             var lastMessage = await _messageRepository.GetLastMessageInRoomAsync(room.Id);
             roomDto.IsRead = false;
+            roomDto.LastMessageId = lastMessage.Id;
             roomDto.LastMessageTime = lastMessage.SendTime.AddHours(-7);
             roomDto.LastMessage = Constants.BECOME_FRIEND_MESSAGE;
             return roomDto;
