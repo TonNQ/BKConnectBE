@@ -389,7 +389,7 @@ namespace BKConnectBE.Service.Rooms
 
             var lastMessage = await _messageRepository.GetLastMessageInRoomAsync(room.Id);
             roomDto.IsRead = false;
-            roomDto.LastMessageTime = lastMessage.SendTime;
+            roomDto.LastMessageTime = lastMessage.SendTime.AddHours(-7);
             roomDto.LastMessage = Constants.BECOME_FRIEND_MESSAGE;
             return roomDto;
         }

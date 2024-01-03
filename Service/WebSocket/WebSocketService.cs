@@ -329,6 +329,10 @@ namespace BKConnectBE.Service.WebSocket
                 {
                     await SendPostFileInClassRoom(websocketData, cnn.UserId);
                 }
+                else
+                {
+                    await SendErrorNotification(cnn, MsgNo.ERROR_WEBSOCKET_DATA);
+                }
             }
             catch (Exception)
             {
@@ -514,6 +518,10 @@ namespace BKConnectBE.Service.WebSocket
                 else if (websocketData.VideoCall.VideoCallType == SystemMessageType.IsJoinCall.ToString())
                 {
                     await JoinVideoCall(websocketData, cnn);
+                }
+                else
+                {
+                    await SendErrorNotification(cnn, MsgNo.ERROR_WEBSOCKET_DATA);
                 }
             }
             catch (Exception)
@@ -997,39 +1005,42 @@ namespace BKConnectBE.Service.WebSocket
             if (listOfWebSocket.Count > 0)
             {
                 var user2 = await _userService.GetByIdAsync(user2Id);
-                roomInfo.Name = user2.Name;
-                roomInfo.Avatar = user2.Avatar;
-                if (listOfWebSocket.Any(ws => ws.UserId == user2Id))
+                var roomInfoForUser1 = new RoomDetailDto
                 {
-                    roomInfo.IsOnline = true;
-                }
-                else
-                {
-                    roomInfo.LastOnline = user2.LastOnline;
-                }
+                    Id = roomInfo.Id,
+                    Name = user2.Name,
+                    Avatar = user2.Avatar,
+                    LastMessage = roomInfo.LastMessage,
+                    LastMessageId = roomInfo.LastMessageId,
+                    LastMessageTime = roomInfo.LastMessageTime,
+                    IsOnline = listOfWebSocket.Any(ws => ws.UserId == user2Id),
+                    LastOnline = user2.LastOnline
+                };
+
                 var webSocketDataForUser1 = new ReceiveWebSocketData
                 {
                     UserId = user2Id,
                     DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
-                    RoomInfo = roomInfo
+                    RoomInfo = roomInfoForUser1
                 };
 
                 var user1 = await _userService.GetByIdAsync(user1Id);
-                roomInfo.Name = user1.Name;
-                roomInfo.Avatar = user1.Avatar;
-                if (listOfWebSocket.Any(ws => ws.UserId == user1Id))
+                var roomInfoForUser2 = new RoomDetailDto
                 {
-                    roomInfo.IsOnline = true;
-                }
-                else
-                {
-                    roomInfo.LastOnline = user1.LastOnline;
-                }
+                    Id = roomInfo.Id,
+                    Name = user1.Name,
+                    Avatar = user1.Avatar,
+                    LastMessage = roomInfo.LastMessage,
+                    LastMessageId = roomInfo.LastMessageId,
+                    LastMessageTime = roomInfo.LastMessageTime,
+                    IsOnline = listOfWebSocket.Any(ws => ws.UserId == user1Id),
+                    LastOnline = user1.LastOnline
+                };
                 var webSocketDataForUser2 = new ReceiveWebSocketData
                 {
                     UserId = user1Id,
                     DataType = WebSocketDataType.IsCreateGroupRoom.ToString(),
-                    RoomInfo = roomInfo
+                    RoomInfo = roomInfoForUser2
                 };
 
                 var options = new JsonSerializerOptions

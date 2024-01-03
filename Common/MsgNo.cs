@@ -73,6 +73,7 @@ namespace BKConnect.BKConnectBE.Common
         public static readonly string ERROR_UP_FILE = "Bạn không thể tải file lên";
         public static readonly string ERROR_FILE_NOT_FOUND = "File không tồn tại";
         public static readonly string ERROR_MESSAGE_NOT_IN_ROOM = "Tin nhắn không thuộc phòng này";
+        public static readonly string ERROR_MESSAGE_NOT_FOUND = "Tin nhắn không tồn tại";
         public static readonly string ERROR_USER_ALREADY_IN_CALL = "Bạn đã đang tham gia một cuộc gọi";
         public static readonly string ERROR_USER_NOT_IN_CALL = "Bạn không tham gia cuộc gọi này";
         public static readonly string ERROR_VIDEO_CALL_NOT_FOUND = "Cuộc gọi video không tồn tại";

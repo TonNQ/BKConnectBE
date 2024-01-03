@@ -59,6 +59,17 @@ namespace BKConnectBE.Repository.Rooms
                     UpdatedDate = DateTime.UtcNow.AddHours(7)
                 });
             }
+            else
+            {
+                _context.Messages.Add(new Message()
+                {
+                    TypeOfMessage = MessageType.System.ToString(),
+                    Content = serverMessage,
+                    SendTime = DateTime.UtcNow.AddHours(7),
+                    SenderId = null,
+                    RoomId = room.Id
+                });
+            }
         }
 
         public async Task<Room> GetInformationOfRoom(long roomId)
@@ -170,19 +181,13 @@ namespace BKConnectBE.Repository.Rooms
             await _context.SaveChangesAsync();
         }
 
-        public async Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage)
+        public async Task SetReadMessageOfRoom(string userId, long readMessageId)
         {
+            var roomId = await _context.Messages.Where(m => m.Id == readMessageId).Select(m => m.RoomId).FirstOrDefaultAsync();
             var userOfRoom = await _context.UsersOfRoom
-                .FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == readMessage.RoomId && !u.IsDeleted)
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.RoomId == roomId && !u.IsDeleted)
                 ?? throw new Exception(MsgNo.ERROR_USER_NOT_IN_ROOM);
-            if (!_context.Messages.Any(m => m.Id == readMessage.MessageId && m.RoomId == readMessage.RoomId))
-            {
-                throw new Exception(MsgNo.ERROR_MESSAGE_NOT_IN_ROOM);
-            }
-            else
-            {
-                userOfRoom.ReadMessageId = readMessage.MessageId;
-            }
+            userOfRoom.ReadMessageId = readMessageId;
         }
     }
 };

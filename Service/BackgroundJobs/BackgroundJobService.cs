@@ -17,9 +17,9 @@ namespace BKConnectBE.Service.BackgroundJobs
             _messageRepository = messageRepository;
         }
 
-        public async Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage)
+        public async Task SetReadMessageOfRoom(string userId, long readMessageId)
         {
-            await _roomRepository.SetReadMessageOfRoom(userId, readMessage);
+            await _roomRepository.SetReadMessageOfRoom(userId, readMessageId);
             await _messageRepository.SaveChangeAsync();
         }
     }

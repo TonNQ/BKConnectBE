@@ -47,7 +47,7 @@ namespace BKConnectBE.Repository.Relationships
 
         public async Task<List<FriendDto>> GetListOfFriendsByUserId(string userId)
         {
-            return await _context.Relationships.Include(f => f.User1).Include(f => f.User2).ThenInclude(u => u.Class)
+            return await _context.Relationships
                 .Where(f => f.BlockBy == null && (f.User1Id == userId || f.User2Id == userId))
                 .OrderByDescending(f => f.CreatedDate)
                 .Select(f => f.User1Id == userId

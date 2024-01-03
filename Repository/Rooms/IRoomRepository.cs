@@ -22,6 +22,6 @@ namespace BKConnectBE.Repository.Rooms
         Task RemoveUserById(long roomId, string userId);
         Task UpdateAvatar(long roomId, string img);
         Task UpdateName(long roomId, string name);
-        Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage);
+        Task SetReadMessageOfRoom(string userId, long readMessageId);
     }
 }

@@ -9,7 +9,7 @@ namespace BKConnectBE.Common
         public const string END_VIDEO_CALL = "Cuộc gọi đã kết thúc";
         public const string REGEX_EMAIL = @"^.+@.*dut\.udn\.vn$";
         public const string REGEX_PASSWORD = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$";
-        public const int DEFAULT_PAGE_SIZE = 5;
+        public const int DEFAULT_PAGE_SIZE = 10;
         public const int ATTEMPTS_IN_HANGFIRE = 3;
         public const int DELAY_IN_HANGFIRE = 30;
     }

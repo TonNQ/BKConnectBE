@@ -17,8 +17,6 @@ namespace BKConnectBE.Repository.FriendRequests
         public Task<List<ReceivedFriendRequestDto>> GetListOfReceivedFriendRequestsOfUser(string userId)
         {
             return _context.FriendRequests
-                .Include(fr => fr.Sender)
-                .ThenInclude(sd => sd.Class)
                 .Where(fr => fr.ReceiverId == userId)
                 .OrderByDescending(fr => fr.SendTime)
                 .Select(fr => new ReceivedFriendRequestDto()
