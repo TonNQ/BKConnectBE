@@ -4,6 +4,6 @@ namespace BKConnectBE.Service.BackgroundJobs
 {
     public interface IBackgroundJobService
     {
-        Task SetReadMessageOfRoom(string userId, ReadMessageOfRoomDto readMessage);
+        Task SetReadMessageOfRoom(string userId, long readMessageId);
     }
 }

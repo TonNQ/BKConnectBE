@@ -20,7 +20,7 @@ namespace BKConnectBE.Controllers.BackgroundJobs
             _backgroundJobService = backgroundJobService;
         }
 
-        [HttpPut("set-read-message-of-room")]
+        [HttpPut("setReadMessageOfRoom")]
         public ActionResult<Responses> SetReadMessageOfRoom(ReadMessageOfRoomDto readMessage)
         {
             try
@@ -28,7 +28,7 @@ namespace BKConnectBE.Controllers.BackgroundJobs
 
                 if (HttpContext.Items.TryGetValue("UserId", out var userIdObj) && userIdObj is string userId)
                 {
-                    BackgroundJob.Enqueue(() => _backgroundJobService.SetReadMessageOfRoom(userId, readMessage));
+                    BackgroundJob.Enqueue(() => _backgroundJobService.SetReadMessageOfRoom(userId, readMessage.Id));
                     return this.Success(null, MsgNo.SUCCESS_SET_READ_MESSAGE);
                 }
 
